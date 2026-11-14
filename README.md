@@ -181,7 +181,7 @@ google-chrome --user-data-dir="$(mktemp -d)" --origin-to-force-quic-on=127.0.0.1
 | Період | Що додати |
 | --- | --- |
 | 1991 — HTTP/0.9 | **Готово:** GET → HTML → закриття TCP |
-| 1995–1996 — HTTPS/SSL | SSL 2.0 — історія; для SSL 3.0 готові master secret, Finished і MAC/3DES-CBC; handshake ще в роботі |
+| 1995–1996 — HTTPS/SSL | SSL 2.0 — історія; для SSL 3.0 готові master secret, Finished, MAC/3DES-CBC, записи й ChangeCipherSpec; handshake ще в роботі |
 | 1996 — HTTP/1.0 | **Готово в evolution:** версія, статус, заголовки, Content-Length і HEAD |
 | 1997 — HTTP/1.1 | **Готово в evolution:** версія, Host, keep-alive і chunked |
 | 1999 — TLS 1.0 | Історичний перехід SSL → TLS; виконуване HTTPS — у кроці TLS 1.3 |

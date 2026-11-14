@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-sealed class TlsRecords(Stream stream) : IDisposable
+sealed class TlsRecords(Stream stream) : IRecordLayer
 {
     TlsCipher? read, write;
     ulong readSequence, writeSequence;
@@ -44,23 +44,6 @@ sealed class TlsRecords(Stream stream) : IDisposable
         if (write is not null) data = write.Seal(writeSequence++, [.. data, type], header);
         stream.Write(header); stream.Write(data);
     }
-    public byte[] Handshake()
-    {
-        while (true)
-        {
-            if (handshake.Length >= 4)
-            {
-                var length = (handshake[1] << 16) | (handshake[2] << 8) | handshake[3];
-                if (length > 65536) throw new IOException("Handshake message too large.");
-                if (handshake.Length >= length + 4)
-                {
-                    var message = handshake[..(length + 4)]; handshake = handshake[(length + 4)..]; return message;
-                }
-            }
-            var (type, data) = Read();
-            if (type != 22) throw new IOException("Expected TLS handshake.");
-            handshake = [.. handshake, .. data];
-        }
-    }
+    public byte[] Handshake() => RecordMessages.Read(this, ref handshake);
     public void Dispose() { read?.Dispose(); write?.Dispose(); stream.Dispose(); }
 }

@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-sealed class TlsStream(TlsRecords records) : Stream
+sealed class TlsStream(IRecordLayer records) : Stream
 {
     byte[] pending = [];
     int offset;
