@@ -132,6 +132,13 @@ Handshake формує EncryptedExtensions, Certificate, CertificateVerify та 
 HTTP-коду потік розшифрованих байтів. Перевірено HTTPS через curl/OpenSSL,
 довіру до сертифіката, hostname, close_notify та відновлення після невдалого handshake.
 
+## HTTP/3: QUIC у роботі
+
+`QuicKeys.cs` додає ключі Initial, AES-GCM payload protection і AES header protection.
+Клієнтський і серверний пакети побайтово збігаються з RFC 9001 Appendix A;
+перевірено відновлення обрізаного packet number та переставлені пакети.
+UDP-транспорт, QUIC-потоки й HTTP/3 ще не підключені.
+
 ## Хронологія і стан
 
 Дати показують історичну появу або публікацію специфікацій, а не версії .NET.
