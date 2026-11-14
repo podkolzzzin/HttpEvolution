@@ -5,11 +5,13 @@ sealed class LegacyRecords(Stream stream, byte minor = 0) : IRecordLayer
     LegacyCipher? read, write, nextRead, nextWrite;
     byte[] pending = [];
     public Stream Transport => stream;
+    public bool UseAes;
     public void Keys(byte[] block, bool server)
     {
         if (read is not null || write is not null || nextRead is not null || nextWrite is not null) throw new IOException("SSL renegotiation is outside this demo.");
-        var clientKeys = new LegacyCipher(block[..20], block[40..64], block[88..96], minor);
-        var serverKeys = new LegacyCipher(block[20..40], block[64..88], block[96..104], minor);
+        var key = UseAes ? 16 : 24; var iv = UseAes ? 16 : 8; var start = 40 + 2 * key;
+        var clientKeys = new LegacyCipher(block[..20], block[40..(40 + key)], block[start..(start + iv)], minor);
+        var serverKeys = new LegacyCipher(block[20..40], block[(40 + key)..start], block[(start + iv)..104], minor);
         nextRead = server ? clientKeys : serverKeys; nextWrite = server ? serverKeys : clientKeys;
     }
     public void ReadChange()
