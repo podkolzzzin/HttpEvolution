@@ -5,15 +5,17 @@ using System.Text;
 
 static class Http2
 {
-    public static void Run()
+    public static void Run(bool tls = false)
     {
-        var server = new TcpListener(IPAddress.Loopback, 8081);
+        var port = tls ? 8444 : 8081;
+        var server = new TcpListener(IPAddress.Loopback, port);
         server.Start();
-        Console.WriteLine("HTTP/2 on 127.0.0.1:8081. Stop with Ctrl+C.");
+        Console.WriteLine($"HTTP/2{(tls ? "+TLS 1.3" : "")} on 127.0.0.1:{port}. Stop with Ctrl+C.");
         while (true)
         {
             using var client = server.AcceptTcpClient();
-            using var stream = client.GetStream();
+            using Stream? stream = tls ? TlsStream.TryAccept(client.GetStream(), "h2") : client.GetStream();
+            if (stream is null) continue;
             stream.ReadTimeout = stream.WriteTimeout = 5000;
             try { Serve(stream); }
             catch (IOException) { }
