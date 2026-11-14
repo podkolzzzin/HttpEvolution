@@ -91,7 +91,17 @@ curl --http2-prior-knowledge -i http://127.0.0.1:8081/
 curl --http2-prior-knowledge -I http://127.0.0.1:8081/
 ```
 
-## TLS 1.3: базові операції
+## HTTPS / TLS 1.3
+
+```sh
+dotnet run -- --tls
+# В іншому терміналі:
+curl -k -i https://localhost:8443/
+```
+
+`-k` потрібен для тимчасового self-signed сертифіката демо. Підтримуються
+TLS 1.3, AES-128-GCM-SHA256, P-256, ECDSA та ALPN http/1.1.
+Це навчальна реалізація: без resumption, 0-RTT і KeyUpdate; записів на ключ — до 2^24.
 
 `TlsCrypto.cs` додає HKDF-Expand-Label, Finished та AES-128-GCM.
 Криптографічні примітиви — з .NET BCL; формат протоколу реалізовано вручну.
@@ -109,7 +119,9 @@ Handshake формує EncryptedExtensions, Certificate, CertificateVerify та 
 перевіряє клієнтський Finished і виводить окремі ключі application data.
 При завершенні сеансу ключі handshake очищаються.
 `TlsRecords.cs` кодує plaintext/encrypted записи, збирає розбиті handshake-повідомлення
-та перевіряє AEAD і номери записів. HTTPS ще не підключений.
+та перевіряє AEAD і номери записів. `TlsStream.cs` виконує handshake й надає
+HTTP-коду потік розшифрованих байтів. Перевірено HTTPS через curl/OpenSSL,
+довіру до сертифіката, hostname, close_notify та відновлення після невдалого handshake.
 
 ## Хронологія і стан
 
@@ -122,9 +134,9 @@ Handshake формує EncryptedExtensions, Certificate, CertificateVerify та 
 | 1995–1996 — HTTPS/SSL | Пояснити появу захищеного HTTP; SSL залишити історичним контекстом |
 | 1996 — HTTP/1.0 | **Готово в evolution:** версія, статус, заголовки, Content-Length і HEAD |
 | 1997 — HTTP/1.1 | **Готово в evolution:** версія, Host, keep-alive і chunked |
-| 1999 — TLS 1.0 | Показати заміну SSL на TLS; сучасне HTTPS додати через TLS-потік |
+| 1999 — TLS 1.0 | Історичний перехід SSL → TLS; виконуване HTTPS — у кроці TLS 1.3 |
 | 2015 — HTTP/2 | **Готово в evolution:** кадри, SETTINGS, HPACK/Huffman, GET/HEAD, вікна потоків і CONTINUATION; TLS ще попереду |
-| 2018 — TLS 1.3 | Показати сучасне TLS-узгодження |
+| 2018 — TLS 1.3 | **Готово в evolution:** handshake, сертифікат, ECDH, AES-GCM і HTTPS/1.1 |
 | 2022 — HTTP/3 | QUIC поверх UDP з TLS 1.3; потоки; кадри; QPACK |
 
 HTTPS — HTTP усередині захищеного каналу, а не окрема версія HTTP.
