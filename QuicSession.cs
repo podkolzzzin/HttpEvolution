@@ -16,6 +16,7 @@ sealed class QuicSession : IDisposable
     }
     readonly Space?[] spaces = new Space?[3];
     readonly TlsHandshake tls = new("h3");
+    QuicStreams? streams;
     readonly byte[] original;
     byte[] peerId;
     long received, sent;
@@ -46,7 +47,8 @@ sealed class QuicSession : IDisposable
             Crypto(0, tls.AcceptHello(message));
             if (tls.HandshakeSecret.Length == 0) return;
             if (!tls.PeerExtensions.TryGetValue(57, out var parameters)) throw new InvalidDataException("Missing QUIC parameters.");
-            new QuicParameters(parameters).ValidateClient(peerId);
+            var limits = new QuicParameters(parameters); limits.ValidateClient(peerId);
+            streams = new(limits);
             spaces[1] = new(tls.ClientHandshakeTraffic, tls.ServerHandshakeTraffic);
             Crypto(1, tls.ServerFlight(QuicParameters.Server(original, Id)).SelectMany(bytes => bytes).ToArray());
             spaces[2] = new(tls.ClientTraffic, tls.ServerTraffic);
@@ -84,12 +86,17 @@ sealed class QuicSession : IDisposable
                     while (space.Crypto.Message() is { } message) Handshake(packet.Level, message);
                     break;
                 case >= 8 and <= 15:
-                    input.Int(); if ((type & 4) != 0) input.Int();
-                    if ((type & 2) != 0) input.Vector(); else input.Take(input.Left);
-                    break; // HTTP/3 STREAM handling is the next step.
-                case 4: input.Int(); input.Int(); input.Int(); break;
-                case 5: case 0x11: case 0x15: input.Int(); input.Int(); break;
-                case 0x10: case 0x12: case 0x13: case 0x14: case 0x16: case 0x17: case 0x19: input.Int(); break;
+                    var id = input.Int(); var position = (type & 4) != 0 ? input.Int() : 0;
+                    var bytes = (type & 2) != 0 ? input.Vector() : input.Take(input.Left);
+                    streams!.Receive(id, position, bytes, (type & 1) != 0); break;
+                case 4:
+                    var reset = input.Int(); input.Int(); var final = input.Int();
+                    streams!.Receive(reset, final, [], true); streams.Reset.Add(reset); break;
+                case 0x10: streams!.DataLimit = Math.Max(streams.DataLimit, input.Int()); break;
+                case 0x11: var streamId = input.Int(); streams!.Grant(streamId, input.Int()); break;
+                case 0x13: streams!.UniStreams = Math.Max(streams.UniStreams, input.Int()); break;
+                case 5: case 0x15: input.Int(); input.Int(); break;
+                case 0x12: case 0x14: case 0x16: case 0x17: case 0x19: input.Int(); break;
                 case 0x18:
                     input.Int(); var retire = input.Int(); var cid = input.Take(input.Byte()); input.Take(16);
                     if (cid.Length is 0 or > 20) throw new InvalidDataException("Invalid new connection ID.");
@@ -105,6 +112,8 @@ sealed class QuicSession : IDisposable
     }
     public List<byte[]> Flush()
     {
+        if (tls.Complete && !Closed)
+            foreach (var frame in streams!.Frames()) spaces[2]!.Pending.Enqueue(frame);
         var output = new List<byte[]>();
         for (var level = 0; level < spaces.Length; level++)
         {
