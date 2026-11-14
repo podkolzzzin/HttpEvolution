@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
+if (args.Contains("--h2")) { Http2.Run(); return; }
+
 var server = new TcpListener(IPAddress.Loopback, 8080);
 server.Start();
 Console.WriteLine("HTTP/1.1 on 127.0.0.1:8080. Stop with Ctrl+C.");
