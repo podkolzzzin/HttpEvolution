@@ -79,7 +79,10 @@ curl --http1.1 --raw -i http://127.0.0.1:8080/chunks
 `Huffman.cs` відновлює канонічні коди з 257 довжин таблиці RFC; перевірено всі
 256 байтів, EOS і padding. Відповідь має HEADERS із `:status` та DATA з HTML;
 прапорець END_STREAM завершує відповідь. HEAD не має DATA.
-Поки запит має вміщатися в один HEADERS з END_STREAM; керування вікнами — далі.
+Кожен запит має власний непарний stream ID. DATA враховує вікно з'єднання,
+SETTINGS_INITIAL_WINDOW_SIZE та WINDOW_UPDATE; при нульовому вікні тіло чекає,
+інші потоки й PING продовжують працювати. RST_STREAM прибирає очікувану відповідь.
+Поки запит має вміщатися в один HEADERS з END_STREAM.
 
 ```sh
 curl --http2-prior-knowledge -i http://127.0.0.1:8081/
