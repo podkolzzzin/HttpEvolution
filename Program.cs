@@ -7,6 +7,7 @@ if (args is [var mode, var pin] && mode is "--ssl3-client" or "--tls10-client")
     try { LegacySsl.Client(pin, (byte)(mode == "--ssl3-client" ? 0 : 1)); } catch (IOException error) { Console.Error.WriteLine(error.Message); Environment.ExitCode = 1; }
     return;
 }
+if (args.Contains("--h2")) { Http2.Run(); return; }
 
 var ssl3 = args.Contains("--ssl3");
 var tls10 = args.Contains("--tls10");
