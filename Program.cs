@@ -2,6 +2,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
+if (args is [var mode, var pin] && mode is "--ssl3-client")
+{
+    try { LegacySsl.Client(pin); } catch (IOException error) { Console.Error.WriteLine(error.Message); Environment.ExitCode = 1; }
+    return;
+}
+
 var ssl3 = args.Contains("--ssl3");
 var port = ssl3 ? 8442 : 8080;
 var server = new TcpListener(IPAddress.Loopback, port);
