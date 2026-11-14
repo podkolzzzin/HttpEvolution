@@ -94,7 +94,7 @@ sealed class Hpack
         if (length > 65536 || length > input.Length - input.Position) throw new InvalidDataException("Invalid HPACK string length.");
         var bytes = new byte[length];
         input.ReadExactly(bytes);
-        if ((first & 128) != 0) throw new InvalidDataException("Huffman is not implemented yet.");
+        if ((first & 128) != 0) bytes = Huffman.Decode(bytes);
         return Encoding.Latin1.GetString(bytes);
     }
 }
