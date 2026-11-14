@@ -73,7 +73,8 @@ static class Http2
                 if (connectionWindow > int.MaxValue || pending.Values.Any(item => item.Window > int.MaxValue))
                     throw new InvalidDataException("Flow-control window overflow.");
             }
-            if (type == 1 && id > 0 && (flags & 5) == 5) // HEADERS, END_HEADERS, END_STREAM
+            if (type == 9) throw new InvalidDataException("Unexpected CONTINUATION.");
+            if (type == 1 && id > 0) // HEADERS
             {
                 if ((id & 1) == 0 || id <= lastId) throw new InvalidDataException("Invalid new client stream.");
                 lastId = id;
@@ -81,7 +82,19 @@ static class Http2
                 var padding = start == 1 && data.Length > 0 ? data[0] : 0;
                 if ((flags & 32) != 0) start += 5; // PRIORITY
                 if (start + padding > data.Length) throw new InvalidDataException("Invalid HEADERS padding.");
-                var fields = hpack.Decode(data[start..(data.Length - padding)]);
+                var endStream = (flags & 1) != 0;
+                using var block = new MemoryStream();
+                block.Write(data[start..(data.Length - padding)]);
+                while ((flags & 4) == 0) // END_HEADERS may arrive in a later CONTINUATION.
+                {
+                    var next = Read(stream);
+                    if (next.Type != 9 || next.Id != id) throw new InvalidDataException("Interrupted header block.");
+                    flags = next.Flags;
+                    block.Write(next.Data);
+                    if (block.Length > 65536) throw new InvalidDataException("Header block too large.");
+                }
+                var fields = hpack.Decode(block.ToArray());
+                if (!endStream) { Write(stream, 3, 0, id, [0, 0, 0, 7]); continue; } // Bodyless demo only.
                 var method = fields.Find(field => field.Name == ":method").Value;
                 var path = fields.Find(field => field.Name == ":path").Value;
                 var status = path is "/" or "/chunks" ? "200" : "404";
