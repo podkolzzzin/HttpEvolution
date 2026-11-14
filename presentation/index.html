@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f4ed">
+<meta name="description" content="Еволюція HTTP від 0.9 до HTTP/3: ключові фічі, короткі фрагменти C#, SSL/TLS і QUIC. Презентація для телефона.">
+<title>HTTP. Від GET до QUIC — презентація</title>
+<style>
+:root{--paper:#f4f4ed;--ink:#192b27;--muted:#52665f;--line:#d7ddd4;--accent:#d3f576;--dark:#142820;--nav:78px;--top:66px;--violet:#ebe4ff;--blue:#dcecfb;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper);font-synthesis:none;color-scheme:light}
+*{box-sizing:border-box}body{margin:0}button,a,input{-webkit-tap-highlight-color:transparent}button,input{font:inherit}button,a{touch-action:manipulation}button{color:inherit;cursor:pointer}a{color:inherit;text-underline-offset:4px}button:focus-visible,a:focus-visible,summary:focus-visible,pre:focus-visible{outline:3px solid #6b42ca;outline-offset:4px}button:disabled{opacity:.35;cursor:default}button{border:0}button svg{width:20px;height:20px;flex-shrink:0}svg{display:block}button[hidden],[hidden]{display:none!important}
+.topbar{height:calc(var(--top) + env(safe-area-inset-top));padding:env(safe-area-inset-top) max(24px,env(safe-area-inset-right)) 0 max(24px,env(safe-area-inset-left));display:flex;align-items:center;gap:16px;position:fixed;inset:0 0 auto;background:var(--paper);border-bottom:1px solid var(--line);z-index:5}.brand{display:flex;gap:10px;align-items:center;text-decoration:none;font-weight:800;letter-spacing:-.7px;font-size:19px}.brand-mark{display:grid;place-items:center;width:34px;height:34px;background:var(--ink);color:var(--accent);font:700 15px ui-monospace,monospace;border-radius:9px}.top-sub{margin-left:auto;font:600 11px ui-monospace,monospace;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}.menu-button{background:transparent;border:1px solid var(--line);border-radius:100px;padding:0 15px;min-height:42px;display:flex;gap:9px;align-items:center;font-size:13px;font-weight:650}.top-progress{position:absolute;bottom:-1px;left:0;height:3px;background:var(--ink);width:0;transition:width .2s}
+main{padding:calc(var(--top) + env(safe-area-inset-top)) 0 calc(var(--nav) + env(safe-area-inset-bottom));touch-action:pan-y pinch-zoom}.slide{max-width:1240px;margin:auto;padding:45px 54px 32px;min-height:calc(100svh - var(--top) - var(--nav) - env(safe-area-inset-top) - env(safe-area-inset-bottom));display:flex;flex-direction:column}.slide.current{animation:enter .18s ease-out}@keyframes enter{from{opacity:.2;transform:translateY(5px)}to{opacity:1;transform:none}}.eyebrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:24px;font:600 11px ui-monospace,monospace;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}.year{display:inline-flex;align-items:center;min-height:28px;padding:5px 9px;border:1px solid var(--line);border-radius:5px;color:var(--ink);letter-spacing:.5px}.dot{width:5px;height:5px;border-radius:50%;background:currentColor}.layout{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:52px;align-items:start;flex:1}.story{min-width:0}h1{font-size:clamp(33px,4.5vw,62px);line-height:1.07;letter-spacing:-2.5px;margin:0 0 24px;font-weight:760;text-wrap:balance}h1:focus{outline:none}.hero h1{font-size:clamp(46px,5.9vw,79px);letter-spacing:-3.5px}.lead{font-size:17px;line-height:1.65;max-width:43ch;margin:0 0 28px;color:var(--muted)}.change{border-left:3px solid #82a43d;padding:1px 0 1px 16px;font-size:17px;line-height:1.5;font-weight:620;max-width:42ch}.change-label{display:block;text-transform:uppercase;letter-spacing:1.4px;font:600 10px ui-monospace,monospace;color:var(--muted);margin-bottom:8px}.workbench{min-width:0}.code-card{background:var(--dark);border-radius:13px;overflow:hidden;color:#e9f2e9;border:1px solid #142820;box-shadow:0 12px 30px #1428200a}.code-top{display:flex;gap:10px;align-items:center;justify-content:space-between;min-height:49px;padding:4px 10px 4px 17px;border-bottom:1px solid #ffffff15;font:500 11px ui-monospace,monospace;color:#b4c8bd}.copy{display:flex;align-items:center;gap:6px;padding:8px 9px;min-height:40px;border-radius:6px;background:#ffffff08;color:#e9f2e9;font-size:11px}.copy svg{width:14px;height:14px}.code-top span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.code-label{display:flex;align-items:center;gap:6px}.code-card pre{margin:0;padding:22px 19px 25px;overflow:auto;font-size:13px;line-height:1.85;tab-size:4;overscroll-behavior-x:contain}.code-card code{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}.kw{color:#b6d5ff}.str{color:#c5ed87}.comment{color:#90afa0}.num{color:#ffcc8c}.code-foot{padding:11px 17px;background:#0a1c1338;border-top:1px solid #ffffff0c;color:#a8beaf;font:500 10px ui-monospace,monospace;letter-spacing:.3px}.sources{display:flex;flex-wrap:wrap;align-items:center;gap:9px 17px;margin:15px 1px 21px;font-size:11px;font-weight:580;color:var(--muted)}.sources a{text-decoration:none;min-height:26px;display:flex;align-items:center;gap:5px}.sources a:hover{text-decoration:underline}.sources a::after{content:'↗';font-size:13px}.note{font-size:12px;line-height:1.7;color:var(--muted);margin:19px 0 0;max-width:62ch}.wire{border:1px solid var(--line);border-radius:10px;margin-top:12px;background:#fbfcf6}.wire summary{padding:14px 16px;cursor:pointer;font-size:12px;font-weight:650;min-height:46px}.wire pre{border-top:1px solid var(--line);margin:0;padding:16px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.8 ui-monospace,monospace;color:#334b41}.wire code{font:inherit}.wire button{margin:0 16px 12px;background:var(--ink);color:#fff}.route{display:flex;gap:5px;align-items:center;margin:28px 0 0}.route span{flex:1;border:1px solid var(--line);border-radius:7px;padding:11px 0;text-align:center;font:600 12px ui-monospace,monospace}.route span:last-of-type{background:var(--accent);border-color:var(--accent)}.route i{font-style:normal;color:var(--muted);font-size:12px}.hero-stats{display:flex;gap:28px;margin:20px 0 0;font-size:11px;line-height:1.5;color:var(--muted)}.hero-stats strong{display:block;font-size:21px;letter-spacing:-.7px;color:var(--ink)}.slide-base{margin-top:36px;display:flex;gap:12px;align-items:center;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.6px}.slide-base .rule{height:1px;background:var(--line);flex:1}.section-color{width:7px;height:7px;border-radius:50%;background:#85a53b}.tls .section-color{background:#9a7bdd}.quic .section-color{background:#5a99cc}.tls .year{background:var(--violet);border-color:transparent}.quic .year{background:var(--blue);border-color:transparent}
+.bottom{position:fixed;inset:auto 0 0;background:var(--paper);border-top:1px solid var(--line);padding:12px max(24px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));height:calc(var(--nav) + env(safe-area-inset-bottom));z-index:5;display:flex;justify-content:space-between;align-items:center;gap:14px}.nav-btn{height:48px;border:1px solid var(--line);border-radius:9px;background:transparent;display:flex;align-items:center;justify-content:center;gap:14px;font-size:13px;font-weight:650;min-width:116px;padding:0 19px}.next{background:var(--accent);border-color:var(--accent);min-width:146px}.counter{background:transparent;padding:8px 16px;min-height:46px;text-align:center;font:600 12px ui-monospace,monospace;color:var(--muted)}.counter strong{color:var(--ink);font-size:15px}.counter small{display:block;font:10px ui-monospace,monospace;margin-top:4px;letter-spacing:.5px}.swipe-hint{font-size:10px;letter-spacing:.5px;color:var(--muted);margin-left:auto;margin-right:16px}.toast{position:fixed;bottom:calc(var(--nav) + 12px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;z-index:12;pointer-events:none;opacity:0;transition:opacity .15s}.toast.show{opacity:1}
+dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);color:var(--ink);padding:0;max-width:660px;width:calc(100% - 28px);max-height:85svh;box-shadow:0 24px 90px #0003}dialog::backdrop{background:#102b2377;backdrop-filter:blur(5px)}.dialog-top{padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line)}.dialog-top h2{font-size:21px;letter-spacing:-.7px;margin:0}.close-menu{background:transparent;min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:8px;font-size:24px}.topics{padding:8px 12px 15px;overflow-y:auto;max-height:calc(85svh - 88px)}.topic{display:grid;grid-template-columns:30px 79px 1fr;gap:9px;align-items:center;width:100%;text-align:left;padding:12px 10px;background:none;border-radius:8px;min-height:56px}.topic:hover,.topic[aria-current="step"]{background:#e1e8d8}.topic strong{font-size:13px;line-height:1.3;font-weight:600}.topic span{font:11px ui-monospace,monospace;color:var(--muted)}.topics-group{font:600 10px ui-monospace,monospace;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:17px 10px 6px}
+.model{border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:16px;background:#fbfcf6}.model-label{font:600 10px ui-monospace,monospace;letter-spacing:1px;color:var(--muted);margin-bottom:12px}.switches{display:flex;gap:7px;flex-wrap:wrap}.switches button,.loss-button{font-size:12px;min-height:42px;border-radius:7px;border:1px solid var(--line);background:transparent;padding:8px 12px}.switches button[aria-pressed="true"],.loss-button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:white}.host-result{margin:14px 0 0;padding:12px;border-radius:6px;background:#e6f0d7;font:600 13px ui-monospace,monospace}.host-result.bad{background:#f8e2d7;color:#743627}.loss-button{width:100%;margin-bottom:17px;display:flex;justify-content:space-between;align-items:center}.lane{display:grid;grid-template-columns:62px 1fr;gap:10px;align-items:center;margin:11px 0;font:11px ui-monospace,monospace}.packets{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.packet{padding:9px 3px;background:#dce9c8;border-radius:4px;text-align:center;font-size:11px;transition:background .2s}.lane-title{font-size:10px;color:var(--muted);margin:15px 0 4px}.lost-mode .loss{background:#f3d0bf;color:#77361e;text-decoration:line-through}.lost-mode .blocked{background:#e5e6df;color:#767c72}.lost-mode .independent{background:#b7dbf6}.model-caption{font-size:11px;color:var(--muted);line-height:1.7;margin:12px 0 0}.final-links{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}.final-links a{font-size:12px;font-weight:650;border:1px solid var(--line);border-radius:7px;min-height:42px;padding:11px 13px;text-decoration:none}.final-links a:first-child{background:var(--ink);color:#fff;border-color:var(--ink)}
+@media(min-width:1450px){.slide{padding-top:65px;padding-bottom:45px}.layout{gap:75px}.code-card pre{font-size:14px}.lead{font-size:18px}}
+@media(max-width:760px){:root{--top:58px;--nav:76px}.topbar{padding-left:19px;padding-right:19px;gap:10px}.brand{font-size:17px}.brand-mark{width:30px;height:30px;font-size:13px}.top-sub{display:none}.menu-button{margin-left:auto;min-height:42px;padding:0 13px}.slide{padding:25px 21px 25px}.eyebrow{margin-bottom:20px;font-size:10px;gap:8px}.layout{display:block}.story{margin-bottom:25px}h1{font-size:39px;line-height:1.08;letter-spacing:-1.9px;margin-bottom:17px}.hero h1{font-size:48px;letter-spacing:-2.6px}.hero .hero-stats{display:none}.lead{font-size:15px;line-height:1.6;margin-bottom:18px;max-width:42ch}.change{font-size:14px;padding-left:12px;max-width:none}.change-label{font-size:9px;margin-bottom:5px}.code-card pre{font-size:12px;line-height:1.85;padding:17px 15px 20px;white-space:pre-wrap;overflow-wrap:anywhere}.code-top{padding-left:14px;font-size:10px}.code-foot{padding:10px 14px;font-size:9px}.sources{margin-top:10px;margin-bottom:15px;font-size:10px;gap:7px 13px}.sources a{min-height:30px}.note{font-size:11px;margin-top:15px}.wire pre{font-size:11px}.slide-base{margin-top:26px;font-size:9px}.bottom{padding-left:16px;padding-right:16px;gap:10px}.nav-btn{min-width:52px;height:48px;padding:0 13px}.prev span{display:none}.next{min-width:112px;gap:12px}.counter{margin-right:auto;padding-left:9px;padding-right:9px;font-size:11px}.counter small{font-size:9px}.swipe-hint{display:none}.route{margin-top:20px}.hero-stats{gap:22px;font-size:10px}.hero-stats strong{font-size:19px}.model{padding:14px}.topic{grid-template-columns:25px 68px 1fr;padding:11px 7px;gap:7px}.topic strong{font-size:12px}.topic span{font-size:10px}.dialog-top{padding:15px 18px}.topics{padding-left:8px;padding-right:8px}}
+@media(max-width:360px){.slide{padding-left:17px;padding-right:17px}h1{font-size:34px}.hero h1{font-size:46px}.code-card pre{font-size:11px}.code-top{font-size:9px}.menu-button{font-size:12px}.route span{font-size:10px}.topic{grid-template-columns:23px 61px 1fr}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{.topbar,.bottom,dialog,.toast,.copy,.model button{display:none!important}main{padding:0}.slide,.slide[hidden]{display:flex!important;break-after:page;min-height:auto;padding:25px 20px}.layout{display:grid;grid-template-columns:1fr 1.2fr;gap:30px}h1{font-size:35px}.lead{font-size:13px}.change{font-size:13px}.code-card pre{font-size:10px;white-space:pre-wrap;overflow-wrap:anywhere}.slide-base{margin-top:15px}details{display:none}.sources{font-size:9px}.note{font-size:10px}.code-card{print-color-adjust:exact;-webkit-print-color-adjust:exact}.model{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="#start" aria-label="На перший слайд"><span class="brand-mark" aria-hidden="true">H/</span> HTTP Evolution</a>
+<span class="top-sub">Від байтів до потоків</span>
+<button class="menu-button" id="open-menu" type="button" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Зміст</button>
+<div class="top-progress" id="progress" aria-hidden="true"></div>
+</header>
+<main id="deck" aria-label="Презентація еволюції HTTP"></main>
+<footer class="bottom" aria-label="Навігація слайдами">
+<button class="nav-btn prev" id="prev" type="button" aria-label="Попередній слайд"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg><span>Назад</span></button>
+<button class="counter" id="counter" type="button" aria-label="Відкрити зміст"><strong id="current-num">01</strong> / <span id="total-num">31</span><small id="chapter-name">Маршрут</small></button>
+<span class="swipe-hint">← свайп / клавіші →</span>
+<button class="nav-btn next" id="next" type="button"><span>Далі</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
+</footer>
+<dialog id="contents" aria-labelledby="contents-title"><div class="dialog-top"><h2 id="contents-title">Увесь маршрут</h2><button class="close-menu" type="button" aria-label="Закрити зміст">×</button></div><nav class="topics" aria-label="Зміст презентації"></nav></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><p style="padding:90px 24px">Увімкни JavaScript, щоб переглядати слайди. <a href="https://github.com/podkolzzzin/HttpEvolution/tree/chronological">Код і текстовий посібник на GitHub</a>.</p></noscript>
+<script id="deck-data" type="application/json">
+{
+  "slides": [
+    {
+      "id": "start",
+      "year": "1991 → 2022",
+      "chapter": "Маршрут",
+      "title": "HTTP.\nВід GET до QUIC.",
+      "why": "Як один рядок запиту перетворився на шифровані незалежні потоки.",
+      "change": "Одна фіча. Кілька рядків C#. Один крок уперед.",
+      "code": "var server = new TcpListener(\n    IPAddress.Loopback, 8080);\nserver.Start();\nusing var peer = server.AcceptTcpClient();\nusing var stream = peer.GetStream();\nstream.Write(\"<h1>Hello!</h1>\"u8);",
+      "file": "Program.cs",
+      "commit": "0bb3812",
+      "rfc": "w3c",
+      "wire": "",
+      "hero": true,
+      "note": "На слайдах — скорочені фрагменти. Посилання «Код» відкриває файл, «Коміт» — повну зміну. Читай свайпами або кнопками внизу."
+    },
+    {
+      "id": "http09",
+      "year": "1991",
+      "chapter": "HTTP/0.9",
+      "title": "Один запит.\nОдин документ.",
+      "why": "Клієнт просить шлях. Сервер надсилає HTML і закриває TCP-з’єднання.",
+      "change": "Починаємо з рядка GET; заголовків ще немає.",
+      "code": "var request = reader.ReadLine()?.Split(' ');\nif (request is not [\"GET\", var path, ..]) continue;\nvar html = path == \"/\" ? \"<h1>Hello!</h1>\" : \"Not found\";\nstream.Write(Encoding.ASCII.GetBytes(html));",
+      "file": "Program.cs",
+      "commit": "0bb3812",
+      "rfc": "w3c",
+      "wire": "→ GET /\\r\\n\n← <h1>Hello, HTTP/0.9!</h1>\n\n← TCP: close",
+      "command": "printf 'GET /\\r\\n' | nc 127.0.0.1 8080",
+      "note": "Повний перший сервер — 22 рядки з using, циклом, таймаутом і обробкою від’єднання.",
+      "full": true
+    },
+    {
+      "id": "http10-status",
+      "year": "1996",
+      "chapter": "HTTP/1.0",
+      "title": "Відповідь отримує\nструктуру.",
+      "why": "Самого HTML недостатньо, щоб відрізнити успіх від помилки або визначити тип даних.",
+      "change": "Додаємо статус, заголовки та порожній рядок.",
+      "code": "var body = Encoding.ASCII.GetBytes(html);\nvar headers = $\"HTTP/1.0 {status}\\r\\n\" +\n    $\"Content-Type: text/html\\r\\n\" +\n    $\"Content-Length: {body.Length}\\r\\n\\r\\n\";\nstream.Write(Encoding.ASCII.GetBytes(headers));\nstream.Write(body);",
+      "file": "Program.cs",
+      "commit": "31cdd10",
+      "rfc": "1945",
+      "wire": "HTTP/1.0 200 OK\\r\\n\nContent-Type: text/html\\r\\n\nContent-Length: 22\\r\\n\n\\r\\n\n<h1>Hello, HTTP!</h1>",
+      "note": "Content-Length рахує байти тіла. Заголовки відділяє CRLF CRLF; кінець рядка — CRLF.",
+      "command": "curl --http1.0 -i http://127.0.0.1:8080/"
+    },
+    {
+      "id": "http10-head",
+      "year": "1996",
+      "chapter": "HTTP/1.0",
+      "title": "HEAD: метадані\nбез документа.",
+      "why": "Іноді потрібні лише статус, тип і розмір відповіді.",
+      "change": "Заголовки ті самі, а тіло надсилаємо тільки для GET.",
+      "code": "// Заголовки вже записані.\nif (method == \"GET\") stream.Write(body);\n// HEAD: Content-Length описує GET-відповідь,\n// але байтів тіла немає.",
+      "file": "Program.cs",
+      "commit": "50c79f6",
+      "rfc": "1945",
+      "wire": "→ HEAD / HTTP/1.0\\r\\n\n\\r\\n\n← HTTP/1.0 200 OK\\r\\n\nContent-Length: 22\\r\\n\n\\r\\n\n← TCP: close (тіло відсутнє)",
+      "command": "curl --http1.0 -I http://127.0.0.1:8080/"
+    },
+    {
+      "id": "ssl3-handshake",
+      "year": "1996",
+      "chapter": "SSL 3.0",
+      "title": "HTTPS — це HTTP\nв захищеному каналі.",
+      "why": "Текстовий HTTP відкритий для спостерігача в мережі. Спочатку узгоджуємо ключі.",
+      "change": "Перед HTTP додаємо handshake SSL3.",
+      "code": "exchange.Send(11, certificateChain);\nexchange.Send(14, []); // ServerHelloDone\nvar encrypted = exchange.Read(16); // RSA key exchange\nvar premaster = LegacyIdentity.Premaster(encrypted);\nvar master = Ssl3Crypto.Expand(premaster, seed, 48);",
+      "file": "LegacySsl.cs",
+      "commit": "a253306",
+      "rfc": "6101",
+      "wire": "Клієнт                   Сервер\nClientHello       →\n                  ← ServerHello + Certificate\n                  ← ServerHelloDone\nClientKeyExchange →\nCCS + Finished    ↔ CCS + Finished\nHTTP у записах    ↔ HTTP у записах",
+      "note": "Історичний режим: RSA + 3DES-CBC + SHA-1 MAC. SSL3 походить із 1996; RFC6101 у 2011 опублікував його історичний опис."
+    },
+    {
+      "id": "ssl3-records",
+      "year": "1996",
+      "chapter": "SSL 3.0",
+      "title": "Шифруємо записи,\nа не рядки HTTP.",
+      "why": "Повідомлення HTTP можуть перетинати межі мережевих читань і криптографічних записів.",
+      "change": "До даних додаємо MAC і CBC-padding, потім шифруємо.",
+      "code": "byte[] plain = [.. data, .. Mac(type, data)];\nvar padding = 7 - plain.Length % 8;\nbyte[] padded = [.. plain,\n    .. Enumerable.Repeat((byte)padding, padding + 1)];\nvar encrypted = cipher.EncryptCbc(padded, iv,\n    PaddingMode.None);",
+      "file": "LegacyCipher.cs",
+      "commit": "9477b53",
+      "rfc": "6101",
+      "wire": "HTTP bytes\n  ↓ MAC(sequence, type, length, data)\n  ↓ CBC padding\n  ↓ 3DES-CBC\nrecord header (type, version, length) + ciphertext",
+      "note": "Послідовність записів бере участь у MAC. На прийомі спочатку перевіряємо запис, потім передаємо байти HTTP-коду."
+    },
+    {
+      "id": "ssl3-pin",
+      "year": "1996",
+      "chapter": "SSL 3.0",
+      "title": "Клієнт має знати,\nкому довіряє.",
+      "why": "Зашифрованого каналу замало: треба перевірити ідентичність сервера.",
+      "change": "У локальному демо перевіряємо pin публічного ключа.",
+      "code": "var actual = Convert.ToBase64String(\n    SHA256.HashData(key.ExportSubjectPublicKeyInfo()));\nif (actual != pin)\n    throw new IOException(\"Certificate pin mismatch\");",
+      "file": "LegacySsl.Client.cs",
+      "commit": "22a2658",
+      "rfc": "6101",
+      "wire": "Сервер друкує SPKI pin\n    ↓ передаємо його явно клієнту\nСертифікат → публічний ключ → SHA-256 → порівняння\n    ↓\nПеревірка Finished → HTTP-запит",
+      "command": "dotnet run -- --ssl3\n# Інший термінал, pin із виводу сервера:\ndotnet run -- --ssl3-client PIN",
+      "note": "Pin через SHA-256 — зручність сучасного демо, не фіча SSL3 1996 року. Старі SSL/TLS режими — лише історичні приклади."
+    },
+    {
+      "id": "http11-host",
+      "year": "1997",
+      "chapter": "HTTP/1.1",
+      "title": "Одна IP-адреса.\nКілька сайтів.",
+      "why": "Після TCP-connect сервер знає IP, але ще не знає домен, який відкриває користувач.",
+      "change": "Host стає обов’язковим у запиті HTTP/1.1.",
+      "code": "var badHost = http11 &&\n    (hosts.Count != 1 || hosts[0].Length == 0 ||\n     hosts[0].Contains(','));\nif (badHost) status = \"400 Bad Request\";",
+      "file": "Program.cs",
+      "commit": "c1d4b35",
+      "rfc": "2068",
+      "wire": "GET / HTTP/1.1\\r\\n\nHost: example.com",
+      "interactive": "host",
+      "note": "Демо перевіряє Host; маршрутизації різних доменів у ньому немає."
+    },
+    {
+      "id": "http11-keepalive",
+      "year": "1997",
+      "chapter": "HTTP/1.1",
+      "title": "TCP-з’єднання\nможна зберегти.",
+      "why": "Новий connect для кожного документа додає зайву роботу.",
+      "change": "HTTP/1.1 читає наступний запит у тому самому з’єднанні.",
+      "code": "while (true)\n{\n    // Прочитати запит і записати відповідь.\n    var keepAlive = http11 && !close;\n    if (!keepAlive) break;\n}",
+      "file": "Program.cs",
+      "commit": "68e7818",
+      "rfc": "2068",
+      "wire": "TCP connect\n  GET /         → 200 + Content-Length + body\n  GET /missing  → 404 + Content-Length + body\n  Connection: close\nTCP close",
+      "note": "Зміст циклу скорочено. У повному коді помилковий Host і тіло запиту також вимикають keep-alive. Порядок відповідей у HTTP/1.1 зберігається."
+    },
+    {
+      "id": "http11-chunks",
+      "year": "1997",
+      "chapter": "HTTP/1.1",
+      "title": "Почати відповідь,\nне знаючи довжини.",
+      "why": "Для потокового результату повний Content-Length заздалегідь може бути невідомий.",
+      "change": "Chunked: довжина частини, дані, кінцева нульова частина.",
+      "code": "foreach (var part in parts)\n{\n    stream.Write(Encoding.ASCII.GetBytes($\"{part.Length:X}\\r\\n\"));\n    stream.Write(part);\n    stream.Write(\"\\r\\n\"u8);\n}\nstream.Write(\"0\\r\\n\\r\\n\"u8);",
+      "file": "Program.cs",
+      "commit": "74569b7",
+      "rfc": "2068",
+      "wire": "Transfer-Encoding: chunked\\r\\n\n\\r\\n\n4\\r\\n\n<h1>\\r\\n\n12\\r\\n\nHello, HTTP!</h1>\n\\r\\n\n0",
+      "command": "curl --http1.1 --raw -i http://127.0.0.1:8080/chunks",
+      "note": "Тут довжини в hex: 4 і 12 (18 байтів). Заголовка Content-Length у цій відповіді немає."
+    },
+    {
+      "id": "tls10",
+      "year": "1999",
+      "chapter": "TLS 1.0",
+      "title": "Від SSL до TLS.",
+      "why": "Загальна схема каналу знайома, але правила обчислення ключів і перевірки записів змінюються.",
+      "change": "PRF поєднує HMAC-MD5 і HMAC-SHA1 через XOR.",
+      "code": "var half = (secret.Length + 1) / 2;\nvar left = Part(secret[..half], seed, length, true);\nvar right = Part(secret[(secret.Length - half)..],\n    seed, length, false);\nfor (var i = 0; i < length; i++) left[i] ^= right[i];\nreturn left;",
+      "file": "Tls10Crypto.cs",
+      "commit": "15b5c80",
+      "rfc": "2246",
+      "wire": "SSL3: власні MD5/SHA-1 конструкції\n              ↓\nTLS1.0: PRF + HMAC\n  Finished: 12 байтів\n  У MAC є версія запису\n  RSA ciphertext має поле довжини",
+      "command": "dotnet run -- --tls10\ndotnet run -- --tls10-client PIN",
+      "note": "Окремі режими SSL3 і TLS1.0 дозволяють порівняти майже той самий сервер. Новий стандарт не означає нову версію HTTP."
+    },
+    {
+      "id": "tls-aes",
+      "year": "2002",
+      "chapter": "TLS 1.0 + AES",
+      "title": "Заміна шифру\nбез заміни HTTP.",
+      "why": "У TLS можна домовитися про інший набір алгоритмів, зберігши модель записів.",
+      "change": "Додаємо TLS_RSA_WITH_AES_128_CBC_SHA (0x002f).",
+      "code": "records.UseAes = minor != 0 && suites.Contains(0x002f);\n// Обираємо реалізацію симетричного шифру:\nSymmetricAlgorithm cipher = key.Length == 16\n    ? Aes.Create() : TripleDES.Create();",
+      "file": "LegacySsl.cs",
+      "commit": "c99720d",
+      "rfc": "3268",
+      "wire": "ClientHello: [AES128-SHA, ...]\nServerHello: AES128-SHA\nRSA key exchange → AES-CBC + HMAC-SHA1\nУсередині — той самий HTTP/1.x",
+      "note": "Вибір AES — із LegacySsl.cs; створення шифру — із LegacyCipher.cs. Пізніший коміт 2010 додає renegotiation indication, без повторного handshake."
+    },
+    {
+      "id": "http2-frames",
+      "year": "2015",
+      "chapter": "HTTP/2",
+      "title": "Байти отримують\nрамку.",
+      "why": "Рядки HTTP/1.x замінює бінарний формат, з яким легше розділяти типи повідомлень.",
+      "change": "Кожен кадр має 9-байтовий заголовок.",
+      "code": "Span<byte> header = stackalloc byte[9];\nstream.ReadExactly(header);\nvar length = (header[0] << 16) |\n             (header[1] << 8) | header[2];\nvar type = header[3]; var flags = header[4];\nvar id = BinaryPrimitives.ReadInt32BigEndian(header[5..])\n         & 0x7fffffff;",
+      "file": "Http2.cs",
+      "commit": "1756625",
+      "rfc": "7540",
+      "wire": "24-bit Length | 8-bit Type | 8-bit Flags\nR | 31-bit Stream ID\nPayload (Length bytes)\n\nSETTINGS / PING / HEADERS / DATA / WINDOW_UPDATE",
+      "note": "Демо починає HTTP/2 із cleartext prior knowledge на TCP:8081. Пізніше додаємо h2 через TLS.",
+      "command": "dotnet run -- --h2\ncurl --http2-prior-knowledge -i http://127.0.0.1:8081/"
+    },
+    {
+      "id": "http2-streams",
+      "year": "2015",
+      "chapter": "HTTP/2",
+      "title": "Кілька діалогів\nу одному TCP.",
+      "why": "Кадри різних запитів можна чергувати, розрізняючи їх за stream ID.",
+      "change": "HEADERS і DATA отримують ідентифікатор потоку.",
+      "code": "var response = Hpack.Encode((\":status\", status));\nWrite(stream, 1, 4, id, response); // HEADERS, END_HEADERS\nWrite(stream, 0, 1, id, body);     // DATA, END_STREAM",
+      "file": "Http2.cs",
+      "commit": "b205280",
+      "rfc": "7540",
+      "wire": "stream 1: HEADERS ── DATA ── END_STREAM\nstream 3:    HEADERS ── DATA ── END_STREAM\n              одне TCP-з’єднання",
+      "note": "Це схема мінімальної відповіді; повний код враховує HEAD і вікна. Клієнтські запити в демо мають непарні ID: 1, 3, 5…"
+    },
+    {
+      "id": "hpack",
+      "year": "2015",
+      "chapter": "HPACK",
+      "title": "Заголовки можна\nне повторювати.",
+      "why": "Імена та значення заголовків часто однакові між запитами.",
+      "change": "HPACK кодує індекси таблиці й літерали.",
+      "code": "var hpack = new Hpack(); // Стан одного з’єднання.\nvar fields = hpack.Decode(block.ToArray());\nvar method = fields.Find(f => f.Name == \":method\").Value;\nvar path = fields.Find(f => f.Name == \":path\").Value;",
+      "file": "Http2.cs",
+      "commit": "d5b47c4",
+      "rfc": "7541",
+      "wire": "82 → :method: GET     (індекс 2)\n86 → :scheme: http    (індекс 6)\n84 → :path: /         (індекс 4)\n\nДинамічна таблиця зберігає нові поля з’єднання.",
+      "note": "HPACK стискає заголовки, не тіло HTML. Показані індекси — зі статичної таблиці."
+    },
+    {
+      "id": "huffman",
+      "year": "2015",
+      "chapter": "HPACK",
+      "title": "Коротші бітові коди\nдля частих символів.",
+      "why": "Навіть значення, якого ще немає в таблиці, можна передати компактніше.",
+      "change": "Біт Huffman у довжині рядка вмикає декодер.",
+      "code": "var first = Byte(input);\nvar length = Integer(input, first, 7);\nvar bytes = new byte[length];\ninput.ReadExactly(bytes);\nif ((first & 128) != 0) bytes = Huffman.Decode(bytes);\nreturn Encoding.Latin1.GetString(bytes);",
+      "file": "Hpack.cs",
+      "commit": "890c22b",
+      "rfc": "7541",
+      "wire": "www.example.com\n      ↓ Huffman (RFC7541 C.4)\nf1 e3 c2 e5 f2 3a 6b a0 ab 90 f4 ff\n\n15 текстових байтів → 12 байтів коду",
+      "note": "Використовується фіксована таблиця кодів. Декодер перевіряє EOS і коректність padding."
+    },
+    {
+      "id": "http2-windows",
+      "year": "2015",
+      "chapter": "HTTP/2",
+      "title": "Швидкий відправник\nне має залити буфер.",
+      "why": "Потік і все з’єднання мають окремі ліміти на DATA.",
+      "change": "Надсилаємо не більше, ніж дозволяють обидва вікна.",
+      "code": "var length = (int)Math.Min(remaining,\n    Math.Min(16384, Math.Min(streamWindow, connectionWindow)));\nif (length <= 0) continue;\nWrite(stream, 0, flags, id, data[..length]);\nconnectionWindow -= length;",
+      "file": "Http2.cs",
+      "commit": "fd05485",
+      "rfc": "9113",
+      "wire": "stream window = 8\nconnection window = 5\nremaining body = 22\n           ↓\nDATA: максимум 5 байтів\nWINDOW_UPDATE додає доступний кредит.",
+      "note": "Імена локальних змінних скорочено для слайда. Нульове вікно одного потоку не зупиняє PING та інші потоки з доступним кредитом."
+    },
+    {
+      "id": "http2-continuation",
+      "year": "2015",
+      "chapter": "HTTP/2",
+      "title": "Великі заголовки\nділимо на кадри.",
+      "why": "Один header block може не вміститися в HEADERS.",
+      "change": "CONTINUATION збираємо до прапорця END_HEADERS.",
+      "code": "while ((flags & 4) == 0)\n{\n    var next = Read(stream);\n    if (next.Type != 9 || next.Id != id)\n        throw new InvalidDataException();\n    flags = next.Flags;\n    block.Write(next.Data);\n}",
+      "file": "Http2.cs",
+      "commit": "2ea5a9c",
+      "rfc": "9113",
+      "wire": "HEADERS        stream 1, END_HEADERS=0\nCONTINUATION   stream 1, END_HEADERS=0\nCONTINUATION   stream 1, END_HEADERS=1\n                          ↓\n                    HPACK.Decode(block)",
+      "note": "Такий блок має бути безперервною послідовністю кадрів одного потоку. У демо він обмежений 64 KiB."
+    },
+    {
+      "id": "tls13-ecdh",
+      "year": "2018",
+      "chapter": "TLS 1.3",
+      "title": "Спільний секрет\nне передаємо мережею.",
+      "why": "Для поточного з’єднання сторони створюють тимчасові пари ключів і обмінюються публічними частинами.",
+      "change": "P-256 ECDH → спільний секрет → ключі handshake.",
+      "code": "using var key = ECDiffieHellman.Create(\n    ECCurve.NamedCurves.nistP256);\nusing var publicKey = peer.PublicKey;\nvar shared = key.DeriveRawSecretAgreement(publicKey);\n// Далі HKDF виводить окремі traffic secrets.",
+      "file": "TlsHandshake.cs",
+      "commit": "327be01",
+      "rfc": "8446",
+      "wire": "Приватний a                 Приватний b\nПублічний A       ↔         Публічний B\nECDH(a, B)        =         ECDH(b, A)\n                  ↓\n       HKDF → ключі client / server",
+      "note": "У цьому кроці RSA key exchange замінює ECDHE. TLS1.1/1.2 у навчальному маршруті пропущені."
+    },
+    {
+      "id": "tls13-finished",
+      "year": "2018",
+      "chapter": "TLS 1.3",
+      "title": "Перевіряємо\nвесь handshake.",
+      "why": "Обчислені ключі ще треба пов’язати з ідентичністю сервера та всіма узгодженими повідомленнями.",
+      "change": "Сертифікат, підпис CertificateVerify і Finished.",
+      "code": "Add(15, [4, 3, .. Wire.Vector(\n    TlsCertificate.Sign(Transcript))]);\nAdd(20, TlsCrypto.Finished(\n    ServerHandshakeTraffic, Transcript));\n// Клієнтський Finished також перевіряємо.",
+      "file": "TlsHandshake.cs",
+      "commit": "69d9ab5",
+      "rfc": "8446",
+      "wire": "EncryptedExtensions → ALPN\nCertificate          → ідентичність\nCertificateVerify    → підпис transcript\nFinished             → MAC transcript\n                          ↓\n                   application data",
+      "note": "У демо — тимчасовий self-signed ECDSA-сертифікат. У браузері звичайного сайту довіру забезпечує перевірений ланцюжок сертифікатів."
+    },
+    {
+      "id": "tls13-aead",
+      "year": "2018",
+      "chapter": "TLS 1.3",
+      "title": "Одна операція:\nшифрування + цілісність.",
+      "why": "Одержувач має виявляти зміну ciphertext, заголовка або номера запису.",
+      "change": "AES-GCM дає ciphertext і authentication tag.",
+      "code": "var result = new byte[plain.Length + 16];\naes.Encrypt(Nonce(sequence), plain,\n    result.AsSpan(0, plain.Length),\n    result.AsSpan(plain.Length), additional);\nreturn result;",
+      "file": "TlsCrypto.cs",
+      "commit": "3aad981",
+      "rfc": "8446",
+      "wire": "nonce ← IV XOR sequence number\nplaintext + authenticated header\n                  ↓ AES-GCM\nciphertext + 16-byte tag\n                  ↓\nЗмінені дані → Decrypt не проходить.",
+      "note": "На відміну від старого CBC+MAC, тут використовується AEAD. Ключі для напрямків client/server різні."
+    },
+    {
+      "id": "alpn",
+      "year": "2018",
+      "chapter": "HTTPS / ALPN",
+      "title": "Який HTTP\nговорить цей TLS?",
+      "why": "Захищений канал сам по собі ще не визначає формат повідомлень усередині.",
+      "change": "ALPN узгоджує http/1.1 або h2.",
+      "code": "if (hello.Protocols.Contains(protocol))\n    Protocol = protocol;\n// HTTP-код отримує звичайний Stream:\nusing Stream? stream = TlsStream.TryAccept(\n    client.GetStream(), \"h2\");",
+      "file": "TlsHandshake.cs",
+      "commit": "be202e6",
+      "rfc": "8446",
+      "wire": "TCP → TLS1.3 → ALPN http/1.1 → текст HTTP/1.1\nTCP → TLS1.3 → ALPN h2       → кадри HTTP/2",
+      "command": "dotnet run -- --h2 --tls\ncurl -k --http2 -i https://localhost:8444/",
+      "note": "Фрагменти з TlsHandshake.cs та Http2.cs. ALPN з’явився раніше за TLS1.3; тут він додається в момент, коли навчальний сервер уже підтримує обидва протоколи."
+    },
+    {
+      "id": "quic-udp",
+      "year": "2021",
+      "chapter": "QUIC",
+      "title": "Транспорт\nпереїжджає на UDP.",
+      "why": "HTTP/2 має багато потоків, але TCP віддає застосунку один впорядкований потік байтів.",
+      "change": "UdpClient дає дейтаграми; QUIC додає надійні потоки.",
+      "code": "using var udp = new UdpClient(\n    new IPEndPoint(IPAddress.Loopback, 8445));\nvar datagram = await udp.ReceiveAsync();\nvar packet = QuicPacket.Read(datagram.Buffer);\n// Маршрутизація за connection ID, а не рядком HTTP.",
+      "file": "QuicServer.cs",
+      "commit": "1f82cde",
+      "rfc": "9000",
+      "wire": "HTTP/1.x, HTTP/2\n  HTTP → [TLS] → TCP → IP\n\nHTTP/3\n  HTTP → QUIC (TLS1.3) → UDP → IP",
+      "note": "UDP не надає доставку, порядок чи повтори. Усі ці функції для нашого демо реалізовані у класах Quic*."
+    },
+    {
+      "id": "quic-protection",
+      "year": "2021",
+      "chapter": "QUIC + TLS",
+      "title": "TLS передає ключі.\nQUIC захищає пакети.",
+      "why": "QUIC переносить TLS handshake у CRYPTO frames, без TLS record layer.",
+      "change": "Окремо захищаємо payload і частину заголовка.",
+      "code": "byte[] packet = [.. additional,\n    .. payload.Seal(number, plain, additional)];\nvar mask = Mask(packet, numberOffset);\npacket[0] ^= (byte)(mask[0] &\n    ((packet[0] & 128) != 0 ? 15 : 31));",
+      "file": "QuicKeys.cs",
+      "commit": "0392261",
+      "rfc": "9001",
+      "wire": "Initial keys → відомі salt + destination CID\nHandshake keys → TLS handshake secrets\n1-RTT keys → TLS application secrets\n\nAES-GCM(payload) + AES(header protection)",
+      "note": "Публічно обчислювані Initial-ключі не приховують handshake від спостерігача. Автентифікований секрет з’являється під час TLS."
+    },
+    {
+      "id": "quic-offsets",
+      "year": "2021",
+      "chapter": "QUIC",
+      "title": "Пакети можуть\nприйти не по порядку.",
+      "why": "Мережа може переставити або продублювати дейтаграми.",
+      "change": "CRYPTO і STREAM збираємо за offset.",
+      "code": "var start = (int)offset;\nfor (var i = 0; i < bytes.Length; i++)\n{\n    data[start + i] = bytes[i];\n    present[start + i] = true;\n}\nwhile (contiguous < highest && present[contiguous])\n    contiguous++;",
+      "file": "QuicBuffer.cs",
+      "commit": "fa4b3a8",
+      "rfc": "9000",
+      "wire": "Надійшло: offset 4 → EFGH\nДоступно: нічого (ще немає ABCD)\nНадійшло: offset 0 → ABCD\nДоступно: ABCDEFGH\nДублікат offset 4 → нових даних немає",
+      "note": "Фрагмент показує ідею буфера. Повний код перевіряє межі, конфліктні байти й фінальний розмір потоку."
+    },
+    {
+      "id": "quic-flow",
+      "year": "2021",
+      "chapter": "QUIC",
+      "title": "Кредит є\nі в QUIC-потоків.",
+      "why": "Навіть незалежним потокам потрібні межі пам’яті та обсягу переданих даних.",
+      "change": "MAX_DATA і MAX_STREAM_DATA задають абсолютні ліміти.",
+      "code": "var available = Math.Min(\n    stream.Limit > stream.Offset\n        ? stream.Limit - stream.Offset : 0,\n    DataLimit > sent ? DataLimit - sent : 0);\nvar length = (int)Math.Min(remaining,\n    Math.Min(800, available));",
+      "file": "QuicStreams.cs",
+      "commit": "5297888",
+      "rfc": "9000",
+      "wire": "MAX_DATA: ліміт усіх stream-даних\nMAX_STREAM_DATA: ліміт одного потоку\nSTREAM: ID + offset + bytes + [FIN]\n\nНемає кредиту → дані чекають.",
+      "note": "У демо ліміт receive-потоку — 64 KiB, з’єднання — 1 MiB. Кількість потоків також узгоджується."
+    },
+    {
+      "id": "qpack",
+      "year": "2022",
+      "chapter": "HTTP/3 / QPACK",
+      "title": "Стиснення заголовків\nдля незалежних потоків.",
+      "why": "HTTP/3 потребує свого формату заголовків, придатного до порядку доставки QUIC.",
+      "change": "QPACK. У демо — static table + literals + Huffman.",
+      "code": "using var output = new MemoryStream();\noutput.Write(new byte[] { 0, 0 }); // Без dynamic refs.\nforeach (var (name, value) in fields)\n{\n    var bytes = Encoding.Latin1.GetBytes(name);\n    Hpack.PutInteger(output, bytes.Length, 3, 0x20);\n    output.Write(bytes); Hpack.PutText(output, value);\n}",
+      "file": "Qpack.cs",
+      "commit": "853fb73",
+      "rfc": "9204",
+      "wire": "SETTINGS_QPACK_MAX_TABLE_CAPACITY = 0\nСтатичний індекс: :method = GET\nЛітерал: content-type = text/html\nHEADERS: field section із префіксом 00 00",
+      "note": "Місткість динамічної таблиці 0 узгоджена через SETTINGS. Це свідомо компактна підмножина QPACK, а не повна динамічна реалізація."
+    },
+    {
+      "id": "http3-response",
+      "year": "2022",
+      "chapter": "HTTP/3",
+      "title": "Знайомі заголовки.\nІнші кадри й потоки.",
+      "why": "Семантика GET, HEAD і статусів зберігається, змінюється спосіб передачі.",
+      "change": "На запит відповідаємо HEADERS, DATA і QUIC FIN.",
+      "code": "byte[] response = [\n    .. Frame(1, Qpack.Encode(fields.ToArray())),\n    .. (method == \"HEAD\" ? [] : Frame(0, body))\n];\nstreams.Send(id, response, true); // QUIC FIN",
+      "file": "Http3.cs",
+      "commit": "3ef6f23",
+      "rfc": "9114",
+      "wire": "QUIC bidirectional request stream\n  → HEADERS (QPACK) + FIN\n  ← HEADERS (QPACK)\n  ← DATA (HTML) + FIN\n\nControl stream → SETTINGS (залишається відкритим)",
+      "command": "dotnet run -- --h3",
+      "note": "HTTP/3 frame має type + length + payload; stream ID живе в QUIC. Тут немає 9-байтового HTTP/2 header чи chunked encoding."
+    },
+    {
+      "id": "quic-recovery",
+      "year": "2022 · демо",
+      "chapter": "QUIC / recovery",
+      "title": "Втрачений пакет\nне означає втрачений запит.",
+      "why": "UDP може втратити дейтаграму. Потрібні підтвердження й повтори.",
+      "change": "Після PTO або ознаки втрати повторюємо frame з новим packet number.",
+      "code": "var frame = recovery.Ready(level, now).FirstOrDefault();\n// Збираємо пакет із поточним space.Next.\nrecovery.Record(frame, space.Next, packet.Length, now);\nspace.Next++;\n// ACK будь-якої копії завершує повтори цього frame.",
+      "file": "QuicSession.cs",
+      "commit": "316609c",
+      "rfc": "9000",
+      "wire": "packet #7  : STREAM offset=0 → втрачено\nPTO сплив\npacket #8  : STREAM offset=0 → доставлено\nACK #8 → frame підтверджено\n\nУ демо: PTO/backoff, packet-threshold, обмежене вікно.",
+      "note": "Роки цього слайда — місце в навчальній історії; QUIC recovery описаний у 2021. Наша модель спрощена, без повного RFC9002 congestion control."
+    },
+    {
+      "id": "head-of-line",
+      "year": "TCP ↔ QUIC",
+      "chapter": "Порівняння",
+      "title": "Що відбувається,\nколи пакет губиться?",
+      "why": "У TCP пропуск байтів затримує подальші байти всього з’єднання. У QUIC порядок визначено всередині кожного потоку.",
+      "change": "Змоделюй втрату: потік B у QUIC може продовжитися.",
+      "code": "// Кожен потік отримує свій offset і буфер.\nstreams.Receive(id, position, bytes, fin);\n// Пропуск у A не є пропуском у B.",
+      "file": "QuicStreams.cs",
+      "commit": "5297888",
+      "rfc": "9114",
+      "wire": "",
+      "interactive": "loss",
+      "note": "Це інтерактивна схема доставки, не вимірювання швидкості. Спільне congestion control і навантаження мережі все одно впливають на потоки."
+    },
+    {
+      "id": "run",
+      "year": "Далі — код",
+      "chapter": "Практика",
+      "title": "Пройди цей шлях\nпо одному коміту.",
+      "why": "Усе з презентації є в приватному HttpEvolution. Кожен навчальний коміт збирається окремо.",
+      "change": "main — перші 22 рядки; chronological — усі наступні кроки.",
+      "code": "git switch chronological\ngit log --reverse --oneline\ngit switch --detach step-1996-ssl3\ndotnet run -- --ssl3\n# Назад до повної версії: git switch chronological",
+      "file": "README.md",
+      "commit": "89844bf",
+      "rfc": "",
+      "wire": "",
+      "language": "sh",
+      "final": true,
+      "note": "Демо працює лише на loopback. Пропущено SSL2 і TLS1.1/1.2; немає resumption, 0-RTT, migration та повного QUIC congestion control. Межі кожного режиму є в README."
+    }
+  ],
+  "refs": {
+    "w3c": [
+      "W3C · HTTP/0.9",
+      "https://www.w3.org/Protocols/HTTP/AsImplemented"
+    ],
+    "1945": [
+      "RFC 1945",
+      "https://www.rfc-editor.org/rfc/rfc1945.html"
+    ],
+    "2068": [
+      "RFC 2068",
+      "https://www.rfc-editor.org/rfc/rfc2068.html"
+    ],
+    "6101": [
+      "RFC 6101",
+      "https://www.rfc-editor.org/rfc/rfc6101.html"
+    ],
+    "2246": [
+      "RFC 2246",
+      "https://www.rfc-editor.org/rfc/rfc2246.html"
+    ],
+    "3268": [
+      "RFC 3268",
+      "https://www.rfc-editor.org/rfc/rfc3268.html"
+    ],
+    "7540": [
+      "RFC 7540",
+      "https://www.rfc-editor.org/rfc/rfc7540.html"
+    ],
+    "7541": [
+      "RFC 7541",
+      "https://www.rfc-editor.org/rfc/rfc7541.html"
+    ],
+    "9113": [
+      "RFC 9113",
+      "https://www.rfc-editor.org/rfc/rfc9113.html"
+    ],
+    "8446": [
+      "RFC 8446",
+      "https://www.rfc-editor.org/rfc/rfc8446.html"
+    ],
+    "9000": [
+      "RFC 9000",
+      "https://www.rfc-editor.org/rfc/rfc9000.html"
+    ],
+    "9001": [
+      "RFC 9001",
+      "https://www.rfc-editor.org/rfc/rfc9001.html"
+    ],
+    "9204": [
+      "RFC 9204",
+      "https://www.rfc-editor.org/rfc/rfc9204.html"
+    ],
+    "9114": [
+      "RFC 9114",
+      "https://www.rfc-editor.org/rfc/rfc9114.html"
+    ]
+  },
+  "full": "using System.Net;\nusing System.Net.Sockets;\nusing System.Text;\n\nvar server = new TcpListener(IPAddress.Loopback, 8080);\nserver.Start();\nConsole.WriteLine(\"HTTP/0.9 on 127.0.0.1:8080. Stop with Ctrl+C.\");\nwhile (true)\n{\n    using var client = server.AcceptTcpClient();\n    using var stream = client.GetStream();\n    stream.ReadTimeout = stream.WriteTimeout = 5000;\n    using var reader = new StreamReader(stream, Encoding.ASCII);\n    try\n    {\n        var request = reader.ReadLine()?.Split(' ', StringSplitOptions.RemoveEmptyEntries);\n        if (request is not [\"GET\", var path, ..]) continue;\n        var html = path == \"/\" ? \"<h1>Hello, HTTP/0.9!</h1>\\n\" : \"<h1>Not found</h1>\\n\";\n        stream.Write(Encoding.ASCII.GetBytes(html));\n    }\n    catch (IOException) { } // A disconnected or timed-out client must not stop the demo.\n}"
+}
+</script>
+
+<script>
+'use strict';
+const {slides,refs,full}=JSON.parse(document.getElementById('deck-data').textContent);
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const repo='https://github.com/podkolzzzin/HttpEvolution';
+const icon='<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="6" y="6" width="10" height="11" rx="2"/><path d="M4 13H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1"/></svg>';
+function highlight(code){
+ const rx=/(\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:using|var|if|else|new|return|for|foreach|while|continue|break|true|false|null|int|byte|bool|throw|await|static|sealed|class|public|void|in|is|not|or|stackalloc)\b|\b(?:0x[\da-fA-F]+|\d+)\b)/g;
+ let out='',last=0;
+ for(const m of code.matchAll(rx)){out+=esc(code.slice(last,m.index));const t=m[0];const cls=t.startsWith('//')?'comment':/^["']/.test(t)?'str':/^\d/.test(t)?'num':'kw';out+='<span class="'+cls+'">'+esc(t)+'</span>';last=m.index+t.length;}
+ return out+esc(code.slice(last));
+}
+function codeCard(code,file,lang='C#',caption='ФРАГМЕНТ · деталі й перевірки скорочено'){
+ return '<div class="code-card"><div class="code-top"><span>'+esc(file)+' <b aria-hidden="true">·</b> '+esc(lang)+'</span><button class="copy" type="button" aria-label="Копіювати код">'+icon+'<span>Копіювати</span></button></div><pre tabindex="0" aria-label="Приклад коду"><code>'+highlight(code)+'</code></pre><div class="code-foot">'+esc(caption)+'</div></div>';
+}
+function hostModel(){return '<div class="model" aria-label="Модель перевірки Host"><div class="model-label">СПРОБУЙ · HOST У HTTP/1.1</div><div class="switches"><button type="button" data-host="ok" aria-pressed="true">Є Host</button><button type="button" data-host="missing" aria-pressed="false">Немає</button><button type="button" data-host="duplicate" aria-pressed="false">Дублікат</button></div><p class="host-result" role="status" aria-live="polite">200 OK · Host: localhost</p></div>';}
+function lossModel(){return '<div class="model loss-model"><div class="model-label">ІНТЕРАКТИВНА СХЕМА</div><button class="loss-button" type="button" aria-pressed="false"><span>Загубити пакет A₁</span><span aria-hidden="true">↯</span></button><div class="lane-title">HTTP/2 · спільний порядок TCP</div><div class="lane"><span>TCP</span><div class="packets"><span class="packet">A₀</span><span class="packet loss">A₁</span><span class="packet blocked">B₀</span><span class="packet blocked">B₁</span></div></div><div class="lane-title">HTTP/3 · порядок у кожному QUIC-потоці</div><div class="lane"><span>Потік A</span><div class="packets"><span class="packet">A₀</span><span class="packet loss">A₁</span><span class="packet blocked">A₂</span><span class="packet blocked">A₃</span></div></div><div class="lane"><span>Потік B</span><div class="packets"><span class="packet independent">B₀</span><span class="packet independent">B₁</span><span class="packet independent">B₂</span><span class="packet independent">B₃</span></div></div><p class="model-caption" role="status" aria-live="polite">Усі пакети надійшли. Обидва протоколи можуть передати дані застосунку.</p></div>';}
+$('#deck').innerHTML=slides.map((s,i)=>{
+ const category=/^(SSL|TLS|HTTPS)/.test(s.chapter)?'tls':/^(QUIC|HTTP\/3)/.test(s.chapter)?'quic':'';
+ const source=(s.id==='http09'||s.hero)?s.commit:'chronological';
+ const links='<a href="'+repo+'/blob/'+source+'/'+s.file+'" target="_blank" rel="noopener">Код</a><a href="'+repo+'/commit/'+s.commit+'" target="_blank" rel="noopener">Коміт '+s.commit+'</a>'+(s.rfc?'<a href="'+refs[s.rfc][1]+'" target="_blank" rel="noopener">'+esc(refs[s.rfc][0])+'</a>':'');
+ const wire=s.wire?'<details class="wire"><summary>На дроті / схема</summary><pre>'+esc(s.wire)+'</pre></details>':'';
+ const run=s.command?'<details class="wire"><summary>Команда для показу</summary><pre><code>'+esc(s.command)+'</code></pre></details>':'';
+ const first=s.full?'<details class="wire"><summary>Повний HTTP/0.9-сервер · 22 рядки</summary>'+codeCard(full,'Program.cs','C#','ПОВНИЙ ФАЙЛ · main / 0bb3812')+'</details>':'';
+ const route=s.hero?'<div class="route" aria-label="HTTP 0.9, HTTP 1.x, HTTP 2, HTTP 3"><span>0.9</span><i>→</i><span>1.x</span><i>→</i><span>2</span><i>→</i><span>3</span></div><div class="hero-stats"><span><strong>22</strong>рядки першого сервера</span><span><strong>3</strong>мережеві класи .NET</span></div>':'';
+ const final=s.final?'<div class="final-links"><a href="'+repo+'/tree/chronological" target="_blank" rel="noopener">Відкрити репозиторій ↗</a><a href="'+repo+'/pull/1" target="_blank" rel="noopener">PR для перегляду ↗</a></div>':'';
+ return '<section class="slide '+category+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden><div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div><div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+(s.hero?'Формат презентації':'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+codeCard(s.code,s.file,s.language||'C#')+'<div class="sources">'+links+'</div>'+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
+}).join('');
+let group='';$('.topics').innerHTML=slides.map((s,i)=>{let label='';const g=s.chapter;if(g!==group){group=g;label='<div class="topics-group">'+esc(g)+'</div>';}return label+'<button type="button" class="topic" data-go="'+i+'"><span>'+String(i+1).padStart(2,'0')+'</span><span>'+esc(s.year)+'</span><strong>'+esc(s.title.replace(/\n/g,' '))+'</strong></button>';}).join('');
+let index=-1;
+function hashIndex(){let id;try{id=decodeURIComponent(location.hash.slice(1));}catch{return 0;}const n=slides.findIndex(s=>s.id===id);return n>=0?n:0;}
+function show(n,focus=false){
+ n=Math.max(0,Math.min(slides.length-1,n));
+ if(index===n)return;
+ $$('.slide').forEach((el,i)=>{el.hidden=i!==n;el.classList.toggle('current',i===n);});index=n;
+ $('#current-num').textContent=String(n+1).padStart(2,'0');$('#total-num').textContent=slides.length;$('#chapter-name').textContent=slides[n].chapter;
+ $('#prev').disabled=n===0;$('#next').disabled=n===slides.length-1;$('#next span').textContent=n===slides.length-1?'Кінець':'Далі';
+ $('#progress').style.width=((n+1)/slides.length*100)+'%';document.title=slides[n].title.replace(/\n/g,' ')+' — HTTP Evolution';
+ $$('.topic').forEach((el,i)=>{if(i===n)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});
+ try{localStorage.setItem('http-evolution-slide',slides[n].id);}catch{}
+ window.scrollTo(0,0);if(focus)$('#'+slides[n].id+' h1').focus({preventScroll:true});
+}
+function go(n){n=Math.max(0,Math.min(slides.length-1,n));if(n===index)return;history.pushState(null,'','#'+slides[n].id);show(n,true);}
+let initial=hashIndex();if(!location.hash){try{const saved=localStorage.getItem('http-evolution-slide');const n=slides.findIndex(s=>s.id===saved);if(n>=0)initial=n;}catch{}history.replaceState(null,'','#'+slides[initial].id);}show(initial);
+window.addEventListener('popstate',()=>show(hashIndex(),true));window.addEventListener('hashchange',()=>show(hashIndex(),true));
+$('#prev').addEventListener('click',()=>go(index-1));$('#next').addEventListener('click',()=>go(index+1));
+const dialog=$('#contents');let menuOpener=null;
+function openMenu(event){menuOpener=event.currentTarget;dialog.showModal();requestAnimationFrame(()=>$('.topic[aria-current="step"]')?.scrollIntoView({block:'center'}));}
+$('#open-menu').addEventListener('click',openMenu);$('#counter').addEventListener('click',openMenu);$('.close-menu').addEventListener('click',()=>dialog.close());
+dialog.addEventListener('close',()=>menuOpener?.focus({preventScroll:true}));dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
+$$('.topic').forEach(el=>el.addEventListener('click',()=>{dialog.close();go(Number(el.dataset.go));}));
+document.addEventListener('keydown',e=>{if(dialog.open||e.altKey||e.ctrlKey||e.metaKey||e.target.closest('pre,button,a,input,summary'))return;const changes={ArrowRight:1,PageDown:1,ArrowLeft:-1,PageUp:-1};if(changes[e.key]){e.preventDefault();go(index+changes[e.key]);}else if(e.key==='Home'){e.preventDefault();go(0);}else if(e.key==='End'){e.preventDefault();go(slides.length-1);}});
+let touch=null;$('#deck').addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||!e.isPrimary||e.target.closest('pre,button,a,summary,input,details'))return;touch={x:e.clientX,y:e.clientY,t:performance.now()};});
+$('#deck').addEventListener('pointerup',e=>{if(!touch)return;const dx=e.clientX-touch.x,dy=e.clientY-touch.y,dt=performance.now()-touch.t;touch=null;if(e.pointerType==='touch'&&Math.abs(dx)>65&&Math.abs(dy)<40&&dt<650&&!getSelection()?.toString())go(index+(dx<0?1:-1));});$('#deck').addEventListener('pointercancel',()=>touch=null);
+let toastTimer;function toast(message){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),2000);}
+$$('.copy').forEach(button=>button.addEventListener('click',async()=>{const code=button.closest('.code-card').querySelector('code').textContent;try{await navigator.clipboard.writeText(code);toast('Код скопійовано');}catch{toast('Виділи код і скопіюй вручну');}}));
+$$('[data-host]').forEach(button=>button.addEventListener('click',()=>{const model=button.closest('.model'),value=button.dataset.host;model.querySelectorAll('button').forEach(el=>el.setAttribute('aria-pressed',String(el===button)));const out=model.querySelector('.host-result');out.classList.toggle('bad',value!=='ok');out.textContent=value==='ok'?'200 OK · Host: localhost':value==='missing'?'400 Bad Request · Host відсутній':'400 Bad Request · два заголовки Host';}));
+$('.loss-button').addEventListener('click',e=>{const button=e.currentTarget,model=button.closest('.model'),lost=button.getAttribute('aria-pressed')!=='true';button.setAttribute('aria-pressed',String(lost));model.classList.toggle('lost-mode',lost);button.querySelector('span').textContent=lost?'Відновити пакет A₁':'Загубити пакет A₁';model.querySelector('.model-caption').textContent=lost?'A₁ втрачено. TCP чекає пропуск і затримує B. QUIC чекає лише в A; дані B можуть бути прочитані.':'Усі пакети надійшли. Обидва протоколи можуть передати дані застосунку.';});
+</script>
+</body>
+</html>
