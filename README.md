@@ -105,7 +105,9 @@ ALPN, відлуння session ID і відхилення обрізаних п�
 Перевірено однакові секрети обох сторін із retry й без нього.
 `TlsCertificate.cs` створює тимчасовий self-signed сертифікат для localhost
 та підписує CertificateVerify; приватний ключ існує тільки в пам'яті процесу.
-Завершення handshake і HTTPS ще не підключені.
+Handshake формує EncryptedExtensions, Certificate, CertificateVerify та Finished,
+перевіряє клієнтський Finished і виводить окремі ключі application data.
+При завершенні сеансу ключі handshake очищаються. TLS-записи та HTTPS ще не підключені.
 
 ## Хронологія і стан
 
