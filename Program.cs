@@ -9,17 +9,18 @@ if (args is [var mode, var pin] && mode is "--ssl3-client" or "--tls10-client")
 }
 if (args.Contains("--h2")) { Http2.Run(); return; }
 
+var tls = args.Contains("--tls");
 var ssl3 = args.Contains("--ssl3");
 var tls10 = args.Contains("--tls10");
-var port = ssl3 ? 8442 : tls10 ? 8441 : 8080;
+var port = ssl3 ? 8442 : tls10 ? 8441 : tls ? 8443 : 8080;
 var server = new TcpListener(IPAddress.Loopback, port);
 server.Start();
-Console.WriteLine($"{(ssl3 ? "HTTPS/SSL 3.0" : tls10 ? "HTTPS/TLS 1.0" : "HTTP/1.1")} on 127.0.0.1:{port}. Stop with Ctrl+C.");
+Console.WriteLine($"{(ssl3 ? "HTTPS/SSL 3.0" : tls10 ? "HTTPS/TLS 1.0" : tls ? "HTTPS/TLS 1.3" : "HTTP/1.1")} on 127.0.0.1:{port}. Stop with Ctrl+C.");
 if (ssl3 || tls10) Console.WriteLine($"Certificate SPKI pin: {LegacyIdentity.Pin}");
 while (true)
 {
     using var client = server.AcceptTcpClient();
-    using Stream? stream = ssl3 || tls10 ? LegacySsl.TryAccept(client.GetStream(), (byte)(ssl3 ? 0 : 1)) : client.GetStream();
+    using Stream? stream = ssl3 || tls10 ? LegacySsl.TryAccept(client.GetStream(), (byte)(ssl3 ? 0 : 1)) : tls ? TlsStream.TryAccept(client.GetStream(), "http/1.1") : client.GetStream();
     if (stream is null) continue;
     stream.ReadTimeout = stream.WriteTimeout = 5000;
     using var reader = new StreamReader(stream, Encoding.ASCII);
