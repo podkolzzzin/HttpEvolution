@@ -47,14 +47,27 @@ while (true)
                 if (line is null) break;
             }
             var badHost = http11 && (hosts.Count != 1 || hosts[0].Length == 0 || hosts[0].Contains(','));
-            var status = path == "/" ? "200 OK" : "404 Not Found";
-            var html = path == "/" ? "<h1>Hello, HTTP!</h1>\n" : "<h1>Not found</h1>\n";
+            var found = path is "/" or "/chunks";
+            var status = found ? "200 OK" : "404 Not Found";
+            var html = found ? "<h1>Hello, HTTP!</h1>\n" : "<h1>Not found</h1>\n";
             if (badHost || hasBody) { status = "400 Bad Request"; html = "<h1>Bad request</h1>\n"; }
             var body = Encoding.ASCII.GetBytes(html);
             var keepAlive = http11 && !close && !badHost && !hasBody;
+            var chunked = http11 && path == "/chunks" && !badHost && !hasBody;
+            var framing = chunked ? "Transfer-Encoding: chunked" : $"Content-Length: {body.Length}";
             if (versioned)
-                stream.Write(Encoding.ASCII.GetBytes($"HTTP/1.{(http11 ? 1 : 0)} {status}\r\nContent-Type: text/html\r\nContent-Length: {body.Length}\r\nConnection: {(keepAlive ? "keep-alive" : "close")}\r\n\r\n"));
-            if (method == "GET") stream.Write(body);
+                stream.Write(Encoding.ASCII.GetBytes($"HTTP/1.{(http11 ? 1 : 0)} {status}\r\nContent-Type: text/html\r\n{framing}\r\nConnection: {(keepAlive ? "keep-alive" : "close")}\r\n\r\n"));
+            if (method == "GET" && chunked)
+            {
+                foreach (var part in new[] { body[..4], body[4..] })
+                {
+                    stream.Write(Encoding.ASCII.GetBytes($"{part.Length:X}\r\n"));
+                    stream.Write(part);
+                    stream.Write("\r\n"u8);
+                }
+                stream.Write("0\r\n\r\n"u8);
+            }
+            else if (method == "GET") stream.Write(body);
             if (!keepAlive) break;
         }
     }
