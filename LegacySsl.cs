@@ -46,9 +46,21 @@ static partial class LegacySsl
             var suites = hello.Vector().Chunk(2).Select(pair => new Wire(pair).Int()).ToArray();
             records.UseAes = minor != 0 && suites.Contains(0x002f);
             if ((!records.UseAes && !suites.Contains(10)) || !hello.Vector(1).Contains((byte)0)) throw new IOException("RSA/CBC/SHA cipher required.");
-            if (minor != 0 && hello.Left > 0) hello.Vector();
+            var renegotiation = minor != 0 && suites.Contains(0x00ff);
+            if (minor != 0 && hello.Left > 0)
+            {
+                var extensions = new Wire(hello.Vector());
+                while (extensions.Left > 0)
+                {
+                    var type = extensions.Int(); var data = extensions.Vector();
+                    if (type != 0xff01) continue;
+                    if (!data.AsSpan().SequenceEqual(new byte[] { 0 })) throw new IOException("Initial renegotiation info must be empty.");
+                    renegotiation = true;
+                }
+            }
             hello.End(); var server = HelloRandom();
-            exchange.Send(2, [3, minor, .. server, 0, 0, (byte)(records.UseAes ? 0x2f : 10), 0]);
+            var indication = renegotiation ? Wire.Vector(Wire.Extension(0xff01, [0])) : [];
+            exchange.Send(2, [3, minor, .. server, 0, 0, (byte)(records.UseAes ? 0x2f : 10), 0, .. indication]);
             exchange.Send(11, Wire.Vector(Wire.Vector(LegacyIdentity.Der, 3), 3));
             exchange.Send(14, []);
             var encrypted = exchange.Read(16);
