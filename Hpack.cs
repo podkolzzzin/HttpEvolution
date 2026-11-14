@@ -33,19 +33,7 @@ sealed class Hpack
     public static byte[] Encode(params (string Name, string Value)[] fields)
     {
         using var output = new MemoryStream();
-        void Text(string value)
-        {
-            var bytes = Encoding.Latin1.GetBytes(value);
-            output.WriteByte((byte)Math.Min(bytes.Length, 127));
-            if (bytes.Length >= 127)
-            {
-                var remaining = bytes.Length - 127;
-                while (remaining >= 128) { output.WriteByte((byte)((remaining & 127) | 128)); remaining >>= 7; }
-                output.WriteByte((byte)remaining);
-            }
-            output.Write(bytes);
-        }
-        foreach (var (name, value) in fields) { output.WriteByte(0); Text(name); Text(value); }
+        foreach (var (name, value) in fields) { output.WriteByte(0); PutText(output, name); PutText(output, value); }
         return output.ToArray(); // Literal fields without indexing or Huffman.
     }
 
@@ -90,8 +78,21 @@ sealed class Hpack
         while (size > capacity) { size -= Bytes(dynamic[^1]); dynamic.RemoveAt(dynamic.Count - 1); }
     }
 
-    static int Byte(Stream input) => input.ReadByte() is var value && value >= 0 ? value : throw new InvalidDataException("Truncated HPACK.");
-    static int Integer(Stream input, int first, int bits)
+    public static int Byte(Stream input) => input.ReadByte() is var value && value >= 0 ? value : throw new InvalidDataException("Truncated HPACK.");
+    public static void PutInteger(Stream output, int value, int bits, int flags = 0)
+    {
+        var mask = (1 << bits) - 1;
+        output.WriteByte((byte)(flags | Math.Min(value, mask)));
+        if (value < mask) return;
+        var remaining = value - mask;
+        while (remaining >= 128) { output.WriteByte((byte)((remaining & 127) | 128)); remaining >>= 7; }
+        output.WriteByte((byte)remaining);
+    }
+    public static void PutText(Stream output, string value)
+    {
+        var bytes = Encoding.Latin1.GetBytes(value); PutInteger(output, bytes.Length, 7); output.Write(bytes);
+    }
+    public static int Integer(Stream input, int first, int bits)
     {
         var mask = (1 << bits) - 1;
         long value = first & mask;
@@ -106,7 +107,7 @@ sealed class Hpack
         throw new InvalidDataException("HPACK integer overflow.");
     }
 
-    static string Text(Stream input)
+    public static string Text(Stream input)
     {
         var first = Byte(input);
         var length = Integer(input, first, 7);
