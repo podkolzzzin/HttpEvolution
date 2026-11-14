@@ -107,7 +107,9 @@ ALPN, відлуння session ID і відхилення обрізаних п�
 та підписує CertificateVerify; приватний ключ існує тільки в пам'яті процесу.
 Handshake формує EncryptedExtensions, Certificate, CertificateVerify та Finished,
 перевіряє клієнтський Finished і виводить окремі ключі application data.
-При завершенні сеансу ключі handshake очищаються. TLS-записи та HTTPS ще не підключені.
+При завершенні сеансу ключі handshake очищаються.
+`TlsRecords.cs` кодує plaintext/encrypted записи, збирає розбиті handshake-повідомлення
+та перевіряє AEAD і номери записів. HTTPS ще не підключений.
 
 ## Хронологія і стан
 
