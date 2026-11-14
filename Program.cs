@@ -14,8 +14,9 @@ while (true)
     try
     {
         var request = reader.ReadLine()?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (request is not ["GET", var path, ..]) continue;
+        if (request is not [var method, var path, ..] || method is not ("GET" or "HEAD")) continue;
         var versioned = request.Length > 2;
+        if (!versioned && method == "HEAD") continue;
         if (versioned)
             while (reader.ReadLine() is { Length: > 0 }) { }
         var status = path == "/" ? "200 OK" : "404 Not Found";
@@ -23,7 +24,7 @@ while (true)
         var body = Encoding.ASCII.GetBytes(html);
         if (versioned)
             stream.Write(Encoding.ASCII.GetBytes($"HTTP/1.0 {status}\r\nContent-Type: text/html\r\nContent-Length: {body.Length}\r\n\r\n"));
-        stream.Write(body);
+        if (method == "GET") stream.Write(body);
     }
     catch (IOException) { } // A disconnected or timed-out client must not stop the demo.
 }
