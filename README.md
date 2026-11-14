@@ -2,7 +2,7 @@
 
 Компактне C#-демо еволюції HTTP: одна можливість на коміт.
 Гілка `main` — перший крок HTTP/0.9; `evolution` — наступні кроки.
-**У цій гілці є базові HTTP/1.0 і HTTP/1.1 GET/HEAD, keep-alive та chunked.**
+**У цій гілці є HTTP/1.x та базове cleartext HTTP/2.**
 Мережа: `TcpListener` → `TcpClient` → потік байтів; без ASP.NET, Kestrel,
 `HttpListener`, `HttpClient` і сторонніх пакетів.
 
@@ -82,7 +82,9 @@ curl --http1.1 --raw -i http://127.0.0.1:8080/chunks
 Кожен запит має власний непарний stream ID. DATA враховує вікно з'єднання,
 SETTINGS_INITIAL_WINDOW_SIZE та WINDOW_UPDATE; при нульовому вікні тіло чекає,
 інші потоки й PING продовжують працювати. RST_STREAM прибирає очікувану відповідь.
-Поки запит має вміщатися в один HEADERS з END_STREAM.
+HEADERS може продовжуватися кадрами CONTINUATION до END_HEADERS (до 64 KiB);
+початковий HEADERS має END_STREAM, бо демо не приймає тіла запитів.
+Інакше потік відхиляється через RST_STREAM, зберігаючи HPACK-стан з'єднання.
 
 ```sh
 curl --http2-prior-knowledge -i http://127.0.0.1:8081/
@@ -101,7 +103,7 @@ curl --http2-prior-knowledge -I http://127.0.0.1:8081/
 | 1996 — HTTP/1.0 | **Готово в evolution:** версія, статус, заголовки, Content-Length і HEAD |
 | 1997 — HTTP/1.1 | **Готово в evolution:** версія, Host, keep-alive і chunked |
 | 1999 — TLS 1.0 | Показати заміну SSL на TLS; сучасне HTTPS додати через TLS-потік |
-| 2015 — HTTP/2 | Бінарні кадри; SETTINGS; HPACK; кілька потоків — окремими комітами |
+| 2015 — HTTP/2 | **Готово в evolution:** кадри, SETTINGS, HPACK/Huffman, GET/HEAD, вікна потоків і CONTINUATION; TLS ще попереду |
 | 2018 — TLS 1.3 | Показати сучасне TLS-узгодження |
 | 2022 — HTTP/3 | QUIC поверх UDP з TLS 1.3; потоки; кадри; QPACK |
 
