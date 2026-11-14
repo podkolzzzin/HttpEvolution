@@ -150,7 +150,9 @@ Initial/Handshake/1-RTT та перевіряє клієнтський Finished.
 `QuicServer.cs` слухає UDP через `UdpClient`, маршрутизує connection ID,
 обмежує amplification до 3× до перевірки адреси та прибирає неактивні сеанси.
 Chrome завершує QUIC/TLS handshake з ALPN h3. Для локальної перевірки сервер
-друкує SPKI pin тимчасового сертифіката. HTTP/3-запити ще не обробляються.
+друкує SPKI pin тимчасового сертифіката. `QuicStreams.cs` збирає потоки,
+сегментує дані й враховує MAX_DATA/MAX_STREAM_DATA та кількість uni-потоків.
+HTTP/3-запити ще не обробляються.
 
 ```sh
 dotnet run -- --h3
