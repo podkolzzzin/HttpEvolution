@@ -69,15 +69,22 @@ CRLF, байти частини, CRLF. Нульова частина `0\r\n\r\n`
 curl --http1.1 --raw -i http://127.0.0.1:8080/chunks
 ```
 
-## HTTP/2: перший крок
+## HTTP/2
 
-`dotnet run -- --h2` слухає TCP:8081. Поки реалізовано preface, 9-байтовий
-заголовок кадру, SETTINGS/ACK і PING/ACK; обробка HTTP-запитів буде наступним кроком.
+`dotnet run -- --h2` слухає TCP:8081. Реалізовано preface, 9-байтовий
+заголовок кадру, SETTINGS/ACK, PING/ACK та відповіді на GET/HEAD.
 Це cleartext HTTP/2 із prior knowledge; шифрування додається окремо.
 `Hpack.cs` окремо декодує індекси, літерали та динамічну таблицю заголовків;
 приклади з Huffman і без нього перевірено за RFC 7541 C.3/C.4.
 `Huffman.cs` відновлює канонічні коди з 257 довжин таблиці RFC; перевірено всі
-256 байтів, EOS і padding. Підключення до HTTP/2 — далі.
+256 байтів, EOS і padding. Відповідь має HEADERS із `:status` та DATA з HTML;
+прапорець END_STREAM завершує відповідь. HEAD не має DATA.
+Поки запит має вміщатися в один HEADERS з END_STREAM; керування вікнами — далі.
+
+```sh
+curl --http2-prior-knowledge -i http://127.0.0.1:8081/
+curl --http2-prior-knowledge -I http://127.0.0.1:8081/
+```
 
 ## Хронологія і стан
 
