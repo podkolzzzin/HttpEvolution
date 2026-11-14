@@ -154,7 +154,10 @@ Chrome завершує QUIC/TLS handshake з ALPN h3. Для локальної
 сегментує дані й враховує MAX_DATA/MAX_STREAM_DATA та кількість uni-потоків.
 `Http3.cs` обробляє control/SETTINGS і GET/HEAD: HEADERS з QPACK, DATA з HTML,
 FIN наприкінці відповіді. Chrome відобразив сторінку; його netlog підтвердив HTTP/3.
-Поки в роботі — повторна передача при втраті UDP-пакетів.
+`QuicRecovery.cs` відстежує ACK, повторні передачі одного frame та PTO з backoff;
+вікно надсилання обмежене 12 KiB і зменшується при повторній передачі.
+Модель призначена для локального демо; adaptive RTT і повний RFC 9002 тут не реалізовані.
+Підключення recovery до UDP-циклу — наступний крок.
 
 ```sh
 dotnet run -- --h3
