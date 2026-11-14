@@ -2,13 +2,17 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-var server = new TcpListener(IPAddress.Loopback, 8080);
+var ssl3 = args.Contains("--ssl3");
+var port = ssl3 ? 8442 : 8080;
+var server = new TcpListener(IPAddress.Loopback, port);
 server.Start();
-Console.WriteLine("HTTP/1.0 on 127.0.0.1:8080. Stop with Ctrl+C.");
+Console.WriteLine($"{(ssl3 ? "HTTPS/SSL 3.0" : "HTTP/1.0")} on 127.0.0.1:{port}. Stop with Ctrl+C.");
+if (ssl3) Console.WriteLine($"Certificate SPKI pin: {LegacyIdentity.Pin}");
 while (true)
 {
     using var client = server.AcceptTcpClient();
-    using var stream = client.GetStream();
+    using Stream? stream = ssl3 ? LegacySsl.TryAccept(client.GetStream()) : client.GetStream();
+    if (stream is null) continue;
     stream.ReadTimeout = stream.WriteTimeout = 5000;
     using var reader = new StreamReader(stream, Encoding.ASCII);
     try
