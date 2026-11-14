@@ -142,6 +142,7 @@ HTTP-коду потік розшифрованих байтів. Перевір
 пакети та кодує Initial/Handshake/1-RTT, включно з padding Initial до 1200 байтів.
 `QuicBuffer.cs` збирає CRYPTO/STREAM-фрагменти за offset, усуває дублікати й перевіряє FIN.
 `QuicAcks.cs` кодує й розбирає ACK-діапазони з пропусками та ECN.
+`QuicParameters.cs` узгоджує межі даних/потоків і перевіряє source connection ID.
 UDP-транспорт, QUIC-потоки й HTTP/3 ще не підключені.
 
 ## Хронологія і стан
