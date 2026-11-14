@@ -140,6 +140,7 @@ HTTP-коду потік розшифрованих байтів. Перевір
 `QuicData.cs` читає й записує varint та вектори QUIC/HTTP/3; перевірено приклади RFC 9000
 і межі всіх чотирьох ширин. `QuicPacket.cs` розбирає long/short headers і coalesced
 пакети та кодує Initial/Handshake/1-RTT, включно з padding Initial до 1200 байтів.
+`QuicBuffer.cs` збирає CRYPTO/STREAM-фрагменти за offset, усуває дублікати й перевіряє FIN.
 UDP-транспорт, QUIC-потоки й HTTP/3 ще не підключені.
 
 ## Хронологія і стан
