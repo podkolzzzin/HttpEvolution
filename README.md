@@ -132,7 +132,7 @@ Handshake формує EncryptedExtensions, Certificate, CertificateVerify та 
 HTTP-коду потік розшифрованих байтів. Перевірено HTTPS через curl/OpenSSL,
 довіру до сертифіката, hostname, close_notify та відновлення після невдалого handshake.
 
-## HTTP/3: QUIC у роботі
+## HTTP/3 / QUIC
 
 `QuicKeys.cs` додає ключі Initial, AES-GCM payload protection і AES header protection.
 Клієнтський і серверний пакети побайтово збігаються з RFC 9001 Appendix A;
@@ -152,10 +152,18 @@ Initial/Handshake/1-RTT та перевіряє клієнтський Finished.
 Chrome завершує QUIC/TLS handshake з ALPN h3. Для локальної перевірки сервер
 друкує SPKI pin тимчасового сертифіката. `QuicStreams.cs` збирає потоки,
 сегментує дані й враховує MAX_DATA/MAX_STREAM_DATA та кількість uni-потоків.
-HTTP/3-запити ще не обробляються.
+`Http3.cs` обробляє control/SETTINGS і GET/HEAD: HEADERS з QPACK, DATA з HTML,
+FIN наприкінці відповіді. Chrome відобразив сторінку; його netlog підтвердив HTTP/3.
+Поки в роботі — повторна передача при втраті UDP-пакетів.
 
 ```sh
 dotnet run -- --h3
+```
+
+Для локального Chrome підстав надрукований pin замість `PIN` (окремий тимчасовий профіль):
+
+```sh
+google-chrome --user-data-dir="$(mktemp -d)" --origin-to-force-quic-on=127.0.0.1:8445 --ignore-certificate-errors-spki-list=PIN https://127.0.0.1:8445/
 ```
 
 ## Хронологія і стан
@@ -172,7 +180,7 @@ dotnet run -- --h3
 | 1999 — TLS 1.0 | Історичний перехід SSL → TLS; виконуване HTTPS — у кроці TLS 1.3 |
 | 2015 — HTTP/2 | **Готово в evolution:** кадри, SETTINGS, HPACK/Huffman, GET/HEAD, вікна потоків і CONTINUATION; також h2 через TLS |
 | 2018 — TLS 1.3 | **Готово в evolution:** handshake, сертифікат, ECDH, AES-GCM і HTTPS/1.1 |
-| 2022 — HTTP/3 | QUIC поверх UDP з TLS 1.3; потоки; кадри; QPACK |
+| 2022 — HTTP/3 | **Готово в evolution:** QUIC/UDP, TLS 1.3, потоки, кадри, статичний QPACK і GET/HEAD; recovery ще в роботі |
 
 HTTPS — HTTP усередині захищеного каналу, а не окрема версія HTTP.
 Для захищених етапів зберігаємо обмеження на мережеві API:

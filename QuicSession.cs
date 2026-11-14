@@ -17,6 +17,7 @@ sealed class QuicSession : IDisposable
     readonly Space?[] spaces = new Space?[3];
     readonly TlsHandshake tls = new("h3");
     QuicStreams? streams;
+    Http3? http;
     readonly byte[] original;
     byte[] peerId;
     long received, sent;
@@ -56,6 +57,7 @@ sealed class QuicSession : IDisposable
         else if (level == 1)
         {
             tls.VerifyFinished(message); spaces[2]!.Pending.Enqueue([0x1e]);
+            http = new(streams!);
             Console.WriteLine("QUIC handshake complete; ALPN h3.");
         }
         else throw new InvalidDataException("Unexpected CRYPTO level.");
@@ -113,7 +115,10 @@ sealed class QuicSession : IDisposable
     public List<byte[]> Flush()
     {
         if (tls.Complete && !Closed)
+        {
+            http!.Process();
             foreach (var frame in streams!.Frames()) spaces[2]!.Pending.Enqueue(frame);
+        }
         var output = new List<byte[]>();
         for (var level = 0; level < spaces.Length; level++)
         {
@@ -138,10 +143,10 @@ sealed class QuicSession : IDisposable
         Closed = true;
         foreach (var space in spaces) if (space is not null) { space.Pending.Clear(); space.WantAck = false; }
     }
-    public void Abort()
+    public void Abort(bool application = false)
     {
         Stop(); var level = tls.Complete ? 2 : spaces[1] is not null ? 1 : 0;
-        spaces[level]!.Pending.Enqueue([0x1c, 7, 0, 0]);
+        spaces[level]!.Pending.Enqueue(application ? [0x1d, .. QuicData.Int(0x101), 0] : [0x1c, 7, 0, 0]);
     }
     public void Dispose() { tls.Dispose(); foreach (var space in spaces) space?.Dispose(); }
 }

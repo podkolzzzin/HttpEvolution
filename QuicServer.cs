@@ -43,7 +43,10 @@ static class QuicServer
             catch (OperationCanceledException) { }
             foreach (var session in routes.Values.Distinct().ToArray())
             {
-                foreach (var packet in session.Flush())
+                List<byte[]> output;
+                try { output = session.Flush(); }
+                catch (InvalidDataException error) { Console.Error.WriteLine($"HTTP/3: {error.Message}"); session.Abort(true); output = session.Flush(); }
+                foreach (var packet in output)
                     try { await udp.SendAsync(packet, session.Peer); } catch (SocketException) { session.Stop(); break; }
                 if (!session.Closed && Environment.TickCount64 - session.LastSeen < 10000) continue;
                 foreach (var key in routes.Where(pair => pair.Value == session).Select(pair => pair.Key).ToArray()) routes.Remove(key);
