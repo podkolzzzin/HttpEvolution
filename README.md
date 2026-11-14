@@ -91,6 +91,14 @@ curl --http2-prior-knowledge -i http://127.0.0.1:8081/
 curl --http2-prior-knowledge -I http://127.0.0.1:8081/
 ```
 
+## TLS 1.3: базові операції
+
+`TlsCrypto.cs` додає HKDF-Expand-Label, Finished та AES-128-GCM.
+Криптографічні примітиви — з .NET BCL; формат протоколу реалізовано вручну.
+Ключі, Finished і зашифрований запис побайтово збігаються з RFC 8448;
+змінений тег, заголовок або номер запису не проходять перевірку.
+Handshake і HTTPS ще не підключені.
+
 ## Хронологія і стан
 
 Дати показують історичну появу або публікацію специфікацій, а не версії .NET.
@@ -108,8 +116,8 @@ curl --http2-prior-knowledge -I http://127.0.0.1:8081/
 | 2022 — HTTP/3 | QUIC поверх UDP з TLS 1.3; потоки; кадри; QPACK |
 
 HTTPS — HTTP усередині захищеного каналу, а не окрема версія HTTP.
-Перед реалізацією захищених етапів потрібно визначити межі початкового обмеження:
-`SslStream` дає TLS поверх `TcpClient`, але виходить за перелік дозволених класів.
+Для захищених етапів зберігаємо обмеження на мережеві API:
+TLS-повідомлення й записи реалізуємо поверх `TcpClient`, використовуючи криптопримітиви BCL.
 SSL та старі TLS описуємо історично; для виконуваного демо використовуватимемо сучасний TLS.
 Сам `UdpClient` дає лише дейтаграми: HTTP/3 потребує ще QUIC, TLS і QPACK.
 Власна реалізація цих шарів суттєво збільшить код; готовий QUIC теж розширить
@@ -122,4 +130,5 @@ SSL та старі TLS описуємо історично; для викону
 - [HTTP/1.0](https://www.rfc-editor.org/rfc/rfc1945), [перший RFC HTTP/1.1](https://www.rfc-editor.org/rfc/rfc2068)
 - [Поточна специфікація повідомлень HTTP/1.1](https://www.rfc-editor.org/rfc/rfc9112.html)
 - [TLS 1.0](https://www.rfc-editor.org/rfc/rfc2246), [TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446)
+- [Контрольні приклади TLS 1.3](https://www.rfc-editor.org/rfc/rfc8448)
 - [перший RFC HTTP/2](https://www.rfc-editor.org/rfc/rfc7540), [HTTP/3](https://www.rfc-editor.org/rfc/rfc9114)
