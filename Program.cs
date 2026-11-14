@@ -2,6 +2,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
+if (args is ["--ssl3-client", var pin])
+{
+    try { LegacySsl.Client(pin); } catch (IOException error) { Console.Error.WriteLine(error.Message); Environment.ExitCode = 1; }
+    return;
+}
 if (args.Contains("--h3")) { await QuicServer.Run(); return; }
 if (args.Contains("--h2")) { Http2.Run(args.Contains("--tls")); return; }
 
