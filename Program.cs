@@ -4,7 +4,7 @@ using System.Text;
 
 var server = new TcpListener(IPAddress.Loopback, 8080);
 server.Start();
-Console.WriteLine("HTTP/0.9 on 127.0.0.1:8080. Stop with Ctrl+C.");
+Console.WriteLine("HTTP/1.0 on 127.0.0.1:8080. Stop with Ctrl+C.");
 while (true)
 {
     using var client = server.AcceptTcpClient();
@@ -15,8 +15,15 @@ while (true)
     {
         var request = reader.ReadLine()?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (request is not ["GET", var path, ..]) continue;
-        var html = path == "/" ? "<h1>Hello, HTTP/0.9!</h1>\n" : "<h1>Not found</h1>\n";
-        stream.Write(Encoding.ASCII.GetBytes(html));
+        var versioned = request.Length > 2;
+        if (versioned)
+            while (reader.ReadLine() is { Length: > 0 }) { }
+        var status = path == "/" ? "200 OK" : "404 Not Found";
+        var html = path == "/" ? "<h1>Hello, HTTP!</h1>\n" : "<h1>Not found</h1>\n";
+        var body = Encoding.ASCII.GetBytes(html);
+        if (versioned)
+            stream.Write(Encoding.ASCII.GetBytes($"HTTP/1.0 {status}\r\nContent-Type: text/html\r\nContent-Length: {body.Length}\r\n\r\n"));
+        stream.Write(body);
     }
     catch (IOException) { } // A disconnected or timed-out client must not stop the demo.
 }
