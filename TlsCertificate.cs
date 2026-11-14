@@ -7,6 +7,7 @@ static class TlsCertificate
 {
     static readonly ECDsa Key = ECDsa.Create(ECCurve.NamedCurves.nistP256);
     public static byte[] Der { get; } = Create();
+    public static string Pin => Convert.ToBase64String(SHA256.HashData(Key.ExportSubjectPublicKeyInfo()));
     static byte[] Create()
     {
         var request = new CertificateRequest("CN=localhost", Key, HashAlgorithmName.SHA256);
