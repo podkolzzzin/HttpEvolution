@@ -186,6 +186,11 @@ dotnet run -- --ssl3
 dotnet run -- --ssl3-client PIN
 ```
 
+Для першого TLS 1.0 (1999): `dotnet run -- --tls10` на TCP:8441,
+а в іншому терміналі — `dotnet run -- --tls10-client PIN`.
+Відмінності від SSL3: PRF із MD5/SHA-1, HMAC з версією запису, Finished на
+12 байтів і довжина RSA ciphertext у ClientKeyExchange. PRF перевірено проти OpenSSL.
+
 Дати показують історичну появу або публікацію специфікацій, а не версії .NET.
 Кожен пункт із кількома можливостями розбивається на окремі короткі коміти.
 
@@ -195,7 +200,7 @@ dotnet run -- --ssl3-client PIN
 | 1995–1996 — HTTPS/SSL | SSL 2.0 — історія; **готово:** SSL 3.0 RSA key exchange, Finished, MAC/3DES-CBC, записи й ChangeCipherSpec |
 | 1996 — HTTP/1.0 | **Готово в evolution:** версія, статус, заголовки, Content-Length і HEAD |
 | 1997 — HTTP/1.1 | **Готово в evolution:** версія, Host, keep-alive і chunked |
-| 1999 — TLS 1.0 | Історичний перехід SSL → TLS; виконуване HTTPS — у кроці TLS 1.3 |
+| 1999 — TLS 1.0 | **Готово:** початковий RSA/3DES, PRF/HMAC, короткий Finished і власний клієнт |
 | 2015 — HTTP/2 | **Готово в evolution:** кадри, SETTINGS, HPACK/Huffman, GET/HEAD, вікна потоків і CONTINUATION; також h2 через TLS |
 | 2018 — TLS 1.3 | **Готово в evolution:** handshake, сертифікат, ECDH, AES-GCM і HTTPS/1.1 |
 | 2022 — HTTP/3 | **Готово в evolution:** QUIC/UDP, TLS 1.3, потоки, кадри, статичний QPACK, GET/HEAD та ACK/PTO recovery |

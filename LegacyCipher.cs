@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-sealed class Ssl3Cipher(byte[] mac, byte[] key, byte[] initialIv) : IDisposable
+sealed class LegacyCipher(byte[] mac, byte[] key, byte[] initialIv, byte minor = 0) : IDisposable
 {
     readonly TripleDES cipher = Create(key);
     readonly byte[] macSecret = mac.ToArray();
@@ -10,7 +10,7 @@ sealed class Ssl3Cipher(byte[] mac, byte[] key, byte[] initialIv) : IDisposable
     byte[] Mac(byte type, byte[] data)
     {
         if (sequence == ulong.MaxValue) throw new IOException("SSL sequence limit.");
-        return Ssl3Crypto.Mac(macSecret, sequence++, type, data);
+        return minor == 0 ? Ssl3Crypto.Mac(macSecret, sequence++, type, data) : Tls10Crypto.Mac(macSecret, sequence++, type, data);
     }
     public byte[] Seal(byte type, byte[] data)
     {
@@ -25,7 +25,9 @@ sealed class Ssl3Cipher(byte[] mac, byte[] key, byte[] initialIv) : IDisposable
         if (encrypted.Length == 0 || encrypted.Length % 8 != 0) throw new IOException("Invalid SSL CBC record.");
         var plain = cipher.DecryptCbc(encrypted, iv, PaddingMode.None); iv = encrypted[^8..];
         var length = plain.Length - plain[^1] - 21;
-        if (plain[^1] >= 8 || length < 0) throw new IOException("Invalid SSL CBC record.");
+        if ((minor == 0 && plain[^1] >= 8) || length < 0) throw new IOException("Invalid SSL CBC record.");
+        if (minor != 0)
+            foreach (var value in plain.AsSpan(length + 20)) if (value != plain[^1]) throw new IOException("Invalid TLS CBC padding.");
         var data = plain[..length];
         if (!CryptographicOperations.FixedTimeEquals(Mac(type, data), plain.AsSpan(length, 20))) throw new IOException("Invalid SSL CBC record.");
         return data;
