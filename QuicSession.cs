@@ -8,7 +8,6 @@ sealed class QuicSession : IDisposable
         public readonly QuicKeys Read = new(client), Write = new(server);
         public readonly QuicBuffer Crypto = new();
         public readonly SortedSet<ulong> Received = [];
-        public readonly Queue<byte[]> Pending = [];
         public long Largest = -1;
         public ulong Next, CryptoOffset;
         public bool WantAck;
@@ -16,12 +15,13 @@ sealed class QuicSession : IDisposable
     }
     readonly Space?[] spaces = new Space?[3];
     readonly TlsHandshake tls = new("h3");
+    readonly QuicRecovery recovery = new();
     QuicStreams? streams;
     Http3? http;
     readonly byte[] original;
     byte[] peerId;
     long received, sent;
-    bool validated;
+    bool validated, discardHandshake;
     public byte[] Id { get; } = RandomNumberGenerator.GetBytes(8);
     public IPEndPoint Peer { get; }
     public long LastSeen { get; private set; } = Environment.TickCount64;
@@ -37,7 +37,7 @@ sealed class QuicSession : IDisposable
         for (var offset = 0; offset < message.Length; offset += 800)
         {
             var part = message[offset..Math.Min(message.Length, offset + 800)];
-            space.Pending.Enqueue([6, .. QuicData.Int(space.CryptoOffset), .. QuicData.Vector(part)]);
+            recovery.Add(level, [6, .. QuicData.Int(space.CryptoOffset), .. QuicData.Vector(part)]);
             space.CryptoOffset += (ulong)part.Length;
         }
     }
@@ -56,8 +56,10 @@ sealed class QuicSession : IDisposable
         }
         else if (level == 1)
         {
-            tls.VerifyFinished(message); spaces[2]!.Pending.Enqueue([0x1e]);
+            tls.VerifyFinished(message); recovery.Discard(1); discardHandshake = true;
+            recovery.Add(2, [0x1e]);
             http = new(streams!);
+            tls.Dispose();
             Console.WriteLine("QUIC handshake complete; ALPN h3.");
         }
         else throw new InvalidDataException("Unexpected CRYPTO level.");
@@ -69,7 +71,11 @@ sealed class QuicSession : IDisposable
         try { decoded = space.Read.Open(packet.Bytes, packet.NumberOffset, ref space.Largest); }
         catch (Exception error) when (error is CryptographicException or InvalidDataException) { return; }
         received += packet.Bytes.Length; LastSeen = Environment.TickCount64;
-        if (packet.Level == 1) validated = true;
+        if (packet.Level == 1)
+        {
+            validated = true;
+            if (spaces[0] is { } initial) { recovery.Discard(0); initial.Dispose(); spaces[0] = null; }
+        }
         if ((decoded.Flags & (packet.Level == 2 ? 0x1c : 0x0c)) != 0) throw new InvalidDataException("Invalid reserved/key-phase bits.");
         if (!space.Received.Add(decoded.Number)) { space.WantAck = true; return; }
         if (space.Received.Count > 1024) space.Received.Remove(space.Received.Min);
@@ -82,7 +88,7 @@ sealed class QuicSession : IDisposable
             switch (type)
             {
                 case 0: case 1: break;
-                case 2: case 3: QuicAcks.Read(input, type == 3); break;
+                case 2: case 3: recovery.Acknowledge(packet.Level, QuicAcks.Read(input, type == 3), space.Next); break;
                 case 6:
                     var offset = input.Int(); space.Crypto.Add(offset, input.Vector());
                     while (space.Crypto.Message() is { } message) Handshake(packet.Level, message);
@@ -104,7 +110,7 @@ sealed class QuicSession : IDisposable
                     if (cid.Length is 0 or > 20) throw new InvalidDataException("Invalid new connection ID.");
                     if (retire > 0) peerId = cid;
                     break;
-                case 0x1a: spaces[2]!.Pending.Enqueue([0x1b, .. input.Take(8)]); break;
+                case 0x1a: recovery.Add(2, [0x1b, .. input.Take(8)]); break;
                 case 0x1b: input.Take(8); break;
                 case 0x1c: case 0x1d:
                     input.Int(); if (type == 0x1c) input.Int(); input.Vector(); Stop(); return;
@@ -117,36 +123,47 @@ sealed class QuicSession : IDisposable
         if (tls.Complete && !Closed)
         {
             http!.Process();
-            foreach (var frame in streams!.Frames()) spaces[2]!.Pending.Enqueue(frame);
+            foreach (var frame in streams!.Frames()) recovery.Add(2, frame);
         }
         var output = new List<byte[]>();
+        var now = Environment.TickCount64;
         for (var level = 0; level < spaces.Length; level++)
         {
             if (spaces[level] is not { } space) continue;
-            while (space.Pending.Count > 0 || space.WantAck)
+            while (true)
             {
+                var candidate = recovery.Ready(level, now).FirstOrDefault();
+                if (candidate is null && !space.WantAck) break;
                 var ack = space.WantAck ? QuicAcks.Encode(space.Received) : [];
-                var include = space.Pending.Count > 0 && ack.Length + space.Pending.Peek().Length <= 1050;
-                byte[] plain = [.. ack, .. (include ? space.Pending.Peek() : [])];
+                var include = candidate is not null && ack.Length + candidate.Bytes.Length <= 1050;
+                byte[] plain = [.. ack, .. (include ? candidate!.Bytes : [])];
                 if (plain.Length == 0) throw new InvalidDataException("Oversized outgoing QUIC frame.");
                 var packet = level == 2 ? QuicPacket.Short(peerId, space.Next, plain, space.Write) : QuicPacket.Long(level, peerId, Id, space.Next, plain, space.Write);
+                if (include && !recovery.CanSend(candidate!, packet.Length))
+                {
+                    if (ack.Length == 0) break;
+                    include = false;
+                    packet = level == 2 ? QuicPacket.Short(peerId, space.Next, ack, space.Write) : QuicPacket.Long(level, peerId, Id, space.Next, ack, space.Write);
+                }
                 if (!validated && sent + packet.Length > received * 3) break;
+                if (include) recovery.Record(candidate!, space.Next, packet.Length, now);
                 space.Next++; sent += packet.Length;
-                if (include) space.Pending.Dequeue();
                 space.WantAck = false; output.Add(packet);
             }
         }
+        if (discardHandshake && spaces[1] is { WantAck: false } handshake) { handshake.Dispose(); spaces[1] = null; }
         return output;
     }
     public void Stop()
     {
         Closed = true;
-        foreach (var space in spaces) if (space is not null) { space.Pending.Clear(); space.WantAck = false; }
+        recovery.Clear();
+        foreach (var space in spaces) if (space is not null) space.WantAck = false;
     }
     public void Abort(bool application = false)
     {
         Stop(); var level = tls.Complete ? 2 : spaces[1] is not null ? 1 : 0;
-        spaces[level]!.Pending.Enqueue(application ? [0x1d, .. QuicData.Int(0x101), 0] : [0x1c, 7, 0, 0]);
+        recovery.Add(level, application ? [0x1d, .. QuicData.Int(0x101), 0] : [0x1c, 7, 0, 0], false);
     }
     public void Dispose() { tls.Dispose(); foreach (var space in spaces) space?.Dispose(); }
 }

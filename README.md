@@ -155,9 +155,13 @@ Chrome завершує QUIC/TLS handshake з ALPN h3. Для локальної
 `Http3.cs` обробляє control/SETTINGS і GET/HEAD: HEADERS з QPACK, DATA з HTML,
 FIN наприкінці відповіді. Chrome відобразив сторінку; його netlog підтвердив HTTP/3.
 `QuicRecovery.cs` відстежує ACK, повторні передачі одного frame та PTO з backoff;
-вікно надсилання обмежене 12 KiB і зменшується при повторній передачі.
+вікно надсилання обмежене 12 000 байтів і зменшується при повторній передачі.
 Модель призначена для локального демо; adaptive RTT і повний RFC 9002 тут не реалізовані.
-Підключення recovery до UDP-циклу — наступний крок.
+Recovery працює в UDP-циклі: frames повторюються з новим packet number,
+ACK будь-якої копії завершує повтори; старі ключі Initial/Handshake видаляються.
+Chrome отримав HTML після навмисної втрати Initial, Handshake і 1-RTT пакетів
+та дублювання клієнтського Initial. Межі демо: 16 bidi й 16 uni потоків,
+64 KiB на receive-потік, 1 MiB на з'єднання; active migration вимкнено.
 
 ```sh
 dotnet run -- --h3
@@ -183,7 +187,7 @@ google-chrome --user-data-dir="$(mktemp -d)" --origin-to-force-quic-on=127.0.0.1
 | 1999 — TLS 1.0 | Історичний перехід SSL → TLS; виконуване HTTPS — у кроці TLS 1.3 |
 | 2015 — HTTP/2 | **Готово в evolution:** кадри, SETTINGS, HPACK/Huffman, GET/HEAD, вікна потоків і CONTINUATION; також h2 через TLS |
 | 2018 — TLS 1.3 | **Готово в evolution:** handshake, сертифікат, ECDH, AES-GCM і HTTPS/1.1 |
-| 2022 — HTTP/3 | **Готово в evolution:** QUIC/UDP, TLS 1.3, потоки, кадри, статичний QPACK і GET/HEAD; recovery ще в роботі |
+| 2022 — HTTP/3 | **Готово в evolution:** QUIC/UDP, TLS 1.3, потоки, кадри, статичний QPACK, GET/HEAD та ACK/PTO recovery |
 
 HTTPS — HTTP усередині захищеного каналу, а не окрема версія HTTP.
 Для захищених етапів зберігаємо обмеження на мережеві API:
