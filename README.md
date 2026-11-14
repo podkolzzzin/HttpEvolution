@@ -145,7 +145,14 @@ HTTP-коду потік розшифрованих байтів. Перевір
 `QuicParameters.cs` узгоджує межі даних/потоків і перевіряє source connection ID.
 `QuicSession.cs` переносить TLS-повідомлення у CRYPTO, використовує окремі ключі
 Initial/Handshake/1-RTT та перевіряє клієнтський Finished.
-UDP-цикл і HTTP/3-запити підключаються наступними кроками.
+`QuicServer.cs` слухає UDP через `UdpClient`, маршрутизує connection ID,
+обмежує amplification до 3× до перевірки адреси та прибирає неактивні сеанси.
+Chrome завершує QUIC/TLS handshake з ALPN h3. Для локальної перевірки сервер
+друкує SPKI pin тимчасового сертифіката. HTTP/3-запити ще не обробляються.
+
+```sh
+dotnet run -- --h3
+```
 
 ## Хронологія і стан
 

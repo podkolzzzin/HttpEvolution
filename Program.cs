@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
+if (args.Contains("--h3")) { await QuicServer.Run(); return; }
 if (args.Contains("--h2")) { Http2.Run(args.Contains("--tls")); return; }
 
 var tls = args.Contains("--tls");
