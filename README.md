@@ -143,6 +143,8 @@ HTTP-коду потік розшифрованих байтів. Перевір
 `QuicBuffer.cs` збирає CRYPTO/STREAM-фрагменти за offset, усуває дублікати й перевіряє FIN.
 `QuicAcks.cs` кодує й розбирає ACK-діапазони з пропусками та ECN.
 `QuicParameters.cs` узгоджує межі даних/потоків і перевіряє source connection ID.
+`Qpack.cs` підтримує статичні індекси, літерали та Huffman, повторно використовуючи
+код HPACK. Динамічна таблиця має узгоджену місткість 0; перевірено RFC 9204 B.1.
 `QuicSession.cs` переносить TLS-повідомлення у CRYPTO, використовує окремі ключі
 Initial/Handshake/1-RTT та перевіряє клієнтський Finished.
 `QuicServer.cs` слухає UDP через `UdpClient`, маршрутизує connection ID,
