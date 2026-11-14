@@ -103,7 +103,9 @@ ALPN, відлуння session ID і відхилення обрізаних п�
 `TlsHandshake.cs` узгоджує P-256, обчислює ECDH-секрет і ключі handshake.
 Шлях із HelloRetryRequest використовує синтетичний `message_hash` у transcript.
 Перевірено однакові секрети обох сторін із retry й без нього.
-Сертифікат, завершення handshake і HTTPS ще не підключені.
+`TlsCertificate.cs` створює тимчасовий self-signed сертифікат для localhost
+та підписує CertificateVerify; приватний ключ існує тільки в пам'яті процесу.
+Завершення handshake і HTTPS ще не підключені.
 
 ## Хронологія і стан
 
