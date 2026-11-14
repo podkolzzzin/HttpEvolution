@@ -91,6 +91,15 @@ curl --http2-prior-knowledge -i http://127.0.0.1:8081/
 curl --http2-prior-knowledge -I http://127.0.0.1:8081/
 ```
 
+Для HTTP/2 усередині TLS 1.3:
+
+```sh
+dotnet run -- --h2 --tls
+curl -k --http2 -i https://localhost:8444/
+```
+
+ALPN узгоджує `h2`; HTTP/2 використовує той самий потік, що й HTTPS/1.1.
+
 ## HTTPS / TLS 1.3
 
 ```sh
@@ -135,7 +144,7 @@ HTTP-коду потік розшифрованих байтів. Перевір
 | 1996 — HTTP/1.0 | **Готово в evolution:** версія, статус, заголовки, Content-Length і HEAD |
 | 1997 — HTTP/1.1 | **Готово в evolution:** версія, Host, keep-alive і chunked |
 | 1999 — TLS 1.0 | Історичний перехід SSL → TLS; виконуване HTTPS — у кроці TLS 1.3 |
-| 2015 — HTTP/2 | **Готово в evolution:** кадри, SETTINGS, HPACK/Huffman, GET/HEAD, вікна потоків і CONTINUATION; TLS ще попереду |
+| 2015 — HTTP/2 | **Готово в evolution:** кадри, SETTINGS, HPACK/Huffman, GET/HEAD, вікна потоків і CONTINUATION; також h2 через TLS |
 | 2018 — TLS 1.3 | **Готово в evolution:** handshake, сертифікат, ECDH, AES-GCM і HTTPS/1.1 |
 | 2022 — HTTP/3 | QUIC поверх UDP з TLS 1.3; потоки; кадри; QPACK |
 

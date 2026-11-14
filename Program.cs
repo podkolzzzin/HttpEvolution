@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-if (args.Contains("--h2")) { Http2.Run(); return; }
+if (args.Contains("--h2")) { Http2.Run(args.Contains("--tls")); return; }
 
 var tls = args.Contains("--tls");
 var port = tls ? 8443 : 8080;
