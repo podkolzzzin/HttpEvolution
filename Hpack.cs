@@ -30,6 +30,25 @@ sealed class Hpack
     readonly List<(string Name, string Value)> dynamic = [];
     int capacity = 4096, size;
 
+    public static byte[] Encode(params (string Name, string Value)[] fields)
+    {
+        using var output = new MemoryStream();
+        void Text(string value)
+        {
+            var bytes = Encoding.Latin1.GetBytes(value);
+            output.WriteByte((byte)Math.Min(bytes.Length, 127));
+            if (bytes.Length >= 127)
+            {
+                var remaining = bytes.Length - 127;
+                while (remaining >= 128) { output.WriteByte((byte)((remaining & 127) | 128)); remaining >>= 7; }
+                output.WriteByte((byte)remaining);
+            }
+            output.Write(bytes);
+        }
+        foreach (var (name, value) in fields) { output.WriteByte(0); Text(name); Text(value); }
+        return output.ToArray(); // Literal fields without indexing or Huffman.
+    }
+
     public List<(string Name, string Value)> Decode(byte[] block)
     {
         using var input = new MemoryStream(block);
