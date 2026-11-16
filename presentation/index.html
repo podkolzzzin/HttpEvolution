@@ -37,6 +37,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
 .frame-total{margin-top:10px;font:600 10px ui-monospace,monospace;color:var(--muted)}
 @media(max-width:1050px){.frame-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.frame-model{padding:14px}.frame-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.frame-field{padding:10px 8px}.frame-field strong{font-size:11px}.frame-field code{font-size:13px}.frame-field small{font-size:10px}.frame-explanation{min-height:5em}.frame-model h2{font-size:15px}}
+.channel-model{border:1px solid var(--line);border-radius:10px;background:#fbfcf6;padding:15px;margin-bottom:16px}.channel-path{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:9px;align-items:center;text-align:center}.channel-path strong{font-size:12px}.channel-path span{font-size:12px;font-weight:650;background:var(--accent);padding:9px 11px;border-radius:6px}.channel-model p{font-size:11px;line-height:1.6;color:var(--muted);margin:12px 0 0;text-align:center}
 </style>
 </head>
 <body>
@@ -49,7 +50,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
 <main id="deck" aria-label="Презентація еволюції HTTP"></main>
 <footer class="bottom" aria-label="Навігація слайдами">
 <button class="nav-btn prev" id="prev" type="button" aria-label="Попередній слайд"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg><span>Назад</span></button>
-<button class="counter" id="counter" type="button" aria-label="Відкрити зміст"><strong id="current-num">01</strong> / <span id="total-num">31</span><small id="chapter-name">Маршрут</small></button>
+<button class="counter" id="counter" type="button" aria-label="Відкрити зміст"><strong id="current-num">01</strong> / <span id="total-num">32</span><small id="chapter-name">Маршрут</small></button>
 <span class="swipe-hint">← свайп / клавіші →</span>
 <button class="nav-btn next" id="next" type="button"><span>Далі</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
 </footer>
@@ -234,6 +235,26 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "rfc": "3268",
       "wire": "ClientHello: [AES128-SHA, ...]\nServerHello: AES128-SHA\nRSA key exchange → AES-CBC + HMAC-SHA1\nУсередині — той самий HTTP/1.x",
       "note": "Вибір AES — із LegacySsl.cs; створення шифру — із LegacyCipher.cs. Пізніший коміт 2010 додає renegotiation indication, без повторного handshake."
+    },
+    {
+      "id": "sse",
+      "year": "2009 · W3C draft",
+      "chapter": "SSE / EventSource",
+      "title": "Події із сервера.\nБез нових GET.",
+      "why": "Для прогресу задачі чи стрічки новин не хочеться щосекунди питати: «Є щось нове?». Сервер може надсилати події в одній довгій HTTP-відповіді.",
+      "change": "SSE: текстовий потік сервер → браузер. Подія закінчується порожнім рядком.",
+      "code": "stream.Write(\"HTTP/1.0 200 OK\\r\\n\"u8);\nstream.Write(\"Content-Type: text/event-stream\\r\\n\\r\\n\"u8);\nstream.Write(\"id: 1\\ndata: Hello\\n\\n\"u8);\n// Пізніше, у тій самій відповіді:\nstream.Write(\"id: 2\\ndata: Again\\n\\n\"u8);",
+      "file": "presentation/index.html",
+      "rfc": "sse-draft",
+      "codeTitle": "SSE · сервер",
+      "codeCaption": "НАВЧАЛЬНИЙ ПРИКЛАД · HTTP/1.0 для простого фреймінгу",
+      "client": "const events = new EventSource(\"/events\");\nevents.onmessage = e => console.log(e.data);\n// EventSource сам перепідключається після розриву.",
+      "channel": "sse",
+      "wire": "Браузер → GET /events HTTP/1.1\nСервер  → Content-Type: text/event-stream\n\nid: 1\ndata: Hello\n[порожній рядок — кінець події]\n\n[з’єднання лишається відкритим]\n\nid: 2\ndata: Again\n[порожній рядок — наступна подія]",
+      "note": "2009 — перша публічна чернетка W3C; ідея з’явилася раніше. SSE лишається HTTP, це не нова його версія. У коді HTTP/1.0 спрощує межі тіла; для HTTP/1.1 потрібен, наприклад, chunked. Зворотні команди можна надсилати окремими HTTP-запитами.",
+      "extraRefs": [
+        "sse-current"
+      ]
     },
     {
       "id": "http2-frames",
@@ -566,6 +587,14 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
     "9114": [
       "RFC 9114",
       "https://www.rfc-editor.org/rfc/rfc9114.html"
+    ],
+    "sse-draft": [
+      "W3C · SSE 2009",
+      "https://www.w3.org/TR/2009/WD-eventsource-20090423/"
+    ],
+    "sse-current": [
+      "HTML · EventSource",
+      "https://html.spec.whatwg.org/multipage/server-sent-events.html"
     ]
   },
   "full": "using System.Net;\nusing System.Net.Sockets;\nusing System.Text;\n\nvar server = new TcpListener(IPAddress.Loopback, 8080);\nserver.Start();\nConsole.WriteLine(\"HTTP/0.9 on 127.0.0.1:8080. Stop with Ctrl+C.\");\nwhile (true)\n{\n    using var client = server.AcceptTcpClient();\n    using var stream = client.GetStream();\n    stream.ReadTimeout = stream.WriteTimeout = 5000;\n    using var reader = new StreamReader(stream, Encoding.ASCII);\n    try\n    {\n        var request = reader.ReadLine()?.Split(' ', StringSplitOptions.RemoveEmptyEntries);\n        if (request is not [\"GET\", var path, ..]) continue;\n        var html = path == \"/\" ? \"<h1>Hello, HTTP/0.9!</h1>\\n\" : \"<h1>Not found</h1>\\n\";\n        stream.Write(Encoding.ASCII.GetBytes(html));\n    }\n    catch (IOException) { } // A disconnected or timed-out client must not stop the demo.\n}"
@@ -594,16 +623,22 @@ function frameModel(){
  const fields=[['length','Довжина','00 00 05','3 байти'],['type','Тип','00','1 байт'],['flags','Прапорці','01','1 байт'],['stream','Потік','00 00 00 01','4 байти']];
  return '<div class="frame-model" aria-label="Приклад кадру HTTP/2"><h2>Спочатку опис, потім вміст</h2><p class="frame-hint">Це 9 службових байтів у hex. Натисни на поле.</p><div class="frame-fields">'+fields.map(([id,label,bytes,size],i)=>'<button type="button" class="frame-field" data-frame-field="'+id+'" aria-pressed="'+(i===0)+'"><strong>'+label+'</strong><code>'+bytes+'</code><small>'+size+'</small></button>').join('')+'</div><p class="frame-explanation" role="status" aria-live="polite">Довжина: 00 00 05 означає 5 байтів даних після заголовка. Самі 9 байтів заголовка сюди не входять.</p><div class="frame-payload"><span>Дані · 5 байтів ASCII</span><strong>Hello</strong></div><div class="frame-total">3 + 1 + 1 + 4 = 9 · увесь кадр: 9 + 5 = 14 байтів</div></div>';
 }
+function channelModel(kind){
+ const sse=kind==='sse';
+ return '<div class="channel-model"><div class="channel-path"><strong>Браузер</strong><span>'+(sse?'← події':'↔ повідомлення')+'</span><strong>Сервер</strong></div><p>'+(sse?'SSE: одне HTTP-з’єднання для вхідних подій.':'WebSocket: кожна сторона надсилає, коли має дані.')+'</p></div>';
+}
 $('#deck').innerHTML=slides.map((s,i)=>{
  const category=/^(SSL|TLS|HTTPS)/.test(s.chapter)?'tls':/^(QUIC|HTTP\/3)/.test(s.chapter)?'quic':'';
  const source=(s.id==='http09'||s.hero)?s.commit:'chronological';
- const links='<a href="'+repo+'/blob/'+source+'/'+s.file+'" target="_blank" rel="noopener">Код</a><a href="'+repo+'/commit/'+s.commit+'" target="_blank" rel="noopener">Коміт '+s.commit+'</a>'+(s.rfc?'<a href="'+refs[s.rfc][1]+'" target="_blank" rel="noopener">'+esc(refs[s.rfc][0])+'</a>':'');
+ const links='<a href="'+repo+'/blob/'+source+'/'+s.file+'" target="_blank" rel="noopener">Код</a>'+(s.commit?'<a href="'+repo+'/commit/'+s.commit+'" target="_blank" rel="noopener">Коміт '+s.commit+'</a>':'')+(s.rfc?'<a href="'+refs[s.rfc][1]+'" target="_blank" rel="noopener">'+esc(refs[s.rfc][0])+'</a>':'');
+ const extraLinks=(s.extraRefs||[]).map(id=>'<a href="'+refs[id][1]+'" target="_blank" rel="noopener">'+esc(refs[id][0])+'</a>').join('');
+ const client=s.client?'<details class="wire"><summary>Клієнт у браузері · JavaScript</summary>'+codeCard(s.client,'Браузер','JavaScript','ПРИКЛАД · підключення до відповідного endpoint')+'</details>':'';
  const wire=s.wire?'<details class="wire"><summary>На дроті / схема</summary><pre>'+esc(s.wire)+'</pre></details>':'';
  const run=s.command?'<details class="wire"><summary>Команда для показу</summary><pre><code>'+esc(s.command)+'</code></pre></details>':'';
  const first=s.full?'<details class="wire"><summary>Повний HTTP/0.9-сервер · 22 рядки</summary>'+codeCard(full,'Program.cs','C#','ПОВНИЙ ФАЙЛ · main / 0bb3812')+'</details>':'';
  const route=s.hero?'<div class="route" aria-label="HTTP 0.9, HTTP 1.x, HTTP 2, HTTP 3"><span>0.9</span><i>→</i><span>1.x</span><i>→</i><span>2</span><i>→</i><span>3</span></div><div class="hero-stats"><span><strong>22</strong>рядки першого сервера</span><span><strong>3</strong>мережеві класи .NET</span></div>':'';
  const final=s.final?'<div class="final-links"><a href="'+repo+'/tree/chronological" target="_blank" rel="noopener">Відкрити репозиторій ↗</a><a href="'+repo+'/pull/1" target="_blank" rel="noopener">PR для перегляду ↗</a></div>':'';
- return '<section class="slide '+category+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden><div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div><div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+(s.hero?'Формат презентації':'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='frame'?frameModel():'')+codeCard(s.code,s.file,s.language||'C#',s.codeCaption)+'<div class="sources">'+links+'</div>'+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
+ return '<section class="slide '+category+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden><div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div><div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+(s.hero?'Формат презентації':'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='frame'?frameModel():'')+(s.channel?channelModel(s.channel):'')+codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption)+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
 }).join('');
 let group='';$('.topics').innerHTML=slides.map((s,i)=>{let label='';const g=s.chapter;if(g!==group){group=g;label='<div class="topics-group">'+esc(g)+'</div>';}return label+'<button type="button" class="topic" data-go="'+i+'"><span>'+String(i+1).padStart(2,'0')+'</span><span>'+esc(s.year)+'</span><strong>'+esc(s.title.replace(/\n/g,' '))+'</strong></button>';}).join('');
 let index=-1;
