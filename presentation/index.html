@@ -19,6 +19,24 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
 @media(max-width:360px){.slide{padding-left:17px;padding-right:17px}h1{font-size:34px}.hero h1{font-size:46px}.code-card pre{font-size:11px}.code-top{font-size:9px}.menu-button{font-size:12px}.route span{font-size:10px}.topic{grid-template-columns:23px 61px 1fr}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media print{.topbar,.bottom,dialog,.toast,.copy,.model button{display:none!important}main{padding:0}.slide,.slide[hidden]{display:flex!important;break-after:page;min-height:auto;padding:25px 20px}.layout{display:grid;grid-template-columns:1fr 1.2fr;gap:30px}h1{font-size:35px}.lead{font-size:13px}.change{font-size:13px}.code-card pre{font-size:10px;white-space:pre-wrap;overflow-wrap:anywhere}.slide-base{margin-top:15px}details{display:none}.sources{font-size:9px}.note{font-size:10px}.code-card{print-color-adjust:exact;-webkit-print-color-adjust:exact}.model{break-inside:avoid}}
+
+#http2-frames{scroll-margin-top:calc(var(--top) + env(safe-area-inset-top))}
+/* The HTTP/2 envelope: an inspectable example, before the C# snippet. */
+.frame-model{margin:0 0 18px;padding:16px;border:1px solid var(--line);border-radius:11px;background:#fbfcf6}
+.frame-model h2{font-size:16px;letter-spacing:-.35px;line-height:1.4;margin:0 0 4px}
+.frame-hint{font-size:11px;line-height:1.6;color:var(--muted);margin:0 0 14px}
+.frame-fields{display:grid;grid-template-columns:1.6fr 1fr 1fr 2fr;gap:5px}
+.frame-field{min-width:0;padding:11px 5px 9px;border:1px solid var(--line);border-radius:7px;background:var(--paper);text-align:center}
+.frame-field[aria-pressed="true"]{background:var(--accent);border-color:#87a948}
+.frame-field strong{display:block;font-size:10px;font-weight:650;margin-bottom:8px}
+.frame-field code{display:block;white-space:nowrap;font:600 11px ui-monospace,monospace;letter-spacing:-.3px}
+.frame-field small{display:block;color:var(--muted);font-size:9px;margin-top:7px}
+.frame-explanation{margin:12px 0;font-size:12px;line-height:1.65;min-height:4.95em}
+.frame-payload{display:flex;align-items:center;gap:9px;border-top:1px dashed var(--line);padding-top:12px;font-size:11px;color:var(--muted)}
+.frame-payload strong{margin-left:auto;font:600 20px ui-monospace,monospace;color:var(--ink);letter-spacing:3px}
+.frame-total{margin-top:10px;font:600 10px ui-monospace,monospace;color:var(--muted)}
+@media(max-width:1050px){.frame-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.frame-model{padding:14px}.frame-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.frame-field{padding:10px 8px}.frame-field strong{font-size:11px}.frame-field code{font-size:13px}.frame-field small{font-size:10px}.frame-explanation{min-height:5em}.frame-model h2{font-size:15px}}
 </style>
 </head>
 <body>
@@ -221,16 +239,18 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "id": "http2-frames",
       "year": "2015",
       "chapter": "HTTP/2",
-      "title": "Байти отримують\nрамку.",
-      "why": "Рядки HTTP/1.x замінює бінарний формат, з яким легше розділяти типи повідомлень.",
-      "change": "Кожен кадр має 9-байтовий заголовок.",
-      "code": "Span<byte> header = stackalloc byte[9];\nstream.ReadExactly(header);\nvar length = (header[0] << 16) |\n             (header[1] << 8) | header[2];\nvar type = header[3]; var flags = header[4];\nvar id = BinaryPrimitives.ReadInt32BigEndian(header[5..])\n         & 0x7fffffff;",
+      "title": "Кадр — конверт\nіз даними.",
+      "why": "TCP передає суцільні байти. Щоб зрозуміти, що за ними стоїть і де кінець шматка, HTTP/2 додає перед ним короткий опис.",
+      "change": "Кадр = 9 байтів службового заголовка + дані. Розберімо один кадр із текстом «Hello».",
+      "code": "byte[] header = [\n    0, 0, 5,     // довжина даних: 5\n    0, 1,        // DATA; кінець потоку\n    0, 0, 0, 1   // потік №1\n];\nstream.Write(header);\nstream.Write(\"Hello\"u8);",
       "file": "Http2.cs",
       "commit": "1756625",
       "rfc": "7540",
-      "wire": "24-bit Length | 8-bit Type | 8-bit Flags\nR | 31-bit Stream ID\nPayload (Length bytes)\n\nSETTINGS / PING / HEADERS / DATA / WINDOW_UPDATE",
-      "note": "Демо починає HTTP/2 із cleartext prior knowledge на TCP:8081. Пізніше додаємо h2 через TLS.",
-      "command": "dotnet run -- --h2\ncurl --http2-prior-knowledge -i http://127.0.0.1:8081/"
+      "wire": "00 00 05 | 00 | 01 | 00 00 00 01 | 48 65 6C 6C 6F\n   5     |DATA|END |    потік 1   | H  e  l  l  o\n←──── 9 байтів заголовка ──────→ ←── 5 даних ──→\n\nEND — прапорець END_STREAM.\nНа прийомі: прочитати 9 байтів, дізнатися довжину,\nпотім прочитати рівно 5 байтів даних.",
+      "note": "Службовий заголовок кадру — не HTTP-заголовки на кшталт Content-Type. Кадри HEADERS несуть HTTP-заголовки, DATA — тіло. Одна відповідь може мати багато кадрів; кадр не дорівнює TCP-пакету.",
+      "command": "dotnet run -- --h2\ncurl --http2-prior-knowledge -i http://127.0.0.1:8081/",
+      "codeCaption": "НАВЧАЛЬНИЙ ПРИКЛАД · DATA-кадр після HEADERS",
+      "interactive": "frame"
     },
     {
       "id": "http2-streams",
@@ -570,6 +590,10 @@ function codeCard(code,file,lang='C#',caption='ФРАГМЕНТ · деталі 
 }
 function hostModel(){return '<div class="model" aria-label="Модель перевірки Host"><div class="model-label">СПРОБУЙ · HOST У HTTP/1.1</div><div class="switches"><button type="button" data-host="ok" aria-pressed="true">Є Host</button><button type="button" data-host="missing" aria-pressed="false">Немає</button><button type="button" data-host="duplicate" aria-pressed="false">Дублікат</button></div><p class="host-result" role="status" aria-live="polite">200 OK · Host: localhost</p></div>';}
 function lossModel(){return '<div class="model loss-model"><div class="model-label">ІНТЕРАКТИВНА СХЕМА</div><button class="loss-button" type="button" aria-pressed="false"><span>Загубити пакет A₁</span><span aria-hidden="true">↯</span></button><div class="lane-title">HTTP/2 · спільний порядок TCP</div><div class="lane"><span>TCP</span><div class="packets"><span class="packet">A₀</span><span class="packet loss">A₁</span><span class="packet blocked">B₀</span><span class="packet blocked">B₁</span></div></div><div class="lane-title">HTTP/3 · порядок у кожному QUIC-потоці</div><div class="lane"><span>Потік A</span><div class="packets"><span class="packet">A₀</span><span class="packet loss">A₁</span><span class="packet blocked">A₂</span><span class="packet blocked">A₃</span></div></div><div class="lane"><span>Потік B</span><div class="packets"><span class="packet independent">B₀</span><span class="packet independent">B₁</span><span class="packet independent">B₂</span><span class="packet independent">B₃</span></div></div><p class="model-caption" role="status" aria-live="polite">Усі пакети надійшли. Обидва протоколи можуть передати дані застосунку.</p></div>';}
+function frameModel(){
+ const fields=[['length','Довжина','00 00 05','3 байти'],['type','Тип','00','1 байт'],['flags','Прапорці','01','1 байт'],['stream','Потік','00 00 00 01','4 байти']];
+ return '<div class="frame-model" aria-label="Приклад кадру HTTP/2"><h2>Спочатку опис, потім вміст</h2><p class="frame-hint">Це 9 службових байтів у hex. Натисни на поле.</p><div class="frame-fields">'+fields.map(([id,label,bytes,size],i)=>'<button type="button" class="frame-field" data-frame-field="'+id+'" aria-pressed="'+(i===0)+'"><strong>'+label+'</strong><code>'+bytes+'</code><small>'+size+'</small></button>').join('')+'</div><p class="frame-explanation" role="status" aria-live="polite">Довжина: 00 00 05 означає 5 байтів даних після заголовка. Самі 9 байтів заголовка сюди не входять.</p><div class="frame-payload"><span>Дані · 5 байтів ASCII</span><strong>Hello</strong></div><div class="frame-total">3 + 1 + 1 + 4 = 9 · увесь кадр: 9 + 5 = 14 байтів</div></div>';
+}
 $('#deck').innerHTML=slides.map((s,i)=>{
  const category=/^(SSL|TLS|HTTPS)/.test(s.chapter)?'tls':/^(QUIC|HTTP\/3)/.test(s.chapter)?'quic':'';
  const source=(s.id==='http09'||s.hero)?s.commit:'chronological';
@@ -579,7 +603,7 @@ $('#deck').innerHTML=slides.map((s,i)=>{
  const first=s.full?'<details class="wire"><summary>Повний HTTP/0.9-сервер · 22 рядки</summary>'+codeCard(full,'Program.cs','C#','ПОВНИЙ ФАЙЛ · main / 0bb3812')+'</details>':'';
  const route=s.hero?'<div class="route" aria-label="HTTP 0.9, HTTP 1.x, HTTP 2, HTTP 3"><span>0.9</span><i>→</i><span>1.x</span><i>→</i><span>2</span><i>→</i><span>3</span></div><div class="hero-stats"><span><strong>22</strong>рядки першого сервера</span><span><strong>3</strong>мережеві класи .NET</span></div>':'';
  const final=s.final?'<div class="final-links"><a href="'+repo+'/tree/chronological" target="_blank" rel="noopener">Відкрити репозиторій ↗</a><a href="'+repo+'/pull/1" target="_blank" rel="noopener">PR для перегляду ↗</a></div>':'';
- return '<section class="slide '+category+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden><div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div><div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+(s.hero?'Формат презентації':'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+codeCard(s.code,s.file,s.language||'C#')+'<div class="sources">'+links+'</div>'+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
+ return '<section class="slide '+category+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden><div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div><div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+(s.hero?'Формат презентації':'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='frame'?frameModel():'')+codeCard(s.code,s.file,s.language||'C#',s.codeCaption)+'<div class="sources">'+links+'</div>'+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
 }).join('');
 let group='';$('.topics').innerHTML=slides.map((s,i)=>{let label='';const g=s.chapter;if(g!==group){group=g;label='<div class="topics-group">'+esc(g)+'</div>';}return label+'<button type="button" class="topic" data-go="'+i+'"><span>'+String(i+1).padStart(2,'0')+'</span><span>'+esc(s.year)+'</span><strong>'+esc(s.title.replace(/\n/g,' '))+'</strong></button>';}).join('');
 let index=-1;
@@ -609,6 +633,18 @@ let touch=null;$('#deck').addEventListener('pointerdown',e=>{if(e.pointerType!==
 $('#deck').addEventListener('pointerup',e=>{if(!touch)return;const dx=e.clientX-touch.x,dy=e.clientY-touch.y,dt=performance.now()-touch.t;touch=null;if(e.pointerType==='touch'&&Math.abs(dx)>65&&Math.abs(dy)<40&&dt<650&&!getSelection()?.toString())go(index+(dx<0?1:-1));});$('#deck').addEventListener('pointercancel',()=>touch=null);
 let toastTimer;function toast(message){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),2000);}
 $$('.copy').forEach(button=>button.addEventListener('click',async()=>{const code=button.closest('.code-card').querySelector('code').textContent;try{await navigator.clipboard.writeText(code);toast('Код скопійовано');}catch{toast('Виділи код і скопіюй вручну');}}));
+
+const frameDescriptions={
+ length:'Довжина: 00 00 05 означає 5 байтів даних після заголовка. Самі 9 байтів заголовка сюди не входять.',
+ type:'Тип: 00 означає DATA — кадр несе шматок тіла відповіді. Тип 01 означав би HEADERS — HTTP-заголовки.',
+ flags:'Прапорці: 01 вмикає END_STREAM. Для нашого DATA це означає: «Це останній шматок відповіді в цьому потоці». TCP-з’єднання залишається відкритим.',
+ stream:'Потік: 00 00 00 01 означає №1 — кадр належить цьому діалогу. У 4 байтах старший біт зарезервований. Про кілька діалогів — наступний слайд.'
+};
+$$('[data-frame-field]').forEach(button=>button.addEventListener('click',()=>{
+ const model=button.closest('.frame-model');
+ model.querySelectorAll('[data-frame-field]').forEach(el=>el.setAttribute('aria-pressed',String(el===button)));
+ model.querySelector('.frame-explanation').textContent=frameDescriptions[button.dataset.frameField];
+}));
 $$('[data-host]').forEach(button=>button.addEventListener('click',()=>{const model=button.closest('.model'),value=button.dataset.host;model.querySelectorAll('button').forEach(el=>el.setAttribute('aria-pressed',String(el===button)));const out=model.querySelector('.host-result');out.classList.toggle('bad',value!=='ok');out.textContent=value==='ok'?'200 OK · Host: localhost':value==='missing'?'400 Bad Request · Host відсутній':'400 Bad Request · два заголовки Host';}));
 $('.loss-button').addEventListener('click',e=>{const button=e.currentTarget,model=button.closest('.model'),lost=button.getAttribute('aria-pressed')!=='true';button.setAttribute('aria-pressed',String(lost));model.classList.toggle('lost-mode',lost);button.querySelector('span').textContent=lost?'Відновити пакет A₁':'Загубити пакет A₁';model.querySelector('.model-caption').textContent=lost?'A₁ втрачено. TCP чекає пропуск і затримує B. QUIC чекає лише в A; дані B можуть бути прочитані.':'Усі пакети надійшли. Обидва протоколи можуть передати дані застосунку.';});
 </script>
