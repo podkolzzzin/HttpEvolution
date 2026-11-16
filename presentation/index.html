@@ -50,7 +50,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
 <main id="deck" aria-label="Презентація еволюції HTTP"></main>
 <footer class="bottom" aria-label="Навігація слайдами">
 <button class="nav-btn prev" id="prev" type="button" aria-label="Попередній слайд"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg><span>Назад</span></button>
-<button class="counter" id="counter" type="button" aria-label="Відкрити зміст"><strong id="current-num">01</strong> / <span id="total-num">32</span><small id="chapter-name">Маршрут</small></button>
+<button class="counter" id="counter" type="button" aria-label="Відкрити зміст"><strong id="current-num">01</strong> / <span id="total-num">34</span><small id="chapter-name">Маршрут</small></button>
 <span class="swipe-hint">← свайп / клавіші →</span>
 <button class="nav-btn next" id="next" type="button"><span>Далі</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
 </footer>
@@ -255,6 +255,42 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "extraRefs": [
         "sse-current"
       ]
+    },
+    {
+      "id": "websocket-upgrade",
+      "year": "2009 API → 2011 RFC",
+      "chapter": "WebSocket / handshake",
+      "title": "Від HTTP-запиту\nдо живого діалогу.",
+      "why": "Для чату обидві сторони мають надсилати повідомлення одразу, коли вони з’явилися. Окремий GET на кожен обмін незручний.",
+      "change": "Починаємо з HTTP/1.1 Upgrade. Після 101 Switching Protocols у цьому TCP-з’єднанні йдуть кадри WebSocket.",
+      "code": "var magic = \"258EAFA5-E914-47DA-95CA-C5AB0DC85B11\";\nvar accept = Convert.ToBase64String(SHA1.HashData(\n    Encoding.ASCII.GetBytes(key + magic)));\nvar reply = \"HTTP/1.1 101 Switching Protocols\\r\\n\" +\n    \"Upgrade: websocket\\r\\nConnection: Upgrade\\r\\n\" +\n    $\"Sec-WebSocket-Accept: {accept}\\r\\n\\r\\n\";\nstream.Write(Encoding.ASCII.GetBytes(reply));",
+      "file": "presentation/index.html",
+      "codeTitle": "WebSocket · сервер",
+      "codeCaption": "НАВЧАЛЬНИЙ ПРИКЛАД · відповідь на валідний Upgrade",
+      "rfc": "6455",
+      "extraRefs": [
+        "websocket-draft"
+      ],
+      "channel": "websocket",
+      "wire": "→ GET /chat HTTP/1.1\n  Host: example.com\n  Upgrade: websocket\n  Connection: Upgrade\n  Sec-WebSocket-Version: 13\n  Sec-WebSocket-Key: AAECAwQFBgcICQoLDA0ODw==\n\n← HTTP/1.1 101 Switching Protocols\n  Upgrade: websocket\n  Connection: Upgrade\n  Sec-WebSocket-Accept: Bz3qJYTGdOe8gUSpLosEdiLKDrk=\n\nДалі: кадри WebSocket в обох напрямках.",
+      "note": "2009 — перша публічна чернетка W3C API; грудень 2011 — RFC6455 із форматом протоколу. SHA-1 тут обчислює підтвердження handshake, а не шифрує дані. Для шифрування WebSocket використовує TLS: схема wss://."
+    },
+    {
+      "id": "websocket-messages",
+      "year": "2011 · RFC 6455",
+      "chapter": "WebSocket / повідомлення",
+      "title": "Один канал.\nДва напрямки.",
+      "why": "Після handshake браузер і сервер можуть надсилати повідомлення незалежно. Це зручно для чату, гри чи спільного редактора.",
+      "change": "Повідомлення має власний WebSocket-кадр. Це інший формат, ніж кадр HTTP/2.",
+      "code": "byte[] frame = [0x81, 5, .. \"Hello\"u8];\nstream.Write(frame);\n// 0x81: FIN + текст; 5: довжина в байтах.\n// Це кадр сервера: без маски.",
+      "file": "presentation/index.html",
+      "codeTitle": "WebSocket · TEXT після Upgrade",
+      "codeCaption": "НАВЧАЛЬНИЙ ПРИКЛАД · повідомлення сервера «Hello»",
+      "rfc": "6455",
+      "channel": "websocket",
+      "client": "const ws = new WebSocket(\"wss://example.com/chat\");\nws.onopen = () => ws.send(\"Hi\");\nws.onmessage = e => console.log(e.data);",
+      "wire": "Сервер → браузер: 81 05 48 65 6C 6C 6F\n                  ↑  ↑  H  e  l  l  o\n                 FIN довжина 5\n               + TEXT\n\nБраузер → сервер: masked frame\nСервер  → браузер: unmasked frame\n\nSSE:       сервер → події в HTTP-відповіді\nWebSocket: сервер ↔ браузер, власні кадри",
+      "note": "FIN позначає останній фрагмент повідомлення; з’єднання лишається відкритим. Браузер маскує свої кадри, сервер — ні; маскування не є шифруванням. Автоперепідключення, яке має EventSource, для WebSocket застосунок реалізує сам."
     },
     {
       "id": "http2-frames",
@@ -595,6 +631,14 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
     "sse-current": [
       "HTML · EventSource",
       "https://html.spec.whatwg.org/multipage/server-sent-events.html"
+    ],
+    "6455": [
+      "RFC 6455 · WebSocket",
+      "https://www.rfc-editor.org/rfc/rfc6455.html"
+    ],
+    "websocket-draft": [
+      "W3C · API 2009",
+      "https://www.w3.org/TR/2009/WD-websockets-20090423/"
     ]
   },
   "full": "using System.Net;\nusing System.Net.Sockets;\nusing System.Text;\n\nvar server = new TcpListener(IPAddress.Loopback, 8080);\nserver.Start();\nConsole.WriteLine(\"HTTP/0.9 on 127.0.0.1:8080. Stop with Ctrl+C.\");\nwhile (true)\n{\n    using var client = server.AcceptTcpClient();\n    using var stream = client.GetStream();\n    stream.ReadTimeout = stream.WriteTimeout = 5000;\n    using var reader = new StreamReader(stream, Encoding.ASCII);\n    try\n    {\n        var request = reader.ReadLine()?.Split(' ', StringSplitOptions.RemoveEmptyEntries);\n        if (request is not [\"GET\", var path, ..]) continue;\n        var html = path == \"/\" ? \"<h1>Hello, HTTP/0.9!</h1>\\n\" : \"<h1>Not found</h1>\\n\";\n        stream.Write(Encoding.ASCII.GetBytes(html));\n    }\n    catch (IOException) { } // A disconnected or timed-out client must not stop the demo.\n}"
