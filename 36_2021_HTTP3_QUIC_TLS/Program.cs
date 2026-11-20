@@ -10,4 +10,6 @@ var initial = QuicPacket.Long(0, destination, source, 0, crypto, keys);
 using var session = new QuicSession(new IPEndPoint(IPAddress.Loopback, 12345), destination, source);
 session.Receive(QuicPacket.Read(initial)); // In-memory ClientHello -> server handshake flight.
 foreach (var bytes in session.Flush())
+{
     Console.WriteLine($"Server packet: level {QuicPacket.Read(bytes).Level}; {bytes.Length} bytes");
+}

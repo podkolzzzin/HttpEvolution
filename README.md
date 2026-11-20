@@ -11,6 +11,10 @@ TLS, QUIC, HPACK і QPACK написані тут; криптографічні 
 Без NuGet-залежностей, ASP.NET, `HttpListener`, `SslStream` і `System.Net.Quic`.
 Потрібен **.NET 10 SDK**; усі режими слухають лише loopback.
 
+Форматування C# закріплено в [`.editorconfig`](.editorconfig): 4 пробіли, дужки
+на окремих рядках, блоки для умов і циклів, окремі оголошення та оператори.
+Перевірка: `dotnet format HttpEvolution.slnx --verify-no-changes --no-restore`.
+
 ## HTML-презентація
 
 [presentation/index.html](presentation/index.html) — один автономний HTML-файл:

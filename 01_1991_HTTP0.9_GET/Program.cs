@@ -14,9 +14,15 @@ while (true)
     try
     {
         var request = reader.ReadLine()?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (request is not ["GET", var path, ..]) continue;
+        if (request is not ["GET", var path, ..])
+        {
+            continue;
+        }
+
         var html = path == "/" ? "<h1>Hello, HTTP/0.9!</h1>\n" : "<h1>Not found</h1>\n";
         stream.Write(Encoding.ASCII.GetBytes(html));
     }
-    catch (IOException) { } // A disconnected or timed-out client must not stop the demo.
+    catch (IOException)
+    {
+    } // A disconnected or timed-out client must not stop the demo.
 }
