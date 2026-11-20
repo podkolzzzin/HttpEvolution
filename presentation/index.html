@@ -49,6 +49,22 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
 .narrative .sources:empty{display:none}.narrative .workbench>.model{margin-top:0}
 @media(max-width:760px){.narrative .layout{grid-template-columns:1fr}.story-beats{gap:23px;margin-bottom:20px}.story-beat{padding-top:16px}.story-beat h2{font-size:22px}.story-beat p{font-size:16px}}
 @media print{.narrative .layout{grid-template-columns:1.1fr .9fr}.story-beat h2{font-size:20px}.story-beat p{font-size:13px}.story-beats{gap:18px}}
+/* Visible explanations for the SSL walkthrough. */
+.code-explanation{margin:20px 0 0;display:grid;gap:15px}
+.code-explanation>div{border-top:1px solid var(--line);padding-top:12px}
+.code-explanation dt{font-size:14px;font-weight:700;margin:0 0 5px}
+.code-explanation dd{font-size:14px;line-height:1.55;color:var(--muted);margin:0;max-width:65ch}
+.key-table{width:100%;border-collapse:collapse;margin-top:20px;font-size:13px;line-height:1.5;text-align:left;font-variant-numeric:tabular-nums}
+.key-table caption{text-align:left;font-weight:650;margin-bottom:8px}
+.key-table th,.key-table td{padding:9px 8px 9px 0;border-bottom:1px solid var(--line)}
+.key-table th{font-size:11px;color:var(--muted)}
+.ssl-walkthrough{padding-top:30px}
+.ssl-walkthrough h1{font-size:clamp(33px,3.5vw,46px);letter-spacing:-.03em}
+.ssl-walkthrough .lead{font-size:16px;line-height:1.6;margin-bottom:24px}
+.ssl-walkthrough .change{border:0;padding:0;font-size:16px}
+.ssl-walkthrough .code-card pre{font-size:12px;line-height:1.7;padding:18px}
+.ssl-walkthrough .slide-base{margin-top:24px}
+@media(max-width:760px){.key-table{font-size:12px}.ssl-walkthrough h1{font-size:36px}.ssl-walkthrough .lead{font-size:15px}.ssl-walkthrough .change{font-size:15px}}
 </style>
 </head>
 <body>
@@ -261,29 +277,230 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "id": "ssl3-handshake",
       "year": "1996",
       "chapter": "SSL 3.0",
-      "title": "HTTPS — це HTTP\nв захищеному каналі",
-      "why": "Текстовий HTTP відкритий для спостерігача в мережі. Спочатку узгоджуємо ключі.",
-      "change": "Перед HTTP додаємо handshake SSL3.",
-      "code": "exchange.Send(11, certificateChain);\nexchange.Send(14, []); // ServerHelloDone\nvar encrypted = exchange.Read(16); // RSA key exchange\nvar premaster = LegacyIdentity.Premaster(encrypted);\nvar master = Ssl3Crypto.Expand(premaster, seed, 48);",
+      "title": "SSL 3.0: хто\nза що відповідає",
+      "why": "HTTPS передає звичайний HTTP усередині захищеного каналу. Handshake — це обмін повідомленнями, який готує цей канал до роботи.",
+      "changeLabel": "Головна думка",
+      "change": "У демо один набір алгоритмів: SSL_RSA_WITH_3DES_EDE_CBC_SHA.",
+      "rfc": "6101",
+      "beats": [
+        {
+          "title": "RSA → передати секрет",
+          "text": "Клієнт шифрує початковий секрет публічним ключем сервера. Сервер розшифровує його приватним ключем."
+        },
+        {
+          "title": "3DES-CBC → приховати HTTP",
+          "text": "Обидві сторони отримують однакові симетричні ключі: тим самим ключем дані шифрують і розшифровують."
+        },
+        {
+          "title": "SHA-1 MAC → виявити зміни",
+          "text": "До кожного запису додають код автентичності з окремим секретом. Одержувач обчислює його ще раз і порівнює."
+        }
+      ],
+      "note": "Номер цього набору — 0x000A (10). Це ідентифікатор у протоколі, а не ключ. SSL 3.0 тут — історичне демо; далі розбираємо саме цей набір.",
+      "walkthrough": true
+    },
+    {
+      "id": "ssl3-messages",
+      "year": "1996",
+      "chapter": "SSL 3.0",
+      "title": "11, 14, 16 —\nтипи повідомлень",
+      "why": "Клієнт надсилає ClientHello: версію, підтримувані алгоритми та clientRandom. Сервер відповідає ServerHello: вибраний набір і serverRandom.",
+      "changeLabel": "Головна думка",
+      "change": "Random-значення відкриті. Приватний ключ сервера залишається на сервері.",
+      "rfc": "6101",
+      "code": "// Сервер після ServerHello\nexchange.Send(11, certificateChain);\nexchange.Send(14, []);\nvar encrypted = exchange.Read(16);",
       "file": "LegacySsl.cs",
       "commit": "a253306",
+      "explain": [
+        [
+          "11 · Certificate",
+          "Сертифікат із публічним RSA-ключем. У демо клієнт перевіряє його за відомим pin."
+        ],
+        [
+          "14 · ServerHelloDone",
+          "Сервер закінчив свою частину привітання. [] — порожнє тіло повідомлення."
+        ],
+        [
+          "16 · ClientKeyExchange",
+          "Клієнт передав зашифрований початковий секрет. Read(16) очікує саме цей тип."
+        ]
+      ],
+      "wire": "Клієнт                         Сервер\nClientHello (1)            →\n                          ← ServerHello (2)\n                          ← Certificate (11)\n                          ← ServerHelloDone (14)\nClientKeyExchange (16)     →",
+      "note": "Числа тут десяткові. Кожне Hello містить 32 байти random: у SSL3 це 4 байти часу + 28 випадкових байтів. Їх використаємо під час отримання ключів.",
+      "walkthrough": true
+    },
+    {
+      "id": "ssl3-premaster",
+      "year": "1996",
+      "chapter": "SSL 3.0",
+      "title": "RSA шифрує\nпочатковий секрет",
+      "why": "Клієнт уже перевірив ключ сервера. Тепер він створює premaster — спільний секрет, з якого обидві сторони згодом отримають ключі каналу.",
+      "changeLabel": "Головна думка",
+      "change": "Мережею йде RSA-шифротекст. Сам premaster у відкритому вигляді не передається.",
       "rfc": "6101",
-      "wire": "Клієнт                   Сервер\nClientHello       →\n                  ← ServerHello + Certificate\n                  ← ServerHelloDone\nClientKeyExchange →\nCCS + Finished    ↔ CCS + Finished\nHTTP у записах    ↔ HTTP у записах",
-      "note": "Історичний режим: RSA + 3DES-CBC + SHA-1 MAC. SSL3 походить із 1996; RFC6101 у 2011 опублікував його історичний опис."
+      "code": "// Клієнт: key — публічний RSA-ключ сервера\nvar premaster = RandomNumberGenerator.GetBytes(48);\npremaster[0] = 3; premaster[1] = 0;\nvar encrypted = key.Encrypt(\n    premaster, RSAEncryptionPadding.Pkcs1);\nexchange.Send(16, encrypted);",
+      "file": "LegacySsl.Client.cs",
+      "commit": "22a2658",
+      "explain": [
+        [
+          "48 байтів",
+          "2 байти версії 03 00 (SSL 3.0) + 46 випадкових байтів. Це довжина premaster, не RSA-ключа."
+        ],
+        [
+          "Pkcs1",
+          "Формат доповнення RSA PKCS#1 v1.5 перед шифруванням. Сервер виконує Decrypt своїм приватним ключем."
+        ]
+      ],
+      "note": "У цьому демо RSA-ключ має 2048 біт, тому RSA-шифротекст займає 256 байтів. HTTP надалі шифруватимемо симетричним 3DES, а не цим RSA-ключем.",
+      "walkthrough": true
+    },
+    {
+      "id": "ssl3-master",
+      "year": "1996",
+      "chapter": "SSL 3.0",
+      "title": "Як отримати\nmaster secret",
+      "why": "Клієнт і сервер мають той самий premaster і обидва random. Вони незалежно обчислюють однаковий master — основу майбутніх ключів.",
+      "changeLabel": "Головна думка",
+      "change": "Expand у нашому коді — історична функція отримання ключового матеріалу SSL3 на MD5 і SHA-1.",
+      "rfc": "6101",
+      "code": "// Однаковий розрахунок на обох сторонах\nbyte[] seed = [.. client, .. server];\nvar master = Ssl3Crypto.Expand(premaster, seed, 48);\n\n// Формула Expand: || означає з’єднати байти\nB1 = MD5(secret || SHA1(\"A\"   || secret || seed))\nB2 = MD5(secret || SHA1(\"BB\"  || secret || seed))\nB3 = MD5(secret || SHA1(\"CCC\" || secret || seed))\nmaster = B1 || B2 || B3",
+      "file": "Ssl3Crypto.cs",
+      "codeCaption": "C# ВИКЛИК + ПСЕВДОКОД ФОРМУЛИ · secret тут = premaster",
+      "explain": [
+        [
+          "A, BB, CCC",
+          "Фіксовані ASCII-мітки раундів із SSL3: 0x41; 0x42 0x42; 0x43 0x43 0x43. Вони різні для кожного раунду й не є секретами."
+        ],
+        [
+          "3 × 16 = 48",
+          "SHA-1 дає 20 байтів, зовнішній MD5 — 16. З’єднуємо три результати MD5. Хешування не має операції розшифрування."
+        ]
+      ],
+      "note": "client і server тут — 32-байтові random із Hello. Порядок seed важливий: спочатку client, потім server. Master мережею не передається.",
+      "walkthrough": true
+    },
+    {
+      "id": "ssl3-keys",
+      "year": "1996",
+      "chapter": "SSL 3.0",
+      "title": "З master —\nключі для двох сторін",
+      "why": "Тепер Expand викликається ще раз: secret = master, а random ідуть у зворотному порядку. Результат ділимо на ключі та початкові значення CBC.",
+      "changeLabel": "Головна думка",
+      "change": "104 = 2 × 20 байтів MAC + 2 × 24 байти 3DES + 2 × 8 байтів IV.",
+      "rfc": "6101",
+      "code": "var block = Ssl3Crypto.Expand(\n    master, [.. server, .. client], 104);",
+      "file": "LegacySsl.cs",
+      "keyRows": [
+        [
+          "0–19 / 20–39",
+          "20 + 20 байтів",
+          "MAC-секрети"
+        ],
+        [
+          "40–63 / 64–87",
+          "24 + 24 байти",
+          "Ключі 3DES"
+        ],
+        [
+          "88–95 / 96–103",
+          "8 + 8 байтів",
+          "Початкові IV"
+        ]
+      ],
+      "explain": [
+        [
+          "Спочатку клієнт, потім сервер",
+          "У кожній парі перше значення — для клієнт → сервер, друге — для сервер → клієнт. Ключ відправника використовує й одержувач."
+        ],
+        [
+          "IV · initialization vector",
+          "8 байтів для першого CBC-блоку. Це не додатковий ключ; далі ланцюжок продовжує останній блок попереднього запису."
+        ]
+      ],
+      "wire": "Expand: A, BB, CCC, DDDD, EEEEE, FFFFFF, GGGGGGG\n7 результатів MD5 × 16 = 112 байтів\nБеремо перші 104, решту відкидаємо.\n\n24 байти 3DES = три DES-ключі по 8 байтів\n(кожен містить біти парності). Це не 192 біти стійкості.",
+      "note": "Однаковий master дає обом сторонам однаковий block. Готові ключі теж не пересилаються мережею.",
+      "walkthrough": true
+    },
+    {
+      "id": "ssl3-finished",
+      "year": "1996",
+      "chapter": "SSL 3.0",
+      "title": "Коли вмикається\nшифрування?",
+      "why": "Після отримання ключів клієнт і сервер по черзі надсилають ChangeCipherSpec (CCS), а відразу за ним — захищене повідомлення Finished.",
+      "changeLabel": "Головна думка",
+      "change": "CCS вмикає новий стан для наступних записів відправника. Finished перевіряє ключі та історію handshake.",
+      "rfc": "6101",
+      "code": "// Сервер перевіряє клієнта\nrecords.ReadChange();\nexchange.Verify(master, true);\n\n// Потім сервер підтверджує свою сторону\nrecords.WriteChange();\nexchange.Send(20, Finished(\n    master, exchange.Transcript, false, minor: 0));",
+      "file": "LegacySsl.cs",
+      "explain": [
+        [
+          "Finished · 36 байтів",
+          "16 байтів MD5 + 20 байтів SHA-1, обчислених із master та попередніх handshake-повідомлень. true = клієнт, false = сервер."
+        ],
+        [
+          "Два різні коди 20",
+          "20 у Send — тип handshake Finished. CCS — окремий тип запису 20 з тілом [1]. Це різні рівні протоколу."
+        ]
+      ],
+      "wire": "Обчислення Finished (псевдокод):\nT = попередні handshake-повідомлення\nS = ASCII \"CLNT\" для клієнта або \"SRVR\" для сервера\nM = master\n|| = з’єднання байтів\n\nДля H = MD5 і окремо H = SHA-1:\nH(M || pad2 || H(T || S || M || pad1))\n\npad1 = байт 0x36; pad2 = байт 0x5c\nПовторюємо по 48 разів для MD5, по 40 для SHA-1.\nЗ’єднуємо два результати: 16 + 20 = 36 байтів.\nЦе фіксовані правила SSL3, не секретні константи.\nCCS і заголовки записів не входять до T.\nFinished сервера вже враховує Finished клієнта.",
+      "note": "Finished уже шифрується 3DES-CBC і має MAC. У демо HTTP починається лише після перевірки Finished іншої сторони.",
+      "walkthrough": true
+    },
+    {
+      "id": "ssl3-mac",
+      "year": "1996",
+      "chapter": "SSL 3.0",
+      "title": "MAC: чи змінили\nцей запис?",
+      "why": "MAC — код автентичності повідомлення. Для нього беремо окремий секрет із key block, номер запису та його вміст. Одержувач повторює розрахунок.",
+      "changeLabel": "Головна думка",
+      "change": "Без правильного MAC-секрету не можна просто змінити HTTP й обчислити коректний код перевірки.",
+      "rfc": "6101",
+      "code": "inner = SHA1(macSecret || pad1 ||\n             sequence || type || length || data)\nmac   = SHA1(macSecret || pad2 || inner)",
+      "file": "Ssl3Crypto.cs",
+      "language": "Псевдокод",
+      "codeCaption": "SSL3 MAC · || ОЗНАЧАЄ З’ЄДНАТИ БАЙТИ",
+      "explain": [
+        [
+          "pad1 і pad2",
+          "0x36 та 0x5c, кожен повторено 40 разів. Це сталі байти конструкції SSL3 MAC, а не доповнення CBC."
+        ],
+        [
+          "sequence, type, length",
+          "8-байтовий номер запису, 1-байтовий тип і 2-байтова довжина data. Для HTTP тип = 23 (Application Data)."
+        ],
+        [
+          "data → MAC із 20 байтів",
+          "data — відкриті байти HTTP у цьому записі. MAC обчислюється до шифрування; data та MAC шифруються разом."
+        ]
+      ],
+      "note": "Номер запису рахується окремо для кожного напрямку; він не передається в заголовку. SSL3 MAC відрізняється від HMAC, який з’явиться на наступному етапі TLS 1.0.",
+      "walkthrough": true
     },
     {
       "id": "ssl3-records",
       "year": "1996",
       "chapter": "SSL 3.0",
-      "title": "Шифруємо записи,\nа не рядки HTTP",
-      "why": "Повідомлення HTTP можуть перетинати межі мережевих читань і криптографічних записів.",
-      "change": "До даних додаємо MAC і CBC-padding, потім шифруємо.",
-      "code": "byte[] plain = [.. data, .. Mac(type, data)];\nvar padding = 7 - plain.Length % 8;\nbyte[] padded = [.. plain,\n    .. Enumerable.Repeat((byte)padding, padding + 1)];\nvar encrypted = cipher.EncryptCbc(padded, iv,\n    PaddingMode.None);",
+      "title": "Що саме\nшифрує 3DES-CBC?",
+      "why": "У data лежить шматок HTTP: рядок запиту чи статусу, HTTP-заголовки або тіло. Спочатку додаємо MAC, потім доповнення до цілого блоку.",
+      "changeLabel": "Головна думка",
+      "change": "3DES — три DES-операції з трьома ключами над блоком із 8 байтів. CBC перед цим змішує блок через XOR із попереднім шифроблоком; перший — з IV.",
+      "rfc": "6101",
+      "code": "byte[] plain = [.. data, .. Mac(type, data)];\nvar padding = 7 - plain.Length % 8;\nbyte[] padded = [.. plain,\n    .. Enumerable.Repeat((byte)padding, padding + 1)];\nvar encrypted = cipher.EncryptCbc(\n    padded, iv, PaddingMode.None);",
       "file": "LegacyCipher.cs",
       "commit": "9477b53",
-      "rfc": "6101",
-      "wire": "HTTP bytes\n  ↓ MAC(sequence, type, length, data)\n  ↓ CBC padding\n  ↓ 3DES-CBC\nrecord header (type, version, length) + ciphertext",
-      "note": "Послідовність записів бере участь у MAC. На прийомі спочатку перевіряємо запис, потім передаємо байти HTTP-коду."
+      "explain": [
+        [
+          "Чому 7, 8 і padding + 1?",
+          "8 — розмір блоку. 7 = 8 − 1: резервуємо останній байт для довжини доповнення. PaddingMode.None — доповнення вже додав наш код."
+        ],
+        [
+          "Приклад: 18 байтів HTTP",
+          "18 + 20 MAC = 38. padding = 7 − (38 % 8) = 1. Додаємо 01 01: разом 40 байтів, тобто 5 блоків."
+        ]
+      ],
+      "wire": "Приклад HTTP: \"GET / HTTP/1.0\\r\\n\\r\\n\" — 18 байтів\n\nВідкритий заголовок SSL-запису (hex):\n17 03 00 00 28\n│  │     └─ 0x0028 = 40 байтів шифротексту\n│  └─ SSL 3.0\n└─ 0x17 = 23 = Application Data\n\nПісля нього: 3DES-CBC(HTTP || MAC || 01 01)\nУсього мережею: 5 + 40 = 45 байтів\n\nОдержувач: розшифрувати → прибрати доповнення\n→ перевірити MAC → віддати HTTP застосунку.\n\nЯк працює один блок 3DES-CBC:\nX = блок відкритих даних XOR попередній шифроблок\n(для першого блоку замість попереднього беремо IV)\nC = E(K3, D(K2, E(K1, X)))\nE = DES-шифрування; D = DES-розшифрування\nK1, K2, K3 — три частини 24-байтового ключа\nXOR — побітове виключне АБО.\nОдержувач виконує обернені операції.",
+      "note": "HTTP-заголовки теж усередині шифротексту. Зовні видно 5-байтовий заголовок SSL-запису, розміри й час передавання. Детальний приклад — у розгорнутій схемі.",
+      "walkthrough": true
     },
     {
       "id": "ssl3-pin",
@@ -1073,13 +1290,15 @@ $('#deck').innerHTML=slides.map((s,i)=>{
  const links=(s.file?'<a href="'+repo+'/blob/'+source+'/'+s.file+'" target="_blank" rel="noopener">Код</a>':'')+(s.commit?'<a href="'+repo+'/commit/'+s.commit+'" target="_blank" rel="noopener">Коміт '+s.commit+'</a>':'')+(s.rfc?'<a href="'+refs[s.rfc][1]+'" target="_blank" rel="noopener">'+esc(refs[s.rfc][0])+'</a>':'');
  const extraLinks=(s.extraRefs||[]).map(id=>'<a href="'+refs[id][1]+'" target="_blank" rel="noopener">'+esc(refs[id][0])+'</a>').join('');
  const beats=s.beats?'<div class="story-beats">'+s.beats.map(b=>'<div class="story-beat"><h2>'+esc(b.title)+'</h2><p>'+esc(b.text)+'</p></div>').join('')+'</div>':'';
+ const explain=s.explain?'<dl class="code-explanation">'+s.explain.map(([term,meaning])=>'<div><dt>'+esc(term)+'</dt><dd>'+esc(meaning)+'</dd></div>').join('')+'</dl>':'';
+ const keyTable=s.keyRows?'<table class="key-table"><caption>Позиції у block · нумерація з нуля</caption><thead><tr><th scope="col">Клієнт / сервер</th><th scope="col">Довжини</th><th scope="col">Призначення</th></tr></thead><tbody>'+s.keyRows.map(row=>'<tr>'+row.map(cell=>'<td>'+esc(cell)+'</td>').join('')+'</tr>').join('')+'</tbody></table>':'';
  const client=s.client?'<details class="wire"><summary>Клієнт у браузері · JavaScript</summary>'+codeCard(s.client,'Браузер','JavaScript','ПРИКЛАД · підключення до відповідного endpoint')+'</details>':'';
  const wire=s.wire?'<details class="wire"><summary>На дроті / схема</summary><pre>'+esc(s.wire)+'</pre></details>':'';
  const run=s.command?'<details class="wire"><summary>Команда для показу</summary><pre><code>'+esc(s.command)+'</code></pre></details>':'';
  const first=s.full?'<details class="wire"><summary>Повний HTTP/0.9-сервер · 22 рядки</summary>'+codeCard(full,'Program.cs','C#','ПОВНИЙ ФАЙЛ · main / 0bb3812')+'</details>':'';
  const route=s.hero?'<div class="route" aria-label="HTTP 0.9, HTTP 1.x, HTTP 2, HTTP 3"><span>0.9</span><i>→</i><span>1.x</span><i>→</i><span>2</span><i>→</i><span>3</span></div><div class="hero-stats"><span><strong>22</strong>рядки першого сервера</span><span><strong>3</strong>мережеві класи .NET</span></div>':'';
  const final=s.final?'<div class="final-links"><a href="'+repo+'/tree/chronological" target="_blank" rel="noopener">Відкрити репозиторій ↗</a><a href="'+repo+'/pull/1" target="_blank" rel="noopener">PR для перегляду ↗</a></div>':'';
- return '<section class="slide '+category+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden><div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div><div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='frame'?frameModel():'')+(s.channel?channelModel(s.channel):'')+beats+(s.code?codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption):'')+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
+ return '<section class="slide '+category+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='frame'?frameModel():'')+(s.channel?channelModel(s.channel):'')+beats+(s.code?codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
 }).join('');
 let group='';$('.topics').innerHTML=slides.map((s,i)=>{let label='';const g=s.chapter;if(g!==group){group=g;label='<div class="topics-group">'+esc(g)+'</div>';}return label+'<button type="button" class="topic" data-go="'+i+'"><span>'+String(i+1).padStart(2,'0')+'</span><span>'+esc(s.year)+'</span><strong>'+esc(s.title.replace(/\n/g,' '))+'</strong></button>';}).join('');
 let index=-1;
