@@ -1,8 +1,9 @@
 # HttpEvolution
 
-Навчальне C#-демо: від HTTP/0.9 до HTTP/3, по одній можливості на коміт.
-`main` — перший сервер на **22 рядки**. `chronological` — усі наступні кроки
-в історичному порядку. `evolution` зберігає початкову історію розробки.
+Навчальне C#-демо: від HTTP/0.9 до HTTP/3 у **42 послідовних папках**.
+Кожна папка має формат `NN_<year>_HTTP<version>_<SHORT_NAME>/project`
+і містить самостійний проєкт: попередній код + одна невелика можливість.
+Відкривай `HttpEvolution.slnx` або потрібний `project/HttpEvolution.csproj`.
 
 Мережеві API — тільки `TcpListener`, `TcpClient`, `UdpClient` і потоки байтів.
 TLS, QUIC, HPACK і QPACK написані тут; криптографічні примітиви — з .NET BCL.
@@ -15,7 +16,7 @@ TLS, QUIC, HPACK і QPACK написані тут; криптографічні 
 59 слайдів як історія розвитку HTTP: світ навколо, прорив кожної версії,
 її обмеження й причина наступного кроку. 22 слайди без коду дають контекст
 та пояснюють компроміси; решта містять короткі фрагменти й команди.
-Є схеми та посилання на коміти. Працює без CDN; можна відкрити файл у браузері. На телефоні — свайпи,
+Є схеми та посилання на відповідні папки й файли коду. Працює без CDN; можна відкрити файл у браузері. На телефоні — свайпи,
 кнопки навігації та зміст. Є моделі перевірки Host і втрати пакета в TCP/QUIC.
 SSE (чернетка 2009) показує події в HTTP-відповіді та клієнт EventSource;
 WebSocket (API 2009 → RFC 2011) — Upgrade, кадри й двосторонній обмін.
@@ -39,8 +40,7 @@ HTTP-запиту. ECH розшифровано й пояснено безпос
 ## Показати перший крок
 
 ```sh
-git switch main
-dotnet run
+dotnet run --project 01_1991_HTTP0.9_GET/project
 # В іншому терміналі:
 printf 'GET /\r\n' | nc 127.0.0.1 8080
 # <h1>Hello, HTTP/0.9!</h1>
@@ -51,36 +51,83 @@ HTTP/0.9: один рядок GET; відповідь — HTML без стату
 
 ## Пройти історію
 
+Переходь між папками за номером; перемикати Git не потрібно.
+У кожній папці є короткий README із запуском і порівнянням із попереднім кроком.
+Наприклад, із кореня репозиторію:
+
 ```sh
-git switch chronological
-git log --reverse --oneline
-# Будь-який коміт можна запустити: git switch --detach COMMIT; dotnet run
-# Повернення до повної версії: git switch chronological
+dotnet run --project 09_1996_HTTP1.0_SSL3_CLIENT/project -- --ssl3
+diff -ru --exclude=bin --exclude=obj 02_1996_HTTP1.0_HEADERS/project 03_1996_HTTP1.0_HEAD/project
 ```
 
-Кожен навчальний коміт збирається окремо. Теги позначають готові етапи;
-дати — поява протоколу або публікація специфікації, не дати комітів.
+`diff` порівнює вихідний код папок, пропускаючи `bin/` та `obj/`; код завершення 1 означає,
+що відмінності знайдено. Проєкти незалежні: немає спільного коду або посилань
+на інші етапи. Підготовчі етапи додають класи; їхній README пояснює, коли
+новий протокол стає доступним для запитів.
 
-| Рік | Тег для `git switch --detach TAG` | Що показати |
+Рік — історичний орієнтир протоколу або можливості, не дата написання коду.
+HTTP3 у папках 2021 року позначає напрям наступного етапу: там будується QUIC v1,
+на якому працює HTTP/3 (2022). HTTPS — HTTP у захищеному каналі;
+SSL/TLS зазначено в короткій назві, а HTTP-префікс показує поточний етап HTTP.
+
+| № | Папка | Що додається |
 | --- | --- | --- |
-| 1991 | `step-1991-http09` | GET → HTML → закриття TCP |
-| 1996 | `step-1996-http10` | Статус, заголовки, Content-Length, HEAD |
-| 1996 | `step-1996-ssl3` | HTTPS: RSA, Finished, MAC/3DES-CBC, ChangeCipherSpec |
-| 1997 | `step-1997-http11` | Host, keep-alive, chunked |
-| 1999 | `step-1999-tls10` | Перехід SSL3 → TLS1.0: PRF, HMAC, Finished |
-| 2002 | `step-2002-tls-aes` | AES-CBC замість 3DES, сумісність з OpenSSL |
-| 2015 | `step-2015-http2` | Кадри, потоки, HPACK/Huffman, flow control |
-| 2018 | `step-2018-tls13` | ECDH/P-256, ECDSA, HKDF, AES-GCM, HTTPS |
-| 2022 | `step-2022-http3` | QUIC/UDP, TLS1.3, QPACK, потоки, ACK і повтори |
+| 01 | [01_1991_HTTP0.9_GET](01_1991_HTTP0.9_GET/) | GET → HTML → закриття TCP |
+| 02 | [02_1996_HTTP1.0_HEADERS](02_1996_HTTP1.0_HEADERS/) | Статус, заголовки та Content-Length |
+| 03 | [03_1996_HTTP1.0_HEAD](03_1996_HTTP1.0_HEAD/) | HEAD: заголовки без тіла відповіді |
+| 04 | [04_1996_HTTP1.0_SSL3_RECORDS](04_1996_HTTP1.0_SSL3_RECORDS/) | SSL3: MAC і шифрування записів 3DES-CBC |
+| 05 | [05_1996_HTTP1.0_SSL3_MESSAGES](05_1996_HTTP1.0_SSL3_MESSAGES/) | SSL3: повідомлення handshake та ChangeCipherSpec |
+| 06 | [06_1996_HTTP1.0_SSL3_IDENTITY](06_1996_HTTP1.0_SSL3_IDENTITY/) | SSL3: сертифікат RSA/SHA-1 |
+| 07 | [07_1996_HTTP1.0_SSL3_STREAM](07_1996_HTTP1.0_SSL3_STREAM/) | SSL3: розшифровані записи як потік байтів |
+| 08 | [08_1996_HTTP1.0_SSL3_HTTPS](08_1996_HTTP1.0_SSL3_HTTPS/) | HTTPS через власний SSL3 handshake |
+| 09 | [09_1996_HTTP1.0_SSL3_CLIENT](09_1996_HTTP1.0_SSL3_CLIENT/) | SSL3: TcpClient із перевіркою SPKI pin |
+| 10 | [10_1997_HTTP1.1_HOST](10_1997_HTTP1.1_HOST/) | Обов’язковий Host для HTTP/1.1 |
+| 11 | [11_1997_HTTP1.1_KEEP_ALIVE](11_1997_HTTP1.1_KEEP_ALIVE/) | Кілька запитів через одне TCP-з’єднання |
+| 12 | [12_1997_HTTP1.1_CHUNKED](12_1997_HTTP1.1_CHUNKED/) | Передавання відповіді частинами: chunked |
+| 13 | [13_1999_HTTP1.1_TLS10](13_1999_HTTP1.1_TLS10/) | TLS1.0: PRF, HMAC і новий Finished |
+| 14 | [14_2002_HTTP1.1_TLS_AES](14_2002_HTTP1.1_TLS_AES/) | TLS1.0: AES-CBC замість 3DES |
+| 15 | [15_2010_HTTP1.1_TLS_RENEGOTIATION](15_2010_HTTP1.1_TLS_RENEGOTIATION/) | TLS: renegotiation indication |
+| 16 | [16_2015_HTTP2_FRAMES](16_2015_HTTP2_FRAMES/) | HTTP/2: preface, SETTINGS і кадри через TCP |
+| 17 | [17_2015_HTTP2_HPACK](17_2015_HTTP2_HPACK/) | HPACK: таблиці заголовків |
+| 18 | [18_2015_HTTP2_HUFFMAN](18_2015_HTTP2_HUFFMAN/) | HPACK: декодування рядків Huffman |
+| 19 | [19_2015_HTTP2_STREAMS](19_2015_HTTP2_STREAMS/) | HTTP/2: відповіді GET/HEAD у потоках |
+| 20 | [20_2015_HTTP2_FLOW_CONTROL](20_2015_HTTP2_FLOW_CONTROL/) | HTTP/2: вікна flow control |
+| 21 | [21_2015_HTTP2_CONTINUATION](21_2015_HTTP2_CONTINUATION/) | HTTP/2: збирання блоків CONTINUATION |
+| 22 | [22_2018_HTTP2_TLS13_KEYS](22_2018_HTTP2_TLS13_KEYS/) | TLS1.3: ключі трафіку та захист записів |
+| 23 | [23_2018_HTTP2_TLS13_HELLO](23_2018_HTTP2_TLS13_HELLO/) | TLS1.3: ClientHello та P-256 key share |
+| 24 | [24_2018_HTTP2_TLS13_ECDH](24_2018_HTTP2_TLS13_ECDH/) | TLS1.3: узгодження секретів ECDH/P-256 |
+| 25 | [25_2018_HTTP2_TLS13_IDENTITY](25_2018_HTTP2_TLS13_IDENTITY/) | TLS1.3: сертифікат localhost і підписи ECDSA |
+| 26 | [26_2018_HTTP2_TLS13_FINISHED](26_2018_HTTP2_TLS13_FINISHED/) | TLS1.3: автентифікація та Finished |
+| 27 | [27_2018_HTTP2_TLS13_RECORDS](27_2018_HTTP2_TLS13_RECORDS/) | TLS1.3: формат і автентифікація записів |
+| 28 | [28_2018_HTTP2_TLS13_HTTPS](28_2018_HTTP2_TLS13_HTTPS/) | HTTPS через власний потік TLS1.3 |
+| 29 | [29_2018_HTTP2_ALPN](29_2018_HTTP2_ALPN/) | HTTP/2 через TLS1.3 з ALPN h2 |
+| 30 | [30_2021_HTTP3_QUIC_KEYS](30_2021_HTTP3_QUIC_KEYS/) | QUIC v1: захист пакетів і заголовків |
+| 31 | [31_2021_HTTP3_QUIC_VARINT](31_2021_HTTP3_QUIC_VARINT/) | QUIC: цілі числа змінної довжини |
+| 32 | [32_2021_HTTP3_QUIC_PACKETS](32_2021_HTTP3_QUIC_PACKETS/) | QUIC: формат пакетів і connection ID |
+| 33 | [33_2021_HTTP3_QUIC_OFFSETS](33_2021_HTTP3_QUIC_OFFSETS/) | QUIC: збирання фрагментів потоків за offset |
+| 34 | [34_2021_HTTP3_QUIC_ACK](34_2021_HTTP3_QUIC_ACK/) | QUIC: підтвердження діапазонів пакетів |
+| 35 | [35_2021_HTTP3_QUIC_PARAMETERS](35_2021_HTTP3_QUIC_PARAMETERS/) | QUIC: транспортні параметри |
+| 36 | [36_2021_HTTP3_QUIC_TLS](36_2021_HTTP3_QUIC_TLS/) | QUIC: TLS handshake на рівнях шифрування |
+| 37 | [37_2021_HTTP3_QUIC_UDP](37_2021_HTTP3_QUIC_UDP/) | QUIC: приймання сеансів через UdpClient |
+| 38 | [38_2021_HTTP3_QUIC_PTO](38_2021_HTTP3_QUIC_PTO/) | QUIC: облік ACK та probe timeout |
+| 39 | [39_2022_HTTP3_QPACK](39_2022_HTTP3_QPACK/) | HTTP/3: статичне кодування заголовків QPACK |
+| 40 | [40_2022_HTTP3_QUIC_STREAMS](40_2022_HTTP3_QUIC_STREAMS/) | QUIC для HTTP/3: потоки й flow control |
+| 41 | [41_2022_HTTP3_RESPONSE](41_2022_HTTP3_RESPONSE/) | HTTP/3: GET/HEAD через QUIC, HEADERS/DATA/FIN |
+| 42 | [42_2022_HTTP3_QUIC_RECOVERY](42_2022_HTTP3_QUIC_RECOVERY/) | QUIC для HTTP/3: повтори з новими packet number |
 
 SSL2 згаданий як попередник SSL3; його реалізації немає. TLS1.1/1.2 також
 пропущені: це вибрані навчальні кроки, а не повна реалізація всіх версій.
-HTTPS — HTTP усередині захищеного каналу, а не окрема версія HTTP.
+
+## Повна версія
+
+Усі команди нижче запускаються з кореня репозиторію та використовують
+останній етап. Для раннього етапу заміни шлях після `--project`.
+Команди сервера і клієнта виконуються в різних терміналах.
 
 ## HTTP/1.x
 
 ```sh
-dotnet run
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project
 curl --http1.0 -i http://127.0.0.1:8080/
 curl --http1.0 -I http://127.0.0.1:8080/
 curl --http1.1 --raw -i http://127.0.0.1:8080/chunks
@@ -95,13 +142,13 @@ GET/HEAD, `/`, `/chunks`, 404 для інших шляхів. HTTP/1.1 вима�
 ## Історичні SSL3 / TLS1.0
 
 ```sh
-dotnet run -- --ssl3
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --ssl3
 # В іншому терміналі підстав надрукований SPKI pin:
-dotnet run -- --ssl3-client PIN
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --ssl3-client PIN
 
 # Аналогічно для TLS1.0:
-dotnet run -- --tls10
-dotnet run -- --tls10-client PIN
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --tls10
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --tls10-client PIN
 ```
 
 SSL3 слухає TCP:8442, TLS1.0 — TCP:8441. Власний `TcpClient` перевіряє pin
@@ -113,11 +160,11 @@ TLS1.0 також приймає незалежний OpenSSL-клієнт із 
 printf 'GET / HTTP/1.0\r\n\r\n' | openssl s_client -quiet -tls1 -cipher 'AES128-SHA:@SECLEVEL=0' -connect 127.0.0.1:8441
 ```
 
-У навчальній історії окремо додано AES (2002) і початкову renegotiation indication
+В окремих папках додано AES (2002) і початкову renegotiation indication
 (2010). Повторного handshake немає. Сучасний режим використовує TLS1.3:
 
 ```sh
-dotnet run -- --tls
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --tls
 curl -k --http1.1 -i https://localhost:8443/
 ```
 
@@ -127,10 +174,10 @@ TLS1.3: AES-128-GCM-SHA256, P-256, ECDSA, ALPN, HelloRetryRequest.
 ## HTTP/2
 
 ```sh
-dotnet run -- --h2
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --h2
 curl --http2-prior-knowledge -i http://127.0.0.1:8081/
 # Або HTTP/2 через TLS1.3, ALPN h2:
-dotnet run -- --h2 --tls
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --h2 --tls
 curl -k --http2 -I https://localhost:8444/
 ```
 
@@ -141,7 +188,7 @@ WINDOW_UPDATE та RST_STREAM. Тіло запиту не підтримуєть
 ## HTTP/3
 
 ```sh
-dotnet run -- --h3
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --h3
 # В іншому терміналі підстав надрукований SPKI pin:
 google-chrome --user-data-dir="$(mktemp -d)" --origin-to-force-quic-on=127.0.0.1:8445 --ignore-certificate-errors-spki-list=PIN https://127.0.0.1:8445/
 ```
@@ -157,7 +204,8 @@ UDP:8445; QUIC v1, TLS1.3/ALPN h3, CRYPTO/STREAM, control SETTINGS,
 
 ## Перевірено
 
-Release build без попереджень; кожен коміт навчальної гілки збирається.
+Усі 42 проєкти збираються в Release без попереджень.
+Зібрати всі етапи: `dotnet build HttpEvolution.slnx -c Release`.
 HTTP/1.x та HTTP/2 — curl і сирі кадри, включно з вікнами й скасуванням потоків.
 TLS1.0 та TLS1.3 — незалежний OpenSSL, перевірка сертифіката/hostname і close_notify;
 SSL3 — власний pinned peer та незалежні контрольні значення криптографії.
