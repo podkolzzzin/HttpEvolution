@@ -550,7 +550,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "note": "Однаковий master дає обом сторонам однаковий block. Готові ключі теж не пересилаються мережею.",
       "walkthrough": true,
       "step": "09_1996_HTTP1.0_SSL3_CLIENT",
-      "sourceFile": "09_1996_HTTP1.0_SSL3_CLIENT/LegacySsl.cs"
+      "sourceFile": "08_1996_HTTP1.0_SSL3_HTTPS/LegacySsl.cs"
     },
     {
       "id": "ssl3-finished",
@@ -577,7 +577,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "note": "Finished уже шифрується 3DES-CBC і має MAC. У демо HTTP починається лише після перевірки Finished іншої сторони.",
       "walkthrough": true,
       "step": "09_1996_HTTP1.0_SSL3_CLIENT",
-      "sourceFile": "09_1996_HTTP1.0_SSL3_CLIENT/LegacySsl.cs"
+      "sourceFile": "08_1996_HTTP1.0_SSL3_HTTPS/LegacySsl.cs"
     },
     {
       "id": "ssl3-mac",
@@ -932,7 +932,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "why": "TCP передає суцільні байти. Щоб зрозуміти, що за ними стоїть і де кінець шматка, HTTP/2 додає перед ним короткий опис.",
       "change": "Кадр = 9 байтів службового заголовка + дані. Розберімо один кадр із текстом «Hello».",
       "code": "byte[] header = [\n    0, 0, 5,     // довжина даних: 5\n    0, 1,        // DATA; кінець потоку\n    0, 0, 0, 1   // потік №1\n];\nstream.Write(header);\nstream.Write(\"Hello\"u8);",
-      "file": "Http2.cs",
+      "file": "Http2Frames.cs",
       "rfc": "7540",
       "wire": "00 00 05 | 00 | 01 | 00 00 00 01 | 48 65 6C 6C 6F\n   5     |DATA|END |    потік 1   | H  e  l  l  o\n←──── 9 байтів заголовка ──────→ ←── 5 даних ──→\n\nEND — прапорець END_STREAM.\nНа прийомі: прочитати 9 байтів, дізнатися довжину,\nпотім прочитати рівно 5 байтів даних.",
       "note": "Службовий заголовок кадру — не HTTP-заголовки на кшталт Content-Type. Кадри HEADERS несуть HTTP-заголовки, DATA — тіло. Одна відповідь може мати багато кадрів; кадр не дорівнює TCP-пакету.",
@@ -940,7 +940,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "codeCaption": "НАВЧАЛЬНИЙ ПРИКЛАД · DATA-кадр після HEADERS",
       "interactive": "frame",
       "step": "16_2015_HTTP2_FRAMES",
-      "sourceFile": "16_2015_HTTP2_FRAMES/Http2.cs"
+      "sourceFile": "common/Http2Frames.cs"
     },
     {
       "id": "http2-streams",
@@ -965,12 +965,13 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "why": "Імена та значення заголовків часто однакові між запитами.",
       "change": "HPACK кодує індекси таблиці й літерали.",
       "code": "var hpack = new Hpack(); // Стан одного з’єднання.\nvar fields = hpack.Decode(block.ToArray());\nvar method = fields.Find(f => f.Name == \":method\").Value;\nvar path = fields.Find(f => f.Name == \":path\").Value;",
-      "file": "Http2.cs",
+      "file": "Hpack.cs",
       "rfc": "7541",
       "wire": "82 → :method: GET     (індекс 2)\n86 → :scheme: http    (індекс 6)\n84 → :path: /         (індекс 4)\n\nДинамічна таблиця зберігає нові поля з’єднання.",
-      "note": "HPACK стискає заголовки, не тіло HTML. Показані індекси — зі статичної таблиці.",
+      "note": "HPACK стискає заголовки, не тіло HTML. Показані індекси — зі статичної таблиці. Це приклад використання декодера; сервер підключає його до запитів на етапі 19.",
       "step": "17_2015_HTTP2_HPACK",
-      "sourceFile": "17_2015_HTTP2_HPACK/Http2.cs"
+      "sourceFile": "17_2015_HTTP2_HPACK/Hpack.cs",
+      "codeTitle": "Використання Hpack"
     },
     {
       "id": "huffman",
@@ -1122,7 +1123,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "command": "dotnet run --project 29_2018_HTTP2_ALPN -- --h2 --tls\ncurl -k --http2 -i https://localhost:8444/",
       "note": "Фрагменти з TlsHandshake.cs та Http2.cs. ALPN з’явився раніше за TLS1.3; тут він додається в момент, коли навчальний сервер уже підтримує обидва протоколи.",
       "step": "29_2018_HTTP2_ALPN",
-      "sourceFile": "29_2018_HTTP2_ALPN/TlsHandshake.cs"
+      "sourceFile": "26_2018_HTTP2_TLS13_FINISHED/TlsHandshake.cs"
     },
     {
       "id": "mobile-loss",
@@ -1325,7 +1326,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "chapter": "Практика",
       "title": "Історія в коді",
       "why": "Тепер кожен фрагмент має причину: потреба вебу, відповідь протоколу й новий компроміс. У репозиторії цей шлях розкладено на 42 послідовні папки.",
-      "change": "NN_<year>_HTTP<version>_<SHORT_NAME>/ — папка з проєктом кожного кроку. Незмінні допоміжні файли підключені з common/.",
+      "change": "Папка етапу містить новий код. Решта підключена з common/ або з етапу, де вперше з’явилася потрібна версія.",
       "code": "dotnet run --project 01_1991_HTTP0.9_GET\ndotnet run --project 09_1996_HTTP1.0_SSL3_CLIENT -- --ssl3\ndotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --h3",
       "file": "README.md",
       "rfc": "",

@@ -2,20 +2,29 @@
 
 HTTP/3: GET/HEAD через QUIC, HEADERS/DATA/FIN.
 
-Файли проєкту лежать безпосередньо в цій папці. Запуск:
+Проєкт запускається з цієї папки; linked files видно в IDE поруч із локальним кодом:
 
 ```sh
 dotnet run -- --h3
 ```
 
-Порівняти з попереднім кроком із цієї папки:
+Код, доданий або змінений на цьому етапі:
+
+- [Http3.cs](Http3.cs).
+- [QuicServer.cs](QuicServer.cs).
+- [QuicSession.cs](QuicSession.cs).
+
+Порівняти фактичний код із попереднім кроком (код завершення 1 означає відмінності):
 
 ```sh
-diff -ru --exclude=bin --exclude=obj --exclude=README.md ../40_2022_HTTP3_QUIC_STREAMS .
+diff -u /dev/null Http3.cs
+diff -u ../37_2021_HTTP3_QUIC_UDP/QuicServer.cs QuicServer.cs
+diff -u ../40_2022_HTTP3_QUIC_STREAMS/QuicSession.cs QuicSession.cs
 ```
 
-[Усі етапи та клієнтські команди](../README.md).
+Спільні допоміжні файли зберігаються в [`common/`](../common/).
+Потрібні попередні версії інших файлів проєкт підключає безпосередньо з етапів,
+де вони вперше з’явилися. Повний склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+Нову історичну версію зберігай у новому етапі, залишаючи попередню на місці.
 
-Незмінні допоміжні файли підключені з [`common/`](../common/) через
-`Compile Include` та `Link` у `HttpEvolution.csproj`. В IDE вони
-відображаються у віртуальній папці `common`.
+[Усі етапи та клієнтські команди](../README.md).

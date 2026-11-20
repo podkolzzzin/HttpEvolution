@@ -10,6 +10,7 @@
     <Compile Include="../common/RecordLayer.cs" Link="common/RecordLayer.cs" />
     <Compile Include="../common/Ssl3Crypto.cs" Link="common/Ssl3Crypto.cs" />
     <Compile Include="../common/Tls10Crypto.cs" Link="common/Tls10Crypto.cs" />
+    <Compile Include="../common/TlsStream.cs" Link="common/TlsStream.cs" />
     <Compile Include="../common/Wire.cs" Link="common/Wire.cs" />
   </ItemGroup>
 </Project>

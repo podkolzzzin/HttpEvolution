@@ -2,7 +2,7 @@
 
 QUIC: приймання сеансів через UdpClient.
 
-Файли проєкту лежать безпосередньо в цій папці. Запуск:
+Проєкт запускається з цієї папки; linked files видно в IDE поруч із локальним кодом:
 
 ```sh
 dotnet run -- --h2
@@ -10,14 +10,23 @@ dotnet run -- --h2
 
 Це підготовчий крок QUIC/HTTP/3; команда вище запускає готовий HTTP/2. Повна відповідь HTTP/3 доступна з етапу 41.
 
-Порівняти з попереднім кроком із цієї папки:
+Код, доданий або змінений на цьому етапі:
+
+- [Program.cs](Program.cs).
+- [QuicServer.cs](QuicServer.cs).
+- [TlsCertificate.Pin.cs](TlsCertificate.Pin.cs).
+
+Порівняти фактичний код із попереднім кроком (код завершення 1 означає відмінності):
 
 ```sh
-diff -ru --exclude=bin --exclude=obj --exclude=README.md ../36_2021_HTTP3_QUIC_TLS .
+diff -u ../29_2018_HTTP2_ALPN/Program.cs Program.cs
+diff -u /dev/null QuicServer.cs
+diff -u /dev/null TlsCertificate.Pin.cs
 ```
 
-[Усі етапи та клієнтські команди](../README.md).
+Спільні допоміжні файли зберігаються в [`common/`](../common/).
+Потрібні попередні версії інших файлів проєкт підключає безпосередньо з етапів,
+де вони вперше з’явилися. Повний склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+Нову історичну версію зберігай у новому етапі, залишаючи попередню на місці.
 
-Незмінні допоміжні файли підключені з [`common/`](../common/) через
-`Compile Include` та `Link` у `HttpEvolution.csproj`. В IDE вони
-відображаються у віртуальній папці `common`.
+[Усі етапи та клієнтські команди](../README.md).

@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../03_1996_HTTP1.0_HEAD/Program.cs" Link="Program.cs" />
     <Compile Include="../common/Ssl3Crypto.cs" Link="common/Ssl3Crypto.cs" />
     <Compile Include="../common/Wire.cs" Link="common/Wire.cs" />
   </ItemGroup>

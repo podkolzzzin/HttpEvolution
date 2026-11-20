@@ -127,6 +127,7 @@
   </Folder>
   <Folder Name="/common/">
     <File Path="common/README.md" />
+    <File Path="common/Http2Frames.cs" />
     <File Path="common/Huffman.cs" />
     <File Path="common/LegacyIdentity.cs" />
     <File Path="common/Qpack.cs" />
@@ -141,9 +142,11 @@
     <File Path="common/RecordLayer.cs" />
     <File Path="common/Ssl3Crypto.cs" />
     <File Path="common/Tls10Crypto.cs" />
+    <File Path="common/TlsCertificate.cs" />
     <File Path="common/TlsCrypto.cs" />
     <File Path="common/TlsHello.cs" />
     <File Path="common/TlsRecords.cs" />
+    <File Path="common/TlsStream.cs" />
     <File Path="common/Wire.cs" />
   </Folder>
 </Solution>

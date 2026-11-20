@@ -6,7 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../04_1996_HTTP1.0_SSL3_RECORDS/LegacyCipher.cs" Link="LegacyCipher.cs" />
     <Compile Include="../common/LegacyIdentity.cs" Link="common/LegacyIdentity.cs" />
+    <Compile Include="../05_1996_HTTP1.0_SSL3_MESSAGES/LegacyRecords.cs" Link="LegacyRecords.cs" />
+    <Compile Include="../03_1996_HTTP1.0_HEAD/Program.cs" Link="Program.cs" />
     <Compile Include="../common/RecordLayer.cs" Link="common/RecordLayer.cs" />
     <Compile Include="../common/Ssl3Crypto.cs" Link="common/Ssl3Crypto.cs" />
     <Compile Include="../common/Wire.cs" Link="common/Wire.cs" />
