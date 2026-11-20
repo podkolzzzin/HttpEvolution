@@ -65,6 +65,32 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
 .ssl-walkthrough .code-card pre{font-size:12px;line-height:1.7;padding:18px}
 .ssl-walkthrough .slide-base{margin-top:24px}
 @media(max-width:760px){.key-table{font-size:12px}.ssl-walkthrough h1{font-size:36px}.ssl-walkthrough .lead{font-size:15px}.ssl-walkthrough .change{font-size:15px}}
+
+/* Traffic fields depict protocol containment, not TCP packet boundaries. */
+.traffic-slide{padding-top:24px}.traffic-slide .layout{display:block}.traffic-slide .story{display:grid;grid-template-columns:1fr 1fr;gap:10px 40px;margin-bottom:20px}
+.traffic-slide h1{grid-row:1 / 3;font-size:38px;margin:0}.traffic-slide .lead{margin:0;max-width:55ch}.traffic-slide .change{font-size:14px;max-width:none}.traffic-slide .change-label{display:none}
+.traffic-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.traffic-controls .switches button{font-size:14px;min-height:44px}.traffic-reveal{padding:10px 14px;min-height:44px;border:1px solid var(--ink);border-radius:7px;background:transparent;font-size:14px}
+.traffic-reveal[aria-pressed="true"]{background:var(--ink);color:var(--paper)}.traffic-reveal:hover:not(:disabled){background:#dfe8d5;color:var(--ink)}
+.traffic-caption{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:10px}.traffic-caption strong{color:var(--ink);font-weight:650}
+.traffic-http{display:grid;grid-template-columns:1fr 1.35fr .6fr;gap:3px}.traffic-field{min-width:0;text-align:left;padding:13px 15px;background:#dcecfb;color:#183a54;min-height:70px;display:flex;flex-direction:column;gap:6px;border:1px solid transparent;border-radius:3px}
+.traffic-field strong{font-size:14px}.traffic-field code{font:12px/1.6 ui-monospace,monospace;overflow-wrap:anywhere;white-space:pre-wrap}.traffic-field small{font-size:12px;line-height:1.4}
+.traffic-field:hover{filter:brightness(.96)}.traffic-field[aria-pressed="true"]{border-color:currentColor;box-shadow:inset 0 0 0 1px currentColor}
+.traffic-transform{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0;font-size:13px;font-weight:600}.traffic-transform svg{width:20px;height:22px;flex:none}
+.traffic-network{display:grid;grid-template-columns:105px 105px minmax(0,1fr);gap:7px;align-items:stretch}
+.traffic-network>.traffic-field{background:#e6e8df;color:#33463d;justify-content:center}
+.traffic-record{border:1px solid #a8b7ae;border-radius:6px;overflow:hidden;min-width:0}
+.traffic-record-title{padding:9px 12px;font-size:12px;font-weight:650;background:#e9eee4}
+.traffic-record-parts{display:grid;grid-template-columns:170px minmax(0,1fr);gap:3px;padding:3px}
+.traffic-record-parts>.traffic-field{background:#e9eee4;color:#33463d;justify-content:center}
+.traffic-cipher{background:var(--dark);color:#e9f2e9;border-radius:3px;min-height:142px;padding:0;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.traffic-cipher>button{width:100%;flex:1;background:transparent;color:inherit;display:flex;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:left;border:2px solid transparent;border-radius:3px}
+.traffic-cipher>button[aria-pressed="true"]{border-color:#b7d77b}.traffic-cipher>button:hover{background:#203e32}.traffic-cipher svg{width:30px;height:36px;flex:none}.traffic-cipher strong{display:block;font-size:19px;margin-bottom:7px}.traffic-cipher small{font-size:13px;line-height:1.5;color:#c0d2c5;display:block}
+.traffic-decoded{padding:10px;background:#ebe4ff;color:#392c59;min-width:0}.traffic-decoded-label{font-size:12px;line-height:1.5;margin:0 0 8px;font-weight:650}.traffic-decoded-parts{display:grid;grid-template-columns:2fr 1fr 1fr;gap:3px}.traffic-decoded .traffic-field{background:#f5f0ff;color:#392c59;padding:10px;min-height:85px}.traffic-decoded .traffic-field strong{font-size:13px}
+.traffic-detail{display:grid;grid-template-columns:210px 1fr;gap:15px;padding:15px 0;margin-top:15px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);min-height:83px}.traffic-detail h2{font-size:16px;margin:0;line-height:1.5}.traffic-detail p{font-size:14px;line-height:1.6;margin:0;color:var(--muted)}
+.traffic-boundaries{font-size:12px;line-height:1.6;color:var(--muted);margin:12px 0 0;max-width:none}.traffic-slide .sources{margin:8px 0 0}.traffic-slide .slide-base{margin-top:20px}
+@media(max-width:1050px){.traffic-network{grid-template-columns:80px 80px minmax(0,1fr)}.traffic-record-parts{grid-template-columns:140px minmax(0,1fr)}.traffic-field{padding:10px}.traffic-decoded-parts{grid-template-columns:1fr 1fr}.traffic-decoded-parts>:first-child{grid-column:1 / -1}}
+@media(max-width:760px){.traffic-slide .story{display:block}.traffic-slide h1{font-size:34px;margin-bottom:18px}.traffic-slide .lead{margin-bottom:15px}.traffic-controls{align-items:stretch;flex-direction:column}.traffic-controls .switches{display:grid;grid-template-columns:1fr 1fr}.traffic-http{grid-template-columns:1fr}.traffic-field{min-height:64px}.traffic-caption{display:block;line-height:1.6}.traffic-caption span{display:block}.traffic-network{grid-template-columns:1fr 1fr}.traffic-record{grid-column:1 / -1}.traffic-record-parts{grid-template-columns:1fr}.traffic-record-parts>.traffic-field{min-height:65px}.traffic-cipher{min-height:135px}.traffic-detail{grid-template-columns:1fr;gap:6px}.traffic-transform{line-height:1.5}.traffic-decoded-parts{grid-template-columns:1fr 1fr}.traffic-decoded-parts>:first-child{grid-column:1 / -1}.traffic-decoded .traffic-field{padding:7px}.traffic-decoded .traffic-field strong{font-size:12px}}
 </style>
 </head>
 <body>
@@ -360,6 +386,18 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       ],
       "note": "Номер цього набору — 0x000A (10). Це ідентифікатор у протоколі, а не ключ. SSL 3.0 тут — історичне демо; далі розбираємо саме цей набір.",
       "walkthrough": true
+    },
+    {
+      "id": "ssl3-traffic",
+      "year": "1996",
+      "chapter": "SSL 3.0",
+      "title": "Що видно в мережі,\nколи додаємо SSL?",
+      "why": "Той самий HTTP-запит, два способи передавання. Перемкни режим і натисни на будь-який шматок схеми.",
+      "changeLabel": "Межа шифрування",
+      "change": "HTTP-заголовки — усередині шифротексту. Заголовок SSL-запису — зовні.",
+      "interactive": "ssl-traffic",
+      "walkthrough": true,
+      "rfc": "6101"
     },
     {
       "id": "ssl3-messages",
@@ -1358,6 +1396,47 @@ function channelModel(kind){
  const sse=kind==='sse';
  return '<div class="channel-model"><div class="channel-path"><strong>Браузер</strong><span>'+(sse?'← події':'↔ повідомлення')+'</span><strong>Сервер</strong></div><p>'+(sse?'SSE: одне HTTP-з’єднання для вхідних подій.':'WebSocket: кожна сторона надсилає, коли має дані.')+'</p></div>';
 }
+
+function sslTrafficModel(){
+ return `<div class="traffic-model" data-ssl="true" data-revealed="false">
+ <div class="traffic-controls"><div class="switches" role="group" aria-label="Спосіб передавання"><button type="button" data-traffic-mode="plain" aria-pressed="false">Без SSL</button><button type="button" data-traffic-mode="ssl" aria-pressed="true">Із SSL3</button></div><button type="button" class="traffic-reveal" aria-pressed="false" aria-controls="traffic-drawing">Показати вміст на сервері</button></div>
+ <div id="traffic-drawing"></div><div class="traffic-detail" id="traffic-detail" role="status" aria-live="polite" aria-atomic="true"></div>
+ <p class="traffic-boundaries">У режимі SSL показано дані після handshake: SSL3 + 3DES-CBC + SHA-1 MAC, без стиснення. Тут запит умістився в один SSL-запис. Загалом TCP може розбити запис між сегментами або передати кілька записів разом; межі HTTP, SSL і TCP не зобов’язані збігатися.</p></div>`;
+}
+function trafficField(id,title,body,small=''){
+ return '<button type="button" class="traffic-field" data-traffic-field="'+id+'" aria-pressed="false" aria-controls="traffic-detail"><strong>'+esc(title)+'</strong><code>'+esc(body)+'</code>'+(small?'<small>'+esc(small)+'</small>':'')+'</button>';
+}
+function renderTraffic(model){
+ const ssl=model.dataset.ssl==='true', revealed=model.dataset.revealed==='true';
+ model.closest('.slide').querySelector('.change').textContent=ssl?'HTTP-заголовки — усередині шифротексту. Заголовок SSL-запису — зовні.':'Без SSL рядок запиту, HTTP-заголовки й тіло передаються відкрито.';
+ const http='<div class="traffic-http">'+trafficField('request','Рядок запиту','POST / HTTP/1.0\\r\\n','16 байтів')+trafficField('headers','HTTP-заголовок + порожній рядок','Content-Length: 3\\r\\n\\r\\n','22 байти')+trafficField('body','Тіло','x=1','3 байти')+'</div>';
+ const down='<svg viewBox="0 0 20 22" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10 1v18m-6-6 6 6 6-6"/></svg>';
+ const lock='<svg viewBox="0 0 30 36" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="4" y="15" width="22" height="18" rx="3"/><path d="M9 15V9a6 6 0 0 1 12 0v6m-6 8v4"/></svg>';
+ const cipher=revealed?'<div class="traffic-decoded"><p class="traffic-decoded-label">Лише на кінцевій стороні після розшифрування.<br>У мережі всі ці 64 байти зашифровані разом.</p><div class="traffic-decoded-parts">'+trafficField('http','Увесь HTTP','16 + 22 + 3','41 байт')+trafficField('mac','MAC','SHA-1','20 байтів')+trafficField('padding','Доповнення','02 02 02','3 байти')+'</div></div>':'<div class="traffic-cipher"><button type="button" data-traffic-field="cipher" aria-pressed="false" aria-controls="traffic-detail">'+lock+'<span><strong>Шифротекст · 64 байти</strong><small>HTTP + MAC + доповнення<br>Вміст прихований від спостерігача</small></span></button></div>';
+ const payload=ssl?'<div class="traffic-record-title">Дані TCP: один SSL-запис · 69 байтів</div><div class="traffic-record-parts">'+trafficField('record','Заголовок SSL','17 03 00 00 40','Відкрито · 5 байтів')+cipher+'</div>':'<div class="traffic-record-title">Дані TCP: відкритий HTTP · 41 байт</div>'+http;
+ model.querySelector('#traffic-drawing').innerHTML='<div class="traffic-caption"><strong>У клієнта до передавання · HTTP, 41 байт</strong><span>\\r\\n = два байти кінця рядка</span></div>'+http+'<div class="traffic-transform">'+down+'<span>'+(ssl?'Додати MAC і доповнення → зашифрувати 3DES-CBC':'Передати ті самі байти в TCP без шифрування')+'</span></div><div class="traffic-caption"><strong>'+(revealed&&ssl?'Розбір на сервері з ключем':'У мережі · що може прочитати спостерігач')+'</strong><span>Порядок полів; розміри блоків на схемі умовні</span></div><div class="traffic-network">'+trafficField('ip','IP','Адреси','Відкрито')+trafficField('tcp','TCP','Порти','Відкрито')+'<div class="traffic-record">'+payload+'</div></div>';
+ model.querySelectorAll('[data-traffic-mode]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.trafficMode==='ssl')===ssl)));
+ const reveal=model.querySelector('.traffic-reveal');reveal.disabled=!ssl;reveal.setAttribute('aria-pressed',String(ssl&&revealed));reveal.textContent=!ssl?'HTTP уже відкритий':revealed?'Повернути вигляд у мережі':'Показати вміст на сервері';
+ describeTraffic(model,ssl?(revealed?'http':'cipher'):'http');
+}
+function describeTraffic(model,id){
+ const ssl=model.dataset.ssl==='true';
+ const descriptions={
+ ip:['IP залишається відкритим','SSL не приховує IP-адреси клієнта й сервера: вони потрібні для доставки пакетів.'],
+ tcp:['TCP залишається відкритим','Порти, номери послідовності та інші поля заголовка TCP не шифруються SSL. Спостерігач також бачить розміри й час передавання.'],
+ record:['Заголовок SSL теж відкритий','17 у hex = тип 23, Application Data; 03 00 = SSL 3.0; 00 40 = 64 байти шифротексту після заголовка. Ці 5 службових байтів не є HTTP-заголовками.'],
+ cipher:['Одна межа шифрування для всього HTTP','41 байт HTTP + 20 байтів MAC + 3 байти доповнення = 64 байти шифротексту. Натисни «Показати вміст на сервері», щоб побачити склад. Спостерігач без ключа цього вмісту не бачить.'],
+ http:[ssl?'HTTP повністю всередині':'Увесь HTTP видно відкрито',ssl?'Метод, шлях, версія HTTP, заголовки та тіло шифруються разом. Після розшифрування сервер перевіряє MAC і передає застосунку початковий HTTP без MAC і доповнення.':'Без SSL усі 41 байт HTTP читаються прямо в TCP-потоці. Немає ні заголовка SSL-запису, ні SSL MAC, ні CBC-доповнення.'],
+ request:['Рядок запиту · 16 байтів',ssl?'POST, шлях / і HTTP/1.0 також потрапляють усередину шифротексту. Верхній ряд показує початковий текст у клієнта, а не відкритий текст у мережі.':'Спостерігач може прочитати метод POST, шлях / та версію HTTP/1.0. Кінець рядка додає два байти CR і LF.'],
+ headers:['HTTP-заголовки теж є даними',ssl?'Content-Length: 3 разом із кінцем рядка та порожнім рядком займає 22 байти. SSL шифрує ці байти так само, як тіло. Видимою лишається довжина SSL-запису, а не цей HTTP-заголовок.':'Content-Length: 3 видно відкрито. Порожній рядок відокремлює HTTP-заголовки від тіла; він також передається в TCP.'],
+ body:['Тіло · 3 байти',ssl?'x=1 — навчальний приклад тіла запиту. У мережі ці байти зашифровані разом із рядком запиту та HTTP-заголовками.':'x=1 видно відкрито. Так само без SSL було б видно пароль чи інші дані у тілі запиту.'],
+ mac:['MAC також шифрується','20-байтовий код перевірки обчислюють з окремим секретом до шифрування. Його додають до HTTP, а потім шифрують разом із ним.'],
+ padding:['Доповнення до блоку 3DES','41 + 20 = 61 байт. До кратного 8 бракує трьох: демо додає 02 02 02. Останній байт 02 вказує, що перед ним є ще 2 байти доповнення. Після розшифрування їх прибирають.']
+ };
+ const [title,body]=descriptions[id];model.querySelector('#traffic-detail').innerHTML='<h2>'+esc(title)+'</h2><p>'+esc(body)+'</p>';
+ model.querySelectorAll('[data-traffic-field]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.trafficField===id)));
+}
+
 $('#deck').innerHTML=slides.map((s,i)=>{
  const category=/^(SSL|TLS|HTTPS)/.test(s.chapter)?'tls':/^(QUIC|HTTP\/3)/.test(s.chapter)?'quic':'';
  const source=(s.id==='http09'||s.hero)?s.commit:'chronological';
@@ -1372,7 +1451,7 @@ $('#deck').innerHTML=slides.map((s,i)=>{
  const first=s.full?'<details class="wire"><summary>Повний HTTP/0.9-сервер · 22 рядки</summary>'+codeCard(full,'Program.cs','C#','ПОВНИЙ ФАЙЛ · main / 0bb3812')+'</details>':'';
  const route=s.hero?'<div class="route" aria-label="HTTP 0.9, HTTP 1.x, HTTP 2, HTTP 3"><span>0.9</span><i>→</i><span>1.x</span><i>→</i><span>2</span><i>→</i><span>3</span></div><div class="hero-stats"><span><strong>22</strong>рядки першого сервера</span><span><strong>3</strong>мережеві класи .NET</span></div>':'';
  const final=s.final?'<div class="final-links"><a href="'+repo+'/tree/chronological" target="_blank" rel="noopener">Відкрити репозиторій ↗</a><a href="'+repo+'/pull/1" target="_blank" rel="noopener">PR для перегляду ↗</a></div>':'';
- return '<section class="slide '+category+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='frame'?frameModel():'')+(s.channel?channelModel(s.channel):'')+beats+(s.code?codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
+ return '<section class="slide '+category+(s.interactive==='ssl-traffic'?' traffic-slide':'')+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='ssl-traffic'?sslTrafficModel():s.interactive==='frame'?frameModel():'')+(s.channel?channelModel(s.channel):'')+beats+(s.code?codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
 }).join('');
 let group='';$('.topics').innerHTML=slides.map((s,i)=>{let label='';const g=s.chapter;if(g!==group){group=g;label='<div class="topics-group">'+esc(g)+'</div>';}return label+'<button type="button" class="topic" data-go="'+i+'"><span>'+String(i+1).padStart(2,'0')+'</span><span>'+esc(s.year)+'</span><strong>'+esc(s.title.replace(/\n/g,' '))+'</strong></button>';}).join('');
 let index=-1;
@@ -1402,6 +1481,17 @@ let touch=null;$('#deck').addEventListener('pointerdown',e=>{if(e.pointerType!==
 $('#deck').addEventListener('pointerup',e=>{if(!touch)return;const dx=e.clientX-touch.x,dy=e.clientY-touch.y,dt=performance.now()-touch.t;touch=null;if(e.pointerType==='touch'&&Math.abs(dx)>65&&Math.abs(dy)<40&&dt<650&&!getSelection()?.toString())go(index+(dx<0?1:-1));});$('#deck').addEventListener('pointercancel',()=>touch=null);
 let toastTimer;function toast(message){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),2000);}
 $$('.copy').forEach(button=>button.addEventListener('click',async()=>{const code=button.closest('.code-card').querySelector('code').textContent;try{await navigator.clipboard.writeText(code);toast('Код скопійовано');}catch{toast('Виділи код і скопіюй вручну');}}));
+
+
+$$('.traffic-model').forEach(model=>{
+ renderTraffic(model);
+ model.addEventListener('click',event=>{
+  const mode=event.target.closest('[data-traffic-mode]'),reveal=event.target.closest('.traffic-reveal'),field=event.target.closest('[data-traffic-field]');
+  if(mode){model.dataset.ssl=String(mode.dataset.trafficMode==='ssl');model.dataset.revealed='false';renderTraffic(model);}
+  else if(reveal&&!reveal.disabled){model.dataset.revealed=String(model.dataset.revealed!=='true');renderTraffic(model);}
+  else if(field)describeTraffic(model,field.dataset.trafficField);
+ });
+});
 
 const frameDescriptions={
  length:'Довжина: 00 00 05 означає 5 байтів даних після заголовка. Самі 9 байтів заголовка сюди не входять.',
