@@ -192,12 +192,12 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "file": "Program.cs",
       "rfc": "w3c",
       "wire": "→ GET /\\r\\n\n← <h1>Hello, HTTP/0.9!</h1>\n\n← TCP: close",
-      "command": "dotnet run --project 01_1991_HTTP0.9_GET/project\n# В іншому терміналі:\nprintf 'GET /\\r\\n' | nc 127.0.0.1 8080",
+      "command": "dotnet run --project 01_1991_HTTP0.9_GET\n# В іншому терміналі:\nprintf 'GET /\\r\\n' | nc 127.0.0.1 8080",
       "note": "Повний перший сервер — 22 рядки з using, циклом, таймаутом і обробкою від’єднання.",
       "full": true,
       "changeLabel": "Як працював прорив",
       "step": "01_1991_HTTP0.9_GET",
-      "sourceFile": "01_1991_HTTP0.9_GET/project/Program.cs"
+      "sourceFile": "01_1991_HTTP0.9_GET/Program.cs"
     },
     {
       "id": "http09-limits",
@@ -259,9 +259,9 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "rfc": "1945",
       "wire": "HTTP/1.0 200 OK\\r\\n\nContent-Type: text/html\\r\\n\nContent-Length: 22\\r\\n\n\\r\\n\n<h1>Hello, HTTP!</h1>",
       "note": "Content-Length рахує байти тіла. Заголовки відділяє CRLF CRLF; кінець рядка — CRLF.",
-      "command": "dotnet run --project 02_1996_HTTP1.0_HEADERS/project\n# В іншому терміналі:\ncurl --http1.0 -i http://127.0.0.1:8080/",
+      "command": "dotnet run --project 02_1996_HTTP1.0_HEADERS\n# В іншому терміналі:\ncurl --http1.0 -i http://127.0.0.1:8080/",
       "step": "02_1996_HTTP1.0_HEADERS",
-      "sourceFile": "02_1996_HTTP1.0_HEADERS/project/Program.cs"
+      "sourceFile": "02_1996_HTTP1.0_HEADERS/Program.cs"
     },
     {
       "id": "http10-head",
@@ -274,9 +274,9 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "file": "Program.cs",
       "rfc": "1945",
       "wire": "→ HEAD / HTTP/1.0\\r\\n\n\\r\\n\n← HTTP/1.0 200 OK\\r\\n\nContent-Length: 22\\r\\n\n\\r\\n\n← TCP: close (тіло відсутнє)",
-      "command": "dotnet run --project 03_1996_HTTP1.0_HEAD/project\n# В іншому терміналі:\ncurl --http1.0 -I http://127.0.0.1:8080/",
+      "command": "dotnet run --project 03_1996_HTTP1.0_HEAD\n# В іншому терміналі:\ncurl --http1.0 -I http://127.0.0.1:8080/",
       "step": "03_1996_HTTP1.0_HEAD",
-      "sourceFile": "03_1996_HTTP1.0_HEAD/project/Program.cs"
+      "sourceFile": "03_1996_HTTP1.0_HEAD/Program.cs"
     },
     {
       "id": "http10-price",
@@ -453,7 +453,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "note": "Числа тут десяткові. Кожне Hello містить 32 байти random: у SSL3 це 4 байти часу + 28 випадкових байтів. Їх використаємо під час отримання ключів.",
       "walkthrough": true,
       "step": "08_1996_HTTP1.0_SSL3_HTTPS",
-      "sourceFile": "08_1996_HTTP1.0_SSL3_HTTPS/project/LegacySsl.cs"
+      "sourceFile": "08_1996_HTTP1.0_SSL3_HTTPS/LegacySsl.cs"
     },
     {
       "id": "ssl3-premaster",
@@ -479,7 +479,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "note": "У цьому демо RSA-ключ має 2048 біт, тому RSA-шифротекст займає 256 байтів. HTTP надалі шифруватимемо симетричним 3DES, а не цим RSA-ключем.",
       "walkthrough": true,
       "step": "09_1996_HTTP1.0_SSL3_CLIENT",
-      "sourceFile": "09_1996_HTTP1.0_SSL3_CLIENT/project/LegacySsl.Client.cs"
+      "sourceFile": "09_1996_HTTP1.0_SSL3_CLIENT/LegacySsl.Client.cs"
     },
     {
       "id": "ssl3-master",
@@ -506,7 +506,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "note": "client і server тут — 32-байтові random із Hello. Порядок seed важливий: спочатку client, потім server. Master мережею не передається.",
       "walkthrough": true,
       "step": "09_1996_HTTP1.0_SSL3_CLIENT",
-      "sourceFile": "09_1996_HTTP1.0_SSL3_CLIENT/project/Ssl3Crypto.cs"
+      "sourceFile": "common/Ssl3Crypto.cs"
     },
     {
       "id": "ssl3-keys",
@@ -550,7 +550,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "note": "Однаковий master дає обом сторонам однаковий block. Готові ключі теж не пересилаються мережею.",
       "walkthrough": true,
       "step": "09_1996_HTTP1.0_SSL3_CLIENT",
-      "sourceFile": "09_1996_HTTP1.0_SSL3_CLIENT/project/LegacySsl.cs"
+      "sourceFile": "09_1996_HTTP1.0_SSL3_CLIENT/LegacySsl.cs"
     },
     {
       "id": "ssl3-finished",
@@ -577,7 +577,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "note": "Finished уже шифрується 3DES-CBC і має MAC. У демо HTTP починається лише після перевірки Finished іншої сторони.",
       "walkthrough": true,
       "step": "09_1996_HTTP1.0_SSL3_CLIENT",
-      "sourceFile": "09_1996_HTTP1.0_SSL3_CLIENT/project/LegacySsl.cs"
+      "sourceFile": "09_1996_HTTP1.0_SSL3_CLIENT/LegacySsl.cs"
     },
     {
       "id": "ssl3-mac",
@@ -609,7 +609,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "note": "Номер запису рахується окремо для кожного напрямку; він не передається в заголовку. SSL3 MAC відрізняється від HMAC, який з’явиться на наступному етапі TLS 1.0.",
       "walkthrough": true,
       "step": "04_1996_HTTP1.0_SSL3_RECORDS",
-      "sourceFile": "04_1996_HTTP1.0_SSL3_RECORDS/project/Ssl3Crypto.cs"
+      "sourceFile": "common/Ssl3Crypto.cs"
     },
     {
       "id": "ssl3-records",
@@ -636,7 +636,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "note": "HTTP-заголовки теж усередині шифротексту. Зовні видно 5-байтовий заголовок SSL-запису, розміри й час передавання. Детальний приклад — у розгорнутій схемі.",
       "walkthrough": true,
       "step": "04_1996_HTTP1.0_SSL3_RECORDS",
-      "sourceFile": "04_1996_HTTP1.0_SSL3_RECORDS/project/LegacyCipher.cs"
+      "sourceFile": "04_1996_HTTP1.0_SSL3_RECORDS/LegacyCipher.cs"
     },
     {
       "id": "ssl3-pin",
@@ -649,10 +649,10 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "file": "LegacySsl.Client.cs",
       "rfc": "6101",
       "wire": "Сервер друкує SPKI pin\n    ↓ передаємо його явно клієнту\nСертифікат → публічний ключ → SHA-256 → порівняння\n    ↓\nПеревірка Finished → HTTP-запит",
-      "command": "dotnet run --project 09_1996_HTTP1.0_SSL3_CLIENT/project -- --ssl3\n# Інший термінал, pin із виводу сервера:\ndotnet run --project 09_1996_HTTP1.0_SSL3_CLIENT/project -- --ssl3-client PIN",
+      "command": "dotnet run --project 09_1996_HTTP1.0_SSL3_CLIENT -- --ssl3\n# Інший термінал, pin із виводу сервера:\ndotnet run --project 09_1996_HTTP1.0_SSL3_CLIENT -- --ssl3-client PIN",
       "note": "Pin через SHA-256 — зручність сучасного демо, не фіча SSL3 1996 року. Старі SSL/TLS режими — лише історичні приклади.",
       "step": "09_1996_HTTP1.0_SSL3_CLIENT",
-      "sourceFile": "09_1996_HTTP1.0_SSL3_CLIENT/project/LegacySsl.Client.cs"
+      "sourceFile": "09_1996_HTTP1.0_SSL3_CLIENT/LegacySsl.Client.cs"
     },
     {
       "id": "https-price",
@@ -714,7 +714,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "interactive": "host",
       "note": "Демо перевіряє Host; маршрутизації різних доменів у ньому немає.",
       "step": "10_1997_HTTP1.1_HOST",
-      "sourceFile": "10_1997_HTTP1.1_HOST/project/Program.cs"
+      "sourceFile": "10_1997_HTTP1.1_HOST/Program.cs"
     },
     {
       "id": "http11-keepalive",
@@ -729,7 +729,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "TCP connect\n  GET /         → 200 + Content-Length + body\n  GET /missing  → 404 + Content-Length + body\n  Connection: close\nTCP close",
       "note": "Зміст циклу скорочено. У повному коді помилковий Host і тіло запиту також вимикають keep-alive. Порядок відповідей у HTTP/1.1 зберігається.",
       "step": "11_1997_HTTP1.1_KEEP_ALIVE",
-      "sourceFile": "11_1997_HTTP1.1_KEEP_ALIVE/project/Program.cs"
+      "sourceFile": "11_1997_HTTP1.1_KEEP_ALIVE/Program.cs"
     },
     {
       "id": "http11-chunks",
@@ -742,10 +742,10 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "file": "Program.cs",
       "rfc": "2068",
       "wire": "Transfer-Encoding: chunked\\r\\n\n\\r\\n\n4\\r\\n\n<h1>\\r\\n\n12\\r\\n\nHello, HTTP!</h1>\n\\r\\n\n0",
-      "command": "dotnet run --project 12_1997_HTTP1.1_CHUNKED/project\n# В іншому терміналі:\ncurl --http1.1 --raw -i http://127.0.0.1:8080/chunks",
+      "command": "dotnet run --project 12_1997_HTTP1.1_CHUNKED\n# В іншому терміналі:\ncurl --http1.1 --raw -i http://127.0.0.1:8080/chunks",
       "note": "Тут довжини в hex: 4 і 12 (18 байтів). Заголовка Content-Length у цій відповіді немає.",
       "step": "12_1997_HTTP1.1_CHUNKED",
-      "sourceFile": "12_1997_HTTP1.1_CHUNKED/project/Program.cs"
+      "sourceFile": "12_1997_HTTP1.1_CHUNKED/Program.cs"
     },
     {
       "id": "http11-framing",
@@ -780,10 +780,10 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "file": "Tls10Crypto.cs",
       "rfc": "2246",
       "wire": "SSL3: власні MD5/SHA-1 конструкції\n              ↓\nTLS1.0: PRF + HMAC\n  Finished: 12 байтів\n  У MAC є версія запису\n  RSA ciphertext має поле довжини",
-      "command": "dotnet run --project 13_1999_HTTP1.1_TLS10/project -- --tls10\ndotnet run --project 13_1999_HTTP1.1_TLS10/project -- --tls10-client PIN",
+      "command": "dotnet run --project 13_1999_HTTP1.1_TLS10 -- --tls10\ndotnet run --project 13_1999_HTTP1.1_TLS10 -- --tls10-client PIN",
       "note": "Окремі режими SSL3 і TLS1.0 дозволяють порівняти майже той самий сервер. Новий стандарт не означає нову версію HTTP.",
       "step": "13_1999_HTTP1.1_TLS10",
-      "sourceFile": "13_1999_HTTP1.1_TLS10/project/Tls10Crypto.cs"
+      "sourceFile": "common/Tls10Crypto.cs"
     },
     {
       "id": "tls-aes",
@@ -798,7 +798,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "ClientHello: [AES128-SHA, ...]\nServerHello: AES128-SHA\nRSA key exchange → AES-CBC + HMAC-SHA1\nУсередині — той самий HTTP/1.x",
       "note": "Вибір AES — із LegacySsl.cs; створення шифру — із LegacyCipher.cs. Етап 15 (2010) додає renegotiation indication, без повторного handshake.",
       "step": "14_2002_HTTP1.1_TLS_AES",
-      "sourceFile": "14_2002_HTTP1.1_TLS_AES/project/LegacySsl.cs"
+      "sourceFile": "14_2002_HTTP1.1_TLS_AES/LegacySsl.cs"
     },
     {
       "id": "web-apps",
@@ -936,11 +936,11 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "rfc": "7540",
       "wire": "00 00 05 | 00 | 01 | 00 00 00 01 | 48 65 6C 6C 6F\n   5     |DATA|END |    потік 1   | H  e  l  l  o\n←──── 9 байтів заголовка ──────→ ←── 5 даних ──→\n\nEND — прапорець END_STREAM.\nНа прийомі: прочитати 9 байтів, дізнатися довжину,\nпотім прочитати рівно 5 байтів даних.",
       "note": "Службовий заголовок кадру — не HTTP-заголовки на кшталт Content-Type. Кадри HEADERS несуть HTTP-заголовки, DATA — тіло. Одна відповідь може мати багато кадрів; кадр не дорівнює TCP-пакету.",
-      "command": "dotnet run --project 16_2015_HTTP2_FRAMES/project -- --h2\ncurl --http2-prior-knowledge -i http://127.0.0.1:8081/",
+      "command": "dotnet run --project 16_2015_HTTP2_FRAMES -- --h2\ncurl --http2-prior-knowledge -i http://127.0.0.1:8081/",
       "codeCaption": "НАВЧАЛЬНИЙ ПРИКЛАД · DATA-кадр після HEADERS",
       "interactive": "frame",
       "step": "16_2015_HTTP2_FRAMES",
-      "sourceFile": "16_2015_HTTP2_FRAMES/project/Http2.cs"
+      "sourceFile": "16_2015_HTTP2_FRAMES/Http2.cs"
     },
     {
       "id": "http2-streams",
@@ -955,7 +955,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "stream 1: HEADERS ── DATA ── END_STREAM\nstream 3:    HEADERS ── DATA ── END_STREAM\n              одне TCP-з’єднання",
       "note": "Це схема мінімальної відповіді; повний код враховує HEAD і вікна. Клієнтські запити в демо мають непарні ID: 1, 3, 5…",
       "step": "19_2015_HTTP2_STREAMS",
-      "sourceFile": "19_2015_HTTP2_STREAMS/project/Http2.cs"
+      "sourceFile": "19_2015_HTTP2_STREAMS/Http2.cs"
     },
     {
       "id": "hpack",
@@ -970,7 +970,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "82 → :method: GET     (індекс 2)\n86 → :scheme: http    (індекс 6)\n84 → :path: /         (індекс 4)\n\nДинамічна таблиця зберігає нові поля з’єднання.",
       "note": "HPACK стискає заголовки, не тіло HTML. Показані індекси — зі статичної таблиці.",
       "step": "17_2015_HTTP2_HPACK",
-      "sourceFile": "17_2015_HTTP2_HPACK/project/Http2.cs"
+      "sourceFile": "17_2015_HTTP2_HPACK/Http2.cs"
     },
     {
       "id": "huffman",
@@ -985,7 +985,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "www.example.com\n      ↓ Huffman (RFC7541 C.4)\nf1 e3 c2 e5 f2 3a 6b a0 ab 90 f4 ff\n\n15 текстових байтів → 12 байтів коду",
       "note": "Використовується фіксована таблиця кодів. Декодер перевіряє EOS і коректність padding.",
       "step": "18_2015_HTTP2_HUFFMAN",
-      "sourceFile": "18_2015_HTTP2_HUFFMAN/project/Hpack.cs"
+      "sourceFile": "18_2015_HTTP2_HUFFMAN/Hpack.cs"
     },
     {
       "id": "http2-windows",
@@ -1000,7 +1000,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "stream window = 8\nconnection window = 5\nremaining body = 22\n           ↓\nDATA: максимум 5 байтів\nWINDOW_UPDATE додає доступний кредит.",
       "note": "Імена локальних змінних скорочено для слайда. Нульове вікно одного потоку не зупиняє PING та інші потоки з доступним кредитом.",
       "step": "20_2015_HTTP2_FLOW_CONTROL",
-      "sourceFile": "20_2015_HTTP2_FLOW_CONTROL/project/Http2.cs"
+      "sourceFile": "20_2015_HTTP2_FLOW_CONTROL/Http2.cs"
     },
     {
       "id": "http2-continuation",
@@ -1015,7 +1015,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "HEADERS        stream 1, END_HEADERS=0\nCONTINUATION   stream 1, END_HEADERS=0\nCONTINUATION   stream 1, END_HEADERS=1\n                          ↓\n                    HPACK.Decode(block)",
       "note": "Такий блок має бути безперервною послідовністю кадрів одного потоку. У демо він обмежений 64 KiB.",
       "step": "21_2015_HTTP2_CONTINUATION",
-      "sourceFile": "21_2015_HTTP2_CONTINUATION/project/Http2.cs"
+      "sourceFile": "21_2015_HTTP2_CONTINUATION/Http2.cs"
     },
     {
       "id": "http2-price",
@@ -1076,7 +1076,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "Приватний a                 Приватний b\nПублічний A       ↔         Публічний B\nECDH(a, B)        =         ECDH(b, A)\n                  ↓\n       HKDF → ключі client / server",
       "note": "У цьому кроці RSA key exchange замінює ECDHE. TLS1.1/1.2 у навчальному маршруті пропущені.",
       "step": "24_2018_HTTP2_TLS13_ECDH",
-      "sourceFile": "24_2018_HTTP2_TLS13_ECDH/project/TlsHandshake.cs"
+      "sourceFile": "24_2018_HTTP2_TLS13_ECDH/TlsHandshake.cs"
     },
     {
       "id": "tls13-finished",
@@ -1091,7 +1091,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "EncryptedExtensions → ALPN\nCertificate          → ідентичність\nCertificateVerify    → підпис transcript\nFinished             → MAC transcript\n                          ↓\n                   application data",
       "note": "У демо — тимчасовий self-signed ECDSA-сертифікат. У браузері звичайного сайту довіру забезпечує перевірений ланцюжок сертифікатів.",
       "step": "26_2018_HTTP2_TLS13_FINISHED",
-      "sourceFile": "26_2018_HTTP2_TLS13_FINISHED/project/TlsHandshake.cs"
+      "sourceFile": "26_2018_HTTP2_TLS13_FINISHED/TlsHandshake.cs"
     },
     {
       "id": "tls13-aead",
@@ -1106,7 +1106,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "nonce ← IV XOR sequence number\nplaintext + authenticated header\n                  ↓ AES-GCM\nciphertext + 16-byte tag\n                  ↓\nЗмінені дані → Decrypt не проходить.",
       "note": "На відміну від старого CBC+MAC, тут використовується AEAD. Ключі для напрямків client/server різні.",
       "step": "22_2018_HTTP2_TLS13_KEYS",
-      "sourceFile": "22_2018_HTTP2_TLS13_KEYS/project/TlsCrypto.cs"
+      "sourceFile": "common/TlsCrypto.cs"
     },
     {
       "id": "alpn",
@@ -1119,10 +1119,10 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "file": "TlsHandshake.cs",
       "rfc": "8446",
       "wire": "TCP → TLS1.3 → ALPN http/1.1 → текст HTTP/1.1\nTCP → TLS1.3 → ALPN h2       → кадри HTTP/2",
-      "command": "dotnet run --project 29_2018_HTTP2_ALPN/project -- --h2 --tls\ncurl -k --http2 -i https://localhost:8444/",
+      "command": "dotnet run --project 29_2018_HTTP2_ALPN -- --h2 --tls\ncurl -k --http2 -i https://localhost:8444/",
       "note": "Фрагменти з TlsHandshake.cs та Http2.cs. ALPN з’явився раніше за TLS1.3; тут він додається в момент, коли навчальний сервер уже підтримує обидва протоколи.",
       "step": "29_2018_HTTP2_ALPN",
-      "sourceFile": "29_2018_HTTP2_ALPN/project/TlsHandshake.cs"
+      "sourceFile": "29_2018_HTTP2_ALPN/TlsHandshake.cs"
     },
     {
       "id": "mobile-loss",
@@ -1162,7 +1162,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "note": "UDP не надає доставку, порядок чи повтори. Усі ці функції для нашого демо реалізовані у класах Quic*.",
       "changeLabel": "Рішення на іншому шарі",
       "step": "37_2021_HTTP3_QUIC_UDP",
-      "sourceFile": "37_2021_HTTP3_QUIC_UDP/project/QuicServer.cs"
+      "sourceFile": "37_2021_HTTP3_QUIC_UDP/QuicServer.cs"
     },
     {
       "id": "head-of-line",
@@ -1178,7 +1178,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "note": "Це інтерактивна схема доставки, не вимірювання швидкості. Спільне congestion control і навантаження мережі все одно впливають на потоки.",
       "changeLabel": "Що саме виграли",
       "step": "40_2022_HTTP3_QUIC_STREAMS",
-      "sourceFile": "40_2022_HTTP3_QUIC_STREAMS/project/QuicStreams.cs"
+      "sourceFile": "common/QuicStreams.cs"
     },
     {
       "id": "quic-protection",
@@ -1193,7 +1193,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "Initial keys → відомі salt + destination CID\nHandshake keys → TLS handshake secrets\n1-RTT keys → TLS application secrets\n\nAES-GCM(payload) + AES(header protection)",
       "note": "Публічно обчислювані Initial-ключі не приховують handshake від спостерігача. Автентифікований секрет з’являється під час TLS.",
       "step": "30_2021_HTTP3_QUIC_KEYS",
-      "sourceFile": "30_2021_HTTP3_QUIC_KEYS/project/QuicKeys.cs"
+      "sourceFile": "common/QuicKeys.cs"
     },
     {
       "id": "quic-offsets",
@@ -1208,7 +1208,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "Надійшло: offset 4 → EFGH\nДоступно: нічого (ще немає ABCD)\nНадійшло: offset 0 → ABCD\nДоступно: ABCDEFGH\nДублікат offset 4 → нових даних немає",
       "note": "Фрагмент показує ідею буфера. Повний код перевіряє межі, конфліктні байти й фінальний розмір потоку.",
       "step": "33_2021_HTTP3_QUIC_OFFSETS",
-      "sourceFile": "33_2021_HTTP3_QUIC_OFFSETS/project/QuicBuffer.cs"
+      "sourceFile": "common/QuicBuffer.cs"
     },
     {
       "id": "quic-flow",
@@ -1223,7 +1223,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "MAX_DATA: ліміт усіх stream-даних\nMAX_STREAM_DATA: ліміт одного потоку\nSTREAM: ID + offset + bytes + [FIN]\n\nНемає кредиту → дані чекають.",
       "note": "У демо ліміт receive-потоку — 64 KiB, з’єднання — 1 MiB. Кількість потоків також узгоджується.",
       "step": "40_2022_HTTP3_QUIC_STREAMS",
-      "sourceFile": "40_2022_HTTP3_QUIC_STREAMS/project/QuicStreams.cs"
+      "sourceFile": "common/QuicStreams.cs"
     },
     {
       "id": "http3-arrives",
@@ -1262,7 +1262,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "SETTINGS_QPACK_MAX_TABLE_CAPACITY = 0\nСтатичний індекс: :method = GET\nЛітерал: content-type = text/html\nHEADERS: field section із префіксом 00 00",
       "note": "Місткість динамічної таблиці 0 узгоджена через SETTINGS. Це свідомо компактна підмножина QPACK, а не повна динамічна реалізація.",
       "step": "39_2022_HTTP3_QPACK",
-      "sourceFile": "39_2022_HTTP3_QPACK/project/Qpack.cs"
+      "sourceFile": "common/Qpack.cs"
     },
     {
       "id": "http3-response",
@@ -1275,10 +1275,10 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "file": "Http3.cs",
       "rfc": "9114",
       "wire": "QUIC bidirectional request stream\n  → HEADERS (QPACK) + FIN\n  ← HEADERS (QPACK)\n  ← DATA (HTML) + FIN\n\nControl stream → SETTINGS (залишається відкритим)",
-      "command": "dotnet run --project 41_2022_HTTP3_RESPONSE/project -- --h3",
+      "command": "dotnet run --project 41_2022_HTTP3_RESPONSE -- --h3",
       "note": "HTTP/3 frame має type + length + payload; stream ID живе в QUIC. Тут немає 9-байтового HTTP/2 header чи chunked encoding.",
       "step": "41_2022_HTTP3_RESPONSE",
-      "sourceFile": "41_2022_HTTP3_RESPONSE/project/Http3.cs"
+      "sourceFile": "41_2022_HTTP3_RESPONSE/Http3.cs"
     },
     {
       "id": "quic-recovery",
@@ -1293,7 +1293,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "wire": "packet #7  : STREAM offset=0 → втрачено\nPTO сплив\npacket #8  : STREAM offset=0 → доставлено\nACK #8 → frame підтверджено\n\nУ демо: PTO/backoff, packet-threshold, обмежене вікно.",
       "note": "Роки цього слайда — місце в навчальній історії; QUIC recovery описаний у 2021. Наша модель спрощена, без повного RFC9002 congestion control.",
       "step": "42_2022_HTTP3_QUIC_RECOVERY",
-      "sourceFile": "42_2022_HTTP3_QUIC_RECOVERY/project/QuicSession.cs"
+      "sourceFile": "42_2022_HTTP3_QUIC_RECOVERY/QuicSession.cs"
     },
     {
       "id": "http3-price",
@@ -1325,8 +1325,8 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "chapter": "Практика",
       "title": "Історія в коді",
       "why": "Тепер кожен фрагмент має причину: потреба вебу, відповідь протоколу й новий компроміс. У репозиторії цей шлях розкладено на 42 послідовні папки.",
-      "change": "NN_<year>_HTTP<version>_<SHORT_NAME>/project — окремий проєкт для кожного кроку.",
-      "code": "dotnet run --project 01_1991_HTTP0.9_GET/project\ndotnet run --project 09_1996_HTTP1.0_SSL3_CLIENT/project -- --ssl3\ndotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --h3",
+      "change": "NN_<year>_HTTP<version>_<SHORT_NAME>/ — папка з проєктом кожного кроку. Незмінні допоміжні файли підключені з common/.",
+      "code": "dotnet run --project 01_1991_HTTP0.9_GET\ndotnet run --project 09_1996_HTTP1.0_SSL3_CLIENT -- --ssl3\ndotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --h3",
       "file": "README.md",
       "rfc": "",
       "wire": "",
@@ -1537,7 +1537,7 @@ function describeTraffic(model,id){
 $('#deck').innerHTML=slides.map((s,i)=>{
  const category=/^(SSL|TLS|HTTPS)/.test(s.chapter)?'tls':/^(QUIC|HTTP\/3)/.test(s.chapter)?'quic':'';
  const source='chronological';
- const links=(s.file?'<a href="'+repo+'/blob/'+source+'/'+(s.sourceFile||s.file)+'" target="_blank" rel="noopener">Код</a>':'')+(s.step?'<a href="'+repo+'/tree/'+source+'/'+s.step+'/project" target="_blank" rel="noopener">Етап '+esc(s.step.split('_')[0])+'</a>':'')+(s.rfc?'<a href="'+refs[s.rfc][1]+'" target="_blank" rel="noopener">'+esc(refs[s.rfc][0])+'</a>':'');
+ const links=(s.file?'<a href="'+repo+'/blob/'+source+'/'+(s.sourceFile||s.file)+'" target="_blank" rel="noopener">Код</a>':'')+(s.step?'<a href="'+repo+'/tree/'+source+'/'+s.step+'" target="_blank" rel="noopener">Етап '+esc(s.step.split('_')[0])+'</a>':'')+(s.rfc?'<a href="'+refs[s.rfc][1]+'" target="_blank" rel="noopener">'+esc(refs[s.rfc][0])+'</a>':'');
  const extraLinks=(s.extraRefs||[]).map(id=>'<a href="'+refs[id][1]+'" target="_blank" rel="noopener">'+esc(refs[id][0])+'</a>').join('');
  const beats=s.beats?'<div class="story-beats">'+s.beats.map(b=>'<div class="story-beat"><h2>'+esc(b.title)+'</h2><p>'+esc(b.text)+'</p></div>').join('')+'</div>':'';
  const explain=s.explain?'<dl class="code-explanation">'+s.explain.map(([term,meaning])=>'<div><dt>'+esc(term)+'</dt><dd>'+esc(meaning)+'</dd></div>').join('')+'</dl>':'';
@@ -1545,7 +1545,7 @@ $('#deck').innerHTML=slides.map((s,i)=>{
  const client=s.client?'<details class="wire"><summary>Клієнт у браузері · JavaScript</summary>'+codeCard(s.client,'Браузер','JavaScript','ПРИКЛАД · підключення до відповідного endpoint')+'</details>':'';
  const wire=s.wire?'<details class="wire"><summary>На дроті / схема</summary><pre>'+esc(s.wire)+'</pre></details>':'';
  const run=s.command?'<details class="wire"><summary>Команда для показу</summary><pre><code>'+esc(s.command)+'</code></pre></details>':'';
- const first=s.full?'<details class="wire"><summary>Повний HTTP/0.9-сервер · 22 рядки</summary>'+codeCard(full,'Program.cs','C#','ПОВНИЙ ФАЙЛ · 01_1991_HTTP0.9_GET/project')+'</details>':'';
+ const first=s.full?'<details class="wire"><summary>Повний HTTP/0.9-сервер · 22 рядки</summary>'+codeCard(full,'Program.cs','C#','ПОВНИЙ ФАЙЛ · 01_1991_HTTP0.9_GET')+'</details>':'';
  const route=s.hero?'<div class="route" aria-label="HTTP 0.9, HTTP 1.x, HTTP 2, HTTP 3"><span>0.9</span><i>→</i><span>1.x</span><i>→</i><span>2</span><i>→</i><span>3</span></div><div class="hero-stats"><span><strong>22</strong>рядки першого сервера</span><span><strong>3</strong>мережеві класи .NET</span></div>':'';
  const final=s.final?'<div class="final-links"><a href="'+repo+'/tree/chronological" target="_blank" rel="noopener">Відкрити репозиторій ↗</a><a href="'+repo+'/pull/1" target="_blank" rel="noopener">PR для перегляду ↗</a></div>':'';
  return '<section class="slide '+category+(['ssl-traffic','host'].includes(s.interactive)?' traffic-slide':'')+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='ssl-traffic'?sslTrafficModel():s.interactive==='host'?hostPrivacyModel():s.interactive==='frame'?frameModel():'')+(s.channel?channelModel(s.channel):'')+beats+(s.code?(s.interactive==='host'?'<details class="wire"><summary>Код демо · перевірка Host</summary>':'')+codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption)+(s.interactive==='host'?'</details>':''):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';

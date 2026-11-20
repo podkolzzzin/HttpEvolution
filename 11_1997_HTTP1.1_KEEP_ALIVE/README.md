@@ -2,16 +2,20 @@
 
 Кілька запитів через одне TCP-з’єднання.
 
-Самостійний проєкт у `project/`. Із цієї папки:
+Файли проєкту лежать безпосередньо в цій папці. Запуск:
 
 ```sh
-dotnet run --project project
+dotnet run
 ```
 
 Порівняти з попереднім кроком із цієї папки:
 
 ```sh
-diff -ru --exclude=bin --exclude=obj ../10_1997_HTTP1.1_HOST/project project
+diff -ru --exclude=bin --exclude=obj --exclude=README.md ../10_1997_HTTP1.1_HOST .
 ```
 
 [Усі етапи та клієнтські команди](../README.md).
+
+Незмінні допоміжні файли підключені з [`common/`](../common/) через
+`Compile Include` та `Link` у `HttpEvolution.csproj`. В IDE вони
+відображаються у віртуальній папці `common`.

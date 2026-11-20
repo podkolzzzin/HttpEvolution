@@ -2,10 +2,10 @@
 
 HTTP/3: статичне кодування заголовків QPACK.
 
-Самостійний проєкт у `project/`. Із цієї папки:
+Файли проєкту лежать безпосередньо в цій папці. Запуск:
 
 ```sh
-dotnet run --project project -- --h2
+dotnet run -- --h2
 ```
 
 Це підготовчий крок QUIC/HTTP/3; команда вище запускає готовий HTTP/2. Повна відповідь HTTP/3 доступна з етапу 41.
@@ -13,7 +13,11 @@ dotnet run --project project -- --h2
 Порівняти з попереднім кроком із цієї папки:
 
 ```sh
-diff -ru --exclude=bin --exclude=obj ../38_2021_HTTP3_QUIC_PTO/project project
+diff -ru --exclude=bin --exclude=obj --exclude=README.md ../38_2021_HTTP3_QUIC_PTO .
 ```
 
 [Усі етапи та клієнтські команди](../README.md).
+
+Незмінні допоміжні файли підключені з [`common/`](../common/) через
+`Compile Include` та `Link` у `HttpEvolution.csproj`. В IDE вони
+відображаються у віртуальній папці `common`.

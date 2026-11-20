@@ -2,16 +2,16 @@
 
 HEAD: заголовки без тіла відповіді.
 
-Самостійний проєкт у `project/`. Із цієї папки:
+Файли проєкту лежать безпосередньо в цій папці. Запуск:
 
 ```sh
-dotnet run --project project
+dotnet run
 ```
 
 Порівняти з попереднім кроком із цієї папки:
 
 ```sh
-diff -ru --exclude=bin --exclude=obj ../02_1996_HTTP1.0_HEADERS/project project
+diff -ru --exclude=bin --exclude=obj --exclude=README.md ../02_1996_HTTP1.0_HEADERS .
 ```
 
 [Усі етапи та клієнтські команди](../README.md).

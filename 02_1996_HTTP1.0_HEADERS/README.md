@@ -2,16 +2,16 @@
 
 Статус, заголовки та Content-Length.
 
-Самостійний проєкт у `project/`. Із цієї папки:
+Файли проєкту лежать безпосередньо в цій папці. Запуск:
 
 ```sh
-dotnet run --project project
+dotnet run
 ```
 
 Порівняти з попереднім кроком із цієї папки:
 
 ```sh
-diff -ru --exclude=bin --exclude=obj ../01_1991_HTTP0.9_GET/project project
+diff -ru --exclude=bin --exclude=obj --exclude=README.md ../01_1991_HTTP0.9_GET .
 ```
 
 [Усі етапи та клієнтські команди](../README.md).

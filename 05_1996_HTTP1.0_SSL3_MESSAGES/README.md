@@ -2,10 +2,10 @@
 
 SSL3: повідомлення handshake та ChangeCipherSpec.
 
-Самостійний проєкт у `project/`. Із цієї папки:
+Файли проєкту лежать безпосередньо в цій папці. Запуск:
 
 ```sh
-dotnet run --project project
+dotnet run
 ```
 
 Це підготовчий крок SSL3: класи вже збираються, але HTTPS ще не підключено. Запускається HTTP/1.0; SSL3 доступний з етапу 08.
@@ -13,7 +13,11 @@ dotnet run --project project
 Порівняти з попереднім кроком із цієї папки:
 
 ```sh
-diff -ru --exclude=bin --exclude=obj ../04_1996_HTTP1.0_SSL3_RECORDS/project project
+diff -ru --exclude=bin --exclude=obj --exclude=README.md ../04_1996_HTTP1.0_SSL3_RECORDS .
 ```
 
 [Усі етапи та клієнтські команди](../README.md).
+
+Незмінні допоміжні файли підключені з [`common/`](../common/) через
+`Compile Include` та `Link` у `HttpEvolution.csproj`. В IDE вони
+відображаються у віртуальній папці `common`.

@@ -2,22 +2,26 @@
 
 SSL3: TcpClient із перевіркою SPKI pin.
 
-Самостійний проєкт у `project/`. Із цієї папки:
+Файли проєкту лежать безпосередньо в цій папці. Запуск:
 
 ```sh
-dotnet run --project project -- --ssl3
+dotnet run -- --ssl3
 ```
 
 Перевірка в іншому терміналі (PIN із виводу сервера):
 
 ```sh
-dotnet run --project project -- --ssl3-client PIN
+dotnet run -- --ssl3-client PIN
 ```
 
 Порівняти з попереднім кроком із цієї папки:
 
 ```sh
-diff -ru --exclude=bin --exclude=obj ../08_1996_HTTP1.0_SSL3_HTTPS/project project
+diff -ru --exclude=bin --exclude=obj --exclude=README.md ../08_1996_HTTP1.0_SSL3_HTTPS .
 ```
 
 [Усі етапи та клієнтські команди](../README.md).
+
+Незмінні допоміжні файли підключені з [`common/`](../common/) через
+`Compile Include` та `Link` у `HttpEvolution.csproj`. В IDE вони
+відображаються у віртуальній папці `common`.

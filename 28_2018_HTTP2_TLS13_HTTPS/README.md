@@ -2,16 +2,20 @@
 
 HTTPS через власний потік TLS1.3.
 
-Самостійний проєкт у `project/`. Із цієї папки:
+Файли проєкту лежать безпосередньо в цій папці. Запуск:
 
 ```sh
-dotnet run --project project -- --tls
+dotnet run -- --tls
 ```
 
 Порівняти з попереднім кроком із цієї папки:
 
 ```sh
-diff -ru --exclude=bin --exclude=obj ../27_2018_HTTP2_TLS13_RECORDS/project project
+diff -ru --exclude=bin --exclude=obj --exclude=README.md ../27_2018_HTTP2_TLS13_RECORDS .
 ```
 
 [Усі етапи та клієнтські команди](../README.md).
+
+Незмінні допоміжні файли підключені з [`common/`](../common/) через
+`Compile Include` та `Link` у `HttpEvolution.csproj`. В IDE вони
+відображаються у віртуальній папці `common`.

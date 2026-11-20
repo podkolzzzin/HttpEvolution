@@ -1,128 +1,149 @@
 <Solution>
   <Folder Name="/01_1991_HTTP0.9_GET/">
-    <Project Path="01_1991_HTTP0.9_GET/project/HttpEvolution.csproj" />
+    <Project Path="01_1991_HTTP0.9_GET/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/02_1996_HTTP1.0_HEADERS/">
-    <Project Path="02_1996_HTTP1.0_HEADERS/project/HttpEvolution.csproj" />
+    <Project Path="02_1996_HTTP1.0_HEADERS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/03_1996_HTTP1.0_HEAD/">
-    <Project Path="03_1996_HTTP1.0_HEAD/project/HttpEvolution.csproj" />
+    <Project Path="03_1996_HTTP1.0_HEAD/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/04_1996_HTTP1.0_SSL3_RECORDS/">
-    <Project Path="04_1996_HTTP1.0_SSL3_RECORDS/project/HttpEvolution.csproj" />
+    <Project Path="04_1996_HTTP1.0_SSL3_RECORDS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/05_1996_HTTP1.0_SSL3_MESSAGES/">
-    <Project Path="05_1996_HTTP1.0_SSL3_MESSAGES/project/HttpEvolution.csproj" />
+    <Project Path="05_1996_HTTP1.0_SSL3_MESSAGES/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/06_1996_HTTP1.0_SSL3_IDENTITY/">
-    <Project Path="06_1996_HTTP1.0_SSL3_IDENTITY/project/HttpEvolution.csproj" />
+    <Project Path="06_1996_HTTP1.0_SSL3_IDENTITY/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/07_1996_HTTP1.0_SSL3_STREAM/">
-    <Project Path="07_1996_HTTP1.0_SSL3_STREAM/project/HttpEvolution.csproj" />
+    <Project Path="07_1996_HTTP1.0_SSL3_STREAM/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/08_1996_HTTP1.0_SSL3_HTTPS/">
-    <Project Path="08_1996_HTTP1.0_SSL3_HTTPS/project/HttpEvolution.csproj" />
+    <Project Path="08_1996_HTTP1.0_SSL3_HTTPS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/09_1996_HTTP1.0_SSL3_CLIENT/">
-    <Project Path="09_1996_HTTP1.0_SSL3_CLIENT/project/HttpEvolution.csproj" />
+    <Project Path="09_1996_HTTP1.0_SSL3_CLIENT/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/10_1997_HTTP1.1_HOST/">
-    <Project Path="10_1997_HTTP1.1_HOST/project/HttpEvolution.csproj" />
+    <Project Path="10_1997_HTTP1.1_HOST/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/11_1997_HTTP1.1_KEEP_ALIVE/">
-    <Project Path="11_1997_HTTP1.1_KEEP_ALIVE/project/HttpEvolution.csproj" />
+    <Project Path="11_1997_HTTP1.1_KEEP_ALIVE/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/12_1997_HTTP1.1_CHUNKED/">
-    <Project Path="12_1997_HTTP1.1_CHUNKED/project/HttpEvolution.csproj" />
+    <Project Path="12_1997_HTTP1.1_CHUNKED/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/13_1999_HTTP1.1_TLS10/">
-    <Project Path="13_1999_HTTP1.1_TLS10/project/HttpEvolution.csproj" />
+    <Project Path="13_1999_HTTP1.1_TLS10/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/14_2002_HTTP1.1_TLS_AES/">
-    <Project Path="14_2002_HTTP1.1_TLS_AES/project/HttpEvolution.csproj" />
+    <Project Path="14_2002_HTTP1.1_TLS_AES/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/15_2010_HTTP1.1_TLS_RENEGOTIATION/">
-    <Project Path="15_2010_HTTP1.1_TLS_RENEGOTIATION/project/HttpEvolution.csproj" />
+    <Project Path="15_2010_HTTP1.1_TLS_RENEGOTIATION/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/16_2015_HTTP2_FRAMES/">
-    <Project Path="16_2015_HTTP2_FRAMES/project/HttpEvolution.csproj" />
+    <Project Path="16_2015_HTTP2_FRAMES/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/17_2015_HTTP2_HPACK/">
-    <Project Path="17_2015_HTTP2_HPACK/project/HttpEvolution.csproj" />
+    <Project Path="17_2015_HTTP2_HPACK/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/18_2015_HTTP2_HUFFMAN/">
-    <Project Path="18_2015_HTTP2_HUFFMAN/project/HttpEvolution.csproj" />
+    <Project Path="18_2015_HTTP2_HUFFMAN/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/19_2015_HTTP2_STREAMS/">
-    <Project Path="19_2015_HTTP2_STREAMS/project/HttpEvolution.csproj" />
+    <Project Path="19_2015_HTTP2_STREAMS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/20_2015_HTTP2_FLOW_CONTROL/">
-    <Project Path="20_2015_HTTP2_FLOW_CONTROL/project/HttpEvolution.csproj" />
+    <Project Path="20_2015_HTTP2_FLOW_CONTROL/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/21_2015_HTTP2_CONTINUATION/">
-    <Project Path="21_2015_HTTP2_CONTINUATION/project/HttpEvolution.csproj" />
+    <Project Path="21_2015_HTTP2_CONTINUATION/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/22_2018_HTTP2_TLS13_KEYS/">
-    <Project Path="22_2018_HTTP2_TLS13_KEYS/project/HttpEvolution.csproj" />
+    <Project Path="22_2018_HTTP2_TLS13_KEYS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/23_2018_HTTP2_TLS13_HELLO/">
-    <Project Path="23_2018_HTTP2_TLS13_HELLO/project/HttpEvolution.csproj" />
+    <Project Path="23_2018_HTTP2_TLS13_HELLO/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/24_2018_HTTP2_TLS13_ECDH/">
-    <Project Path="24_2018_HTTP2_TLS13_ECDH/project/HttpEvolution.csproj" />
+    <Project Path="24_2018_HTTP2_TLS13_ECDH/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/25_2018_HTTP2_TLS13_IDENTITY/">
-    <Project Path="25_2018_HTTP2_TLS13_IDENTITY/project/HttpEvolution.csproj" />
+    <Project Path="25_2018_HTTP2_TLS13_IDENTITY/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/26_2018_HTTP2_TLS13_FINISHED/">
-    <Project Path="26_2018_HTTP2_TLS13_FINISHED/project/HttpEvolution.csproj" />
+    <Project Path="26_2018_HTTP2_TLS13_FINISHED/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/27_2018_HTTP2_TLS13_RECORDS/">
-    <Project Path="27_2018_HTTP2_TLS13_RECORDS/project/HttpEvolution.csproj" />
+    <Project Path="27_2018_HTTP2_TLS13_RECORDS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/28_2018_HTTP2_TLS13_HTTPS/">
-    <Project Path="28_2018_HTTP2_TLS13_HTTPS/project/HttpEvolution.csproj" />
+    <Project Path="28_2018_HTTP2_TLS13_HTTPS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/29_2018_HTTP2_ALPN/">
-    <Project Path="29_2018_HTTP2_ALPN/project/HttpEvolution.csproj" />
+    <Project Path="29_2018_HTTP2_ALPN/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/30_2021_HTTP3_QUIC_KEYS/">
-    <Project Path="30_2021_HTTP3_QUIC_KEYS/project/HttpEvolution.csproj" />
+    <Project Path="30_2021_HTTP3_QUIC_KEYS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/31_2021_HTTP3_QUIC_VARINT/">
-    <Project Path="31_2021_HTTP3_QUIC_VARINT/project/HttpEvolution.csproj" />
+    <Project Path="31_2021_HTTP3_QUIC_VARINT/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/32_2021_HTTP3_QUIC_PACKETS/">
-    <Project Path="32_2021_HTTP3_QUIC_PACKETS/project/HttpEvolution.csproj" />
+    <Project Path="32_2021_HTTP3_QUIC_PACKETS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/33_2021_HTTP3_QUIC_OFFSETS/">
-    <Project Path="33_2021_HTTP3_QUIC_OFFSETS/project/HttpEvolution.csproj" />
+    <Project Path="33_2021_HTTP3_QUIC_OFFSETS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/34_2021_HTTP3_QUIC_ACK/">
-    <Project Path="34_2021_HTTP3_QUIC_ACK/project/HttpEvolution.csproj" />
+    <Project Path="34_2021_HTTP3_QUIC_ACK/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/35_2021_HTTP3_QUIC_PARAMETERS/">
-    <Project Path="35_2021_HTTP3_QUIC_PARAMETERS/project/HttpEvolution.csproj" />
+    <Project Path="35_2021_HTTP3_QUIC_PARAMETERS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/36_2021_HTTP3_QUIC_TLS/">
-    <Project Path="36_2021_HTTP3_QUIC_TLS/project/HttpEvolution.csproj" />
+    <Project Path="36_2021_HTTP3_QUIC_TLS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/37_2021_HTTP3_QUIC_UDP/">
-    <Project Path="37_2021_HTTP3_QUIC_UDP/project/HttpEvolution.csproj" />
+    <Project Path="37_2021_HTTP3_QUIC_UDP/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/38_2021_HTTP3_QUIC_PTO/">
-    <Project Path="38_2021_HTTP3_QUIC_PTO/project/HttpEvolution.csproj" />
+    <Project Path="38_2021_HTTP3_QUIC_PTO/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/39_2022_HTTP3_QPACK/">
-    <Project Path="39_2022_HTTP3_QPACK/project/HttpEvolution.csproj" />
+    <Project Path="39_2022_HTTP3_QPACK/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/40_2022_HTTP3_QUIC_STREAMS/">
-    <Project Path="40_2022_HTTP3_QUIC_STREAMS/project/HttpEvolution.csproj" />
+    <Project Path="40_2022_HTTP3_QUIC_STREAMS/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/41_2022_HTTP3_RESPONSE/">
-    <Project Path="41_2022_HTTP3_RESPONSE/project/HttpEvolution.csproj" />
+    <Project Path="41_2022_HTTP3_RESPONSE/HttpEvolution.csproj" />
   </Folder>
   <Folder Name="/42_2022_HTTP3_QUIC_RECOVERY/">
-    <Project Path="42_2022_HTTP3_QUIC_RECOVERY/project/HttpEvolution.csproj" />
+    <Project Path="42_2022_HTTP3_QUIC_RECOVERY/HttpEvolution.csproj" />
+  </Folder>
+  <Folder Name="/common/">
+    <File Path="common/README.md" />
+    <File Path="common/Huffman.cs" />
+    <File Path="common/LegacyIdentity.cs" />
+    <File Path="common/Qpack.cs" />
+    <File Path="common/QuicAcks.cs" />
+    <File Path="common/QuicBuffer.cs" />
+    <File Path="common/QuicData.cs" />
+    <File Path="common/QuicKeys.cs" />
+    <File Path="common/QuicPacket.cs" />
+    <File Path="common/QuicParameters.cs" />
+    <File Path="common/QuicRecovery.cs" />
+    <File Path="common/QuicStreams.cs" />
+    <File Path="common/RecordLayer.cs" />
+    <File Path="common/Ssl3Crypto.cs" />
+    <File Path="common/Tls10Crypto.cs" />
+    <File Path="common/TlsCrypto.cs" />
+    <File Path="common/TlsHello.cs" />
+    <File Path="common/TlsRecords.cs" />
+    <File Path="common/Wire.cs" />
   </Folder>
 </Solution>

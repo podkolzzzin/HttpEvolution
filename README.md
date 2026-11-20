@@ -1,9 +1,9 @@
 # HttpEvolution
 
 Навчальне C#-демо: від HTTP/0.9 до HTTP/3 у **42 послідовних папках**.
-Кожна папка має формат `NN_<year>_HTTP<version>_<SHORT_NAME>/project`
-і містить самостійний проєкт: попередній код + одна невелика можливість.
-Відкривай `HttpEvolution.slnx` або потрібний `project/HttpEvolution.csproj`.
+Кожна папка має формат `NN_<year>_HTTP<version>_<SHORT_NAME>`
+і містить окремий виконуваний проєкт: попередній код + одна невелика можливість.
+Відкривай `HttpEvolution.slnx` або `HttpEvolution.csproj` у папці потрібного етапу.
 
 Мережеві API — тільки `TcpListener`, `TcpClient`, `UdpClient` і потоки байтів.
 TLS, QUIC, HPACK і QPACK написані тут; криптографічні примітиви — з .NET BCL.
@@ -40,7 +40,7 @@ HTTP-запиту. ECH розшифровано й пояснено безпос
 ## Показати перший крок
 
 ```sh
-dotnet run --project 01_1991_HTTP0.9_GET/project
+dotnet run --project 01_1991_HTTP0.9_GET
 # В іншому терміналі:
 printf 'GET /\r\n' | nc 127.0.0.1 8080
 # <h1>Hello, HTTP/0.9!</h1>
@@ -56,14 +56,15 @@ HTTP/0.9: один рядок GET; відповідь — HTML без стату
 Наприклад, із кореня репозиторію:
 
 ```sh
-dotnet run --project 09_1996_HTTP1.0_SSL3_CLIENT/project -- --ssl3
-diff -ru --exclude=bin --exclude=obj 02_1996_HTTP1.0_HEADERS/project 03_1996_HTTP1.0_HEAD/project
+dotnet run --project 09_1996_HTTP1.0_SSL3_CLIENT -- --ssl3
+diff -ru --exclude=bin --exclude=obj --exclude=README.md 02_1996_HTTP1.0_HEADERS 03_1996_HTTP1.0_HEAD
 ```
 
-`diff` порівнює вихідний код папок, пропускаючи `bin/` та `obj/`; код завершення 1 означає,
-що відмінності знайдено. Проєкти незалежні: немає спільного коду або посилань
-на інші етапи. Підготовчі етапи додають класи; їхній README пояснює, коли
-новий протокол стає доступним для запитів.
+`diff` порівнює код і файли проєктів, пропускаючи `bin/`, `obj/` та README;
+код завершення 1 означає, що відмінності знайдено. Незмінні допоміжні файли
+зібрані в [`common/`](common/) і явно підключені до потрібних `.csproj` як linked files.
+Підготовчі етапи додають класи; їхній README пояснює, коли новий протокол
+стає доступним для запитів.
 
 Рік — історичний орієнтир протоколу або можливості, не дата написання коду.
 HTTP3 у папках 2021 року позначає напрям наступного етапу: там будується QUIC v1,
@@ -127,7 +128,7 @@ SSL2 згаданий як попередник SSL3; його реалізац�
 ## HTTP/1.x
 
 ```sh
-dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY
 curl --http1.0 -i http://127.0.0.1:8080/
 curl --http1.0 -I http://127.0.0.1:8080/
 curl --http1.1 --raw -i http://127.0.0.1:8080/chunks
@@ -142,13 +143,13 @@ GET/HEAD, `/`, `/chunks`, 404 для інших шляхів. HTTP/1.1 вима�
 ## Історичні SSL3 / TLS1.0
 
 ```sh
-dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --ssl3
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --ssl3
 # В іншому терміналі підстав надрукований SPKI pin:
-dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --ssl3-client PIN
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --ssl3-client PIN
 
 # Аналогічно для TLS1.0:
-dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --tls10
-dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --tls10-client PIN
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --tls10
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --tls10-client PIN
 ```
 
 SSL3 слухає TCP:8442, TLS1.0 — TCP:8441. Власний `TcpClient` перевіряє pin
@@ -164,7 +165,7 @@ printf 'GET / HTTP/1.0\r\n\r\n' | openssl s_client -quiet -tls1 -cipher 'AES128-
 (2010). Повторного handshake немає. Сучасний режим використовує TLS1.3:
 
 ```sh
-dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --tls
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --tls
 curl -k --http1.1 -i https://localhost:8443/
 ```
 
@@ -174,10 +175,10 @@ TLS1.3: AES-128-GCM-SHA256, P-256, ECDSA, ALPN, HelloRetryRequest.
 ## HTTP/2
 
 ```sh
-dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --h2
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --h2
 curl --http2-prior-knowledge -i http://127.0.0.1:8081/
 # Або HTTP/2 через TLS1.3, ALPN h2:
-dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --h2 --tls
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --h2 --tls
 curl -k --http2 -I https://localhost:8444/
 ```
 
@@ -188,7 +189,7 @@ WINDOW_UPDATE та RST_STREAM. Тіло запиту не підтримуєть
 ## HTTP/3
 
 ```sh
-dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY/project -- --h3
+dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --h3
 # В іншому терміналі підстав надрукований SPKI pin:
 google-chrome --user-data-dir="$(mktemp -d)" --origin-to-force-quic-on=127.0.0.1:8445 --ignore-certificate-errors-spki-list=PIN https://127.0.0.1:8445/
 ```
