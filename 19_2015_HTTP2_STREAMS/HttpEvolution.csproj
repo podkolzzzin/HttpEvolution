@@ -13,7 +13,6 @@
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyRecords.cs" Link="LegacyRecords.cs" />
     <Compile Include="../13_1999_HTTP1.1_TLS10/LegacySsl.Client.cs" Link="LegacySsl.Client.cs" />
     <Compile Include="../15_2010_HTTP1.1_TLS_RENEGOTIATION/LegacySsl.cs" Link="LegacySsl.cs" />
-    <Compile Include="../16_2015_HTTP2_FRAMES/Program.cs" Link="Program.cs" />
     <Compile Include="../common/RecordLayer.cs" Link="common/RecordLayer.cs" />
     <Compile Include="../common/Ssl3Crypto.cs" Link="common/Ssl3Crypto.cs" />
     <Compile Include="../common/Tls10Crypto.cs" Link="common/Tls10Crypto.cs" />

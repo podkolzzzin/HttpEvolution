@@ -1,3 +1,4 @@
+// 02_1996_HTTP1.0_HEADERS: Статус, заголовки та Content-Length.
 using System.Net;
 using System.Net.Sockets;
 using System.Text;

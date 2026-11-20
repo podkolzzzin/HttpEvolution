@@ -1,3 +1,4 @@
+// 11_1997_HTTP1.1_KEEP_ALIVE: Кілька запитів через одне TCP-з’єднання.
 using System.Net;
 using System.Net.Sockets;
 using System.Text;

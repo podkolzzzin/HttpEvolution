@@ -127,6 +127,7 @@
   </Folder>
   <Folder Name="/common/">
     <File Path="common/README.md" />
+    <File Path="common/DemoClientHello.cs" />
     <File Path="common/Http2Frames.cs" />
     <File Path="common/Huffman.cs" />
     <File Path="common/LegacyIdentity.cs" />

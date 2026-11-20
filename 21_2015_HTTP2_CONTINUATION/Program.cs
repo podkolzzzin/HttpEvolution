@@ -1,0 +1,2 @@
+// 21_2015_HTTP2_CONTINUATION: HTTP/2: збирання блоків CONTINUATION.
+Http2.Run();

@@ -1,0 +1,2 @@
+// 41_2022_HTTP3_RESPONSE: HTTP/3: GET/HEAD через QUIC, HEADERS/DATA/FIN.
+await QuicServer.Run();

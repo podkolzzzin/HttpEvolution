@@ -1,6 +1,9 @@
+// 13_1999_HTTP1.1_TLS10: TLS1.0: PRF, HMAC і новий Finished.
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+
+if (args.Length == 0) args = ["--tls10"];
 
 if (args is [var mode, var pin] && mode is "--ssl3-client" or "--tls10-client")
 {

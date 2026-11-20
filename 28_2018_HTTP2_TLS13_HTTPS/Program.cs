@@ -1,6 +1,9 @@
+// 28_2018_HTTP2_TLS13_HTTPS: HTTPS через власний потік TLS1.3.
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+
+if (args.Length == 0) args = ["--tls"];
 
 if (args is [var mode, var pin] && mode is "--ssl3-client" or "--tls10-client")
 {

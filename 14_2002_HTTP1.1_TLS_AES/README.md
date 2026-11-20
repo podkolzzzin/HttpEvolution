@@ -2,16 +2,24 @@
 
 TLS1.0: AES-CBC замість 3DES.
 
-Проєкт запускається з цієї папки; linked files видно в IDE поруч із локальним кодом:
+Власне демо: [Program.cs](Program.cs). Із цієї папки:
 
 ```sh
-dotnet run -- --tls10
+dotnet run
 ```
 
-Перевірка в іншому терміналі (PIN із виводу сервера):
+Демо запускає локальний сервер; зупинка — Ctrl+C.
+
+Клієнт в іншому терміналі (PIN із виводу сервера):
 
 ```sh
 dotnet run -- --tls10-client PIN
+```
+
+AES-клієнт в іншому терміналі. Цей етап ще не має renegotiation indication (додано на етапі 15), тому OpenSSL потребує `-legacy_server_connect`:
+
+```sh
+printf 'GET / HTTP/1.0\r\n\r\n' | openssl s_client -quiet -tls1 -legacy_server_connect -cipher 'AES128-SHA:@SECLEVEL=0' -connect 127.0.0.1:8441
 ```
 
 Код, доданий або змінений на цьому етапі:
@@ -19,18 +27,17 @@ dotnet run -- --tls10-client PIN
 - [LegacyCipher.cs](LegacyCipher.cs).
 - [LegacyRecords.cs](LegacyRecords.cs).
 - [LegacySsl.cs](LegacySsl.cs).
+- [Program.cs](Program.cs).
 
-Порівняти фактичний код із попереднім кроком (код завершення 1 означає відмінності):
+Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
 diff -u ../13_1999_HTTP1.1_TLS10/LegacyCipher.cs LegacyCipher.cs
 diff -u ../13_1999_HTTP1.1_TLS10/LegacyRecords.cs LegacyRecords.cs
 diff -u ../13_1999_HTTP1.1_TLS10/LegacySsl.cs LegacySsl.cs
+diff -u ../13_1999_HTTP1.1_TLS10/Program.cs Program.cs
 ```
 
-Спільні допоміжні файли зберігаються в [`common/`](../common/).
-Потрібні попередні версії інших файлів проєкт підключає безпосередньо з етапів,
-де вони вперше з’явилися. Повний склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
-Нову історичну версію зберігай у новому етапі, залишаючи попередню на місці.
+`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
 
-[Усі етапи та клієнтські команди](../README.md).
+[Усі етапи](../README.md).

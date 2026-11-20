@@ -2,13 +2,21 @@
 
 HTTP/2: preface, SETTINGS і кадри через TCP.
 
-Проєкт запускається з цієї папки; linked files видно в IDE поруч із локальним кодом:
+Власне демо: [Program.cs](Program.cs). Із цієї папки:
 
 ```sh
-dotnet run -- --h2
+dotnet run
 ```
 
-Цей крок показує preface та службові кадри HTTP/2. Відповіді GET/HEAD з’являються на етапі 19.
+Демо запускає локальний сервер; зупинка — Ctrl+C.
+
+Цей етап обробляє SETTINGS/PING; GET/HEAD з’являються на етапі 19.
+
+Preface і порожній SETTINGS в іншому терміналі; відповідь у hex:
+
+```sh
+printf 'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n\000\000\000\004\000\000\000\000\000' | nc -N 127.0.0.1 8081 | od -An -tx1
+```
 
 Код, доданий або змінений на цьому етапі:
 
@@ -16,17 +24,14 @@ dotnet run -- --h2
 - [Http2Frames.cs](../common/Http2Frames.cs).
 - [Program.cs](Program.cs).
 
-Порівняти фактичний код із попереднім кроком (код завершення 1 означає відмінності):
+Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
 diff -u /dev/null Http2.cs
 diff -u /dev/null ../common/Http2Frames.cs
-diff -u ../13_1999_HTTP1.1_TLS10/Program.cs Program.cs
+diff -u ../15_2010_HTTP1.1_TLS_RENEGOTIATION/Program.cs Program.cs
 ```
 
-Спільні допоміжні файли зберігаються в [`common/`](../common/).
-Потрібні попередні версії інших файлів проєкт підключає безпосередньо з етапів,
-де вони вперше з’явилися. Повний склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
-Нову історичну версію зберігай у новому етапі, залишаючи попередню на місці.
+`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
 
-[Усі етапи та клієнтські команди](../README.md).
+[Усі етапи](../README.md).

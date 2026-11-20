@@ -2,13 +2,15 @@
 
 TLS1.0: PRF, HMAC і новий Finished.
 
-Проєкт запускається з цієї папки; linked files видно в IDE поруч із локальним кодом:
+Власне демо: [Program.cs](Program.cs). Із цієї папки:
 
 ```sh
-dotnet run -- --tls10
+dotnet run
 ```
 
-Перевірка в іншому терміналі (PIN із виводу сервера):
+Демо запускає локальний сервер; зупинка — Ctrl+C.
+
+Клієнт в іншому терміналі (PIN із виводу сервера):
 
 ```sh
 dotnet run -- --tls10-client PIN
@@ -23,7 +25,7 @@ dotnet run -- --tls10-client PIN
 - [Program.cs](Program.cs).
 - [Tls10Crypto.cs](../common/Tls10Crypto.cs).
 
-Порівняти фактичний код із попереднім кроком (код завершення 1 означає відмінності):
+Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
 diff -u ../04_1996_HTTP1.0_SSL3_RECORDS/LegacyCipher.cs LegacyCipher.cs
@@ -34,9 +36,6 @@ diff -u ../12_1997_HTTP1.1_CHUNKED/Program.cs Program.cs
 diff -u /dev/null ../common/Tls10Crypto.cs
 ```
 
-Спільні допоміжні файли зберігаються в [`common/`](../common/).
-Потрібні попередні версії інших файлів проєкт підключає безпосередньо з етапів,
-де вони вперше з’явилися. Повний склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
-Нову історичну версію зберігай у новому етапі, залишаючи попередню на місці.
+`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
 
-[Усі етапи та клієнтські команди](../README.md).
+[Усі етапи](../README.md).

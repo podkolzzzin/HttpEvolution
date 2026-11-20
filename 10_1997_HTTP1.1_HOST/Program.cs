@@ -1,3 +1,4 @@
+// 10_1997_HTTP1.1_HOST: Обов’язковий Host для HTTP/1.1.
 using System.Net;
 using System.Net.Sockets;
 using System.Text;

@@ -1,6 +1,9 @@
+// 09_1996_HTTP1.0_SSL3_CLIENT: SSL3: TcpClient із перевіркою SPKI pin.
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+
+if (args.Length == 0) args = ["--ssl3"];
 
 if (args is [var mode, var pin] && mode is "--ssl3-client")
 {

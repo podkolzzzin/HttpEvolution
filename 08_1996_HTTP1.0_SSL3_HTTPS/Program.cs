@@ -1,6 +1,9 @@
+// 08_1996_HTTP1.0_SSL3_HTTPS: HTTPS через власний SSL3 handshake.
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+
+if (args.Length == 0) args = ["--ssl3"];
 
 var ssl3 = args.Contains("--ssl3");
 var port = ssl3 ? 8442 : 8080;

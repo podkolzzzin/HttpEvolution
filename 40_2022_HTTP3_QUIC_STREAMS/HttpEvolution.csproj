@@ -15,7 +15,6 @@
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyRecords.cs" Link="LegacyRecords.cs" />
     <Compile Include="../13_1999_HTTP1.1_TLS10/LegacySsl.Client.cs" Link="LegacySsl.Client.cs" />
     <Compile Include="../15_2010_HTTP1.1_TLS_RENEGOTIATION/LegacySsl.cs" Link="LegacySsl.cs" />
-    <Compile Include="../37_2021_HTTP3_QUIC_UDP/Program.cs" Link="Program.cs" />
     <Compile Include="../common/Qpack.cs" Link="common/Qpack.cs" />
     <Compile Include="../common/QuicAcks.cs" Link="common/QuicAcks.cs" />
     <Compile Include="../common/QuicBuffer.cs" Link="common/QuicBuffer.cs" />

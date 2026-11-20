@@ -2,29 +2,32 @@
 
 HTTP/3: GET/HEAD через QUIC, HEADERS/DATA/FIN.
 
-Проєкт запускається з цієї папки; linked files видно в IDE поруч із локальним кодом:
+Власне демо: [Program.cs](Program.cs). Із цієї папки:
 
 ```sh
-dotnet run -- --h3
+dotnet run
 ```
+
+Демо запускає локальний сервер; зупинка — Ctrl+C.
+
+Клієнт HTTP/3 та SPKI pin описані в [головному README](../README.md#http3).
 
 Код, доданий або змінений на цьому етапі:
 
 - [Http3.cs](Http3.cs).
+- [Program.cs](Program.cs).
 - [QuicServer.cs](QuicServer.cs).
 - [QuicSession.cs](QuicSession.cs).
 
-Порівняти фактичний код із попереднім кроком (код завершення 1 означає відмінності):
+Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
 diff -u /dev/null Http3.cs
+diff -u ../40_2022_HTTP3_QUIC_STREAMS/Program.cs Program.cs
 diff -u ../37_2021_HTTP3_QUIC_UDP/QuicServer.cs QuicServer.cs
 diff -u ../40_2022_HTTP3_QUIC_STREAMS/QuicSession.cs QuicSession.cs
 ```
 
-Спільні допоміжні файли зберігаються в [`common/`](../common/).
-Потрібні попередні версії інших файлів проєкт підключає безпосередньо з етапів,
-де вони вперше з’явилися. Повний склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
-Нову історичну версію зберігай у новому етапі, залишаючи попередню на місці.
+`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
 
-[Усі етапи та клієнтські команди](../README.md).
+[Усі етапи](../README.md).

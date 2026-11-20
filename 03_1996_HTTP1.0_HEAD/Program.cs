@@ -1,3 +1,4 @@
+// 03_1996_HTTP1.0_HEAD: HEAD: заголовки без тіла відповіді.
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
