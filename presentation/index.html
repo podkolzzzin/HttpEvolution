@@ -253,25 +253,87 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
     },
     {
       "id": "https-world",
-      "year": "1995–1996",
+      "year": "1994–1995",
       "chapter": "HTTPS / SSL",
-      "title": "Через веб хочеться\nпередавати приватне",
-      "why": "Коли в запиті з’являються пароль або дані покупки, сам формат HTTP не захищає їх від читання чи зміни в мережі.",
-      "changeLabel": "Паралельна лінія історії",
-      "change": "SSL додає захищений канал. HTTP продовжує розвиватися всередині нього.",
+      "title": "Навіщо Netscape\nстворює SSL",
+      "why": "Повернімося до 1994–1995 років. Веб стає комерційним: через браузер хочуть передавати паролі й дані покупок. Звичайний HTTP поверх TCP не приховує ці байти.",
+      "changeLabel": "Головна думка",
+      "change": "Netscape створює SSL — Secure Sockets Layer: захист з’єднання між клієнтом і сервером.",
       "beats": [
         {
-          "title": "Нова потреба",
-          "text": "Потрібно приховати дані від сторонніх і переконатися, що на іншому кінці саме потрібний сервер."
+          "title": "Автор має обидва кінці каналу",
+          "text": "Netscape випускає браузер Navigator і сервер для вебторгівлі. SSL потрібен, щоб передавати чутливі дані між ними."
         },
         {
-          "title": "SSL 3.0 у 1996",
-          "text": "Після раннього SSL 2.0 приходить SSL 3.0. У демо починаємо з нього: handshake, перевірка сервера, захищені записи."
+          "title": "Захист під HTTP",
+          "text": "SSL розміщується між HTTP і TCP: перевіряє сервер, шифрує дані та допомагає виявити їх підміну."
+        },
+        {
+          "title": "Так з’являється HTTPS",
+          "text": "Браузер спочатку встановлює захищений канал, а вже всередині надсилає HTTP-запит. Методи, заголовки й HTML залишаються HTTP."
         }
       ],
+      "walkthrough": true,
+      "extraRefs": [
+        "netscape-1994",
+        "6101"
+      ],
+      "note": "Це паралельна гілка історії: HTTP розвиває формат спілкування, SSL — захист каналу. Номери їхніх версій незалежні."
+    },
+    {
+      "id": "ssl-versions",
+      "year": "до 1995–1996",
+      "chapter": "HTTPS / SSL",
+      "title": "А де були\nSSL 1.0 і 2.0?",
+      "why": "3.0 — третя версія протоколу SSL. До неї були невдала перша спроба та версія, яка вже працювала у браузерах і серверах.",
+      "changeLabel": "Головна думка",
+      "change": "SSL не починається з 3.0. Із 3.0 починається лише реалізація в нашому демо.",
+      "beats": [
+        {
+          "title": "SSL 1.0 · не вийшла публічно",
+          "text": "У початковій версії виявили криптографічні помилки. Netscape не випустила її для користувачів."
+        },
+        {
+          "title": "SSL 2.0 · перша у продуктах",
+          "text": "Публічна специфікація датована лютим 1995 року. Захищений веб уже працює, але в самому протоколі залишаються слабкі місця."
+        },
+        {
+          "title": "SSL 3.0 · переробка у 1996",
+          "text": "Netscape суттєво змінює протокол, щоб виправити проблеми SSL2. Саме ця конструкція згодом стане основою TLS."
+        }
+      ],
+      "walkthrough": true,
       "rfc": "6101",
-      "extraRefs": [],
-      "note": "SSL 3.0 тут є історичним етапом. HTTPS не є наступною версією HTTP."
+      "extraRefs": [
+        "ssl-history",
+        "6176"
+      ],
+      "note": "Спогади Тіма Діркса, автора еталонної реалізації SSL3, пояснюють ранні версії. RFC 6101 опубліковано у 2011 році як історичний опис SSL3 з 1996-го."
+    },
+    {
+      "id": "ssl3-redesign",
+      "year": "1996",
+      "chapter": "HTTPS / SSL",
+      "title": "Чому SSL2\nдовелося переробити",
+      "why": "Шифрувати дані недостатньо, якщо зловмисник може втрутитися в домовленість про те, як саме їх захищати. У SSL2 були проблеми саме на цьому рівні.",
+      "changeLabel": "Головна думка",
+      "change": "Для компактного демо пропускаємо реалізацію SSL2 й починаємо з SSL3: тут видно основу майбутнього TLS.",
+      "beats": [
+        {
+          "title": "Домовленість теж треба перевіряти",
+          "text": "У SSL2 повідомлення handshake не захищені: посередник може схилити сторони до слабшого алгоритму. У SSL3 Finished перевіряє всю попередню історію handshake."
+        },
+        {
+          "title": "Різним задачам — різні ключі",
+          "text": "SSL2 використовує один ключ для шифрування й перевірки цілісності. SSL3 отримує окремі секрети для цих задач і для кожного напрямку передавання."
+        }
+      ],
+      "walkthrough": true,
+      "rfc": "6176",
+      "extraRefs": [
+        "6101"
+      ],
+      "note": "Далі розберемо цю відповідь SSL3 крок за кроком: домовленість → спільний секрет → ключі → Finished → захищений HTTP. Це навчальний історичний етап."
     },
     {
       "id": "ssl3-handshake",
@@ -1252,6 +1314,18 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
     "cern": [
       "CERN · історія вебу",
       "https://home.cern/science/computing/the-birth-of-the-web/short-history-web/"
+    ],
+    "netscape-1994": [
+      "Netscape · анонс 1994 (архів)",
+      "https://www.krsaborio.net/internet/research/1994/1215.htm"
+    ],
+    "ssl-history": [
+      "Тім Діркс · історія SSL",
+      "https://tim.dierks.org/2014/05/security-standards-and-name-changes-in.html"
+    ],
+    "6176": [
+      "RFC 6176 · недоліки SSL2",
+      "https://www.rfc-editor.org/rfc/rfc6176.html"
     ]
   },
   "full": "using System.Net;\nusing System.Net.Sockets;\nusing System.Text;\n\nvar server = new TcpListener(IPAddress.Loopback, 8080);\nserver.Start();\nConsole.WriteLine(\"HTTP/0.9 on 127.0.0.1:8080. Stop with Ctrl+C.\");\nwhile (true)\n{\n    using var client = server.AcceptTcpClient();\n    using var stream = client.GetStream();\n    stream.ReadTimeout = stream.WriteTimeout = 5000;\n    using var reader = new StreamReader(stream, Encoding.ASCII);\n    try\n    {\n        var request = reader.ReadLine()?.Split(' ', StringSplitOptions.RemoveEmptyEntries);\n        if (request is not [\"GET\", var path, ..]) continue;\n        var html = path == \"/\" ? \"<h1>Hello, HTTP/0.9!</h1>\\n\" : \"<h1>Not found</h1>\\n\";\n        stream.Write(Encoding.ASCII.GetBytes(html));\n    }\n    catch (IOException) { } // A disconnected or timed-out client must not stop the demo.\n}"
