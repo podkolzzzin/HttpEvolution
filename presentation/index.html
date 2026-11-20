@@ -91,6 +91,18 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
 .traffic-boundaries{font-size:12px;line-height:1.6;color:var(--muted);margin:12px 0 0;max-width:none}.traffic-slide .sources{margin:8px 0 0}.traffic-slide .slide-base{margin-top:20px}
 @media(max-width:1050px){.traffic-network{grid-template-columns:80px 80px minmax(0,1fr)}.traffic-record-parts{grid-template-columns:140px minmax(0,1fr)}.traffic-field{padding:10px}.traffic-decoded-parts{grid-template-columns:1fr 1fr}.traffic-decoded-parts>:first-child{grid-column:1 / -1}}
 @media(max-width:760px){.traffic-slide .story{display:block}.traffic-slide h1{font-size:34px;margin-bottom:18px}.traffic-slide .lead{margin-bottom:15px}.traffic-controls{align-items:stretch;flex-direction:column}.traffic-controls .switches{display:grid;grid-template-columns:1fr 1fr}.traffic-http{grid-template-columns:1fr}.traffic-field{min-height:64px}.traffic-caption{display:block;line-height:1.6}.traffic-caption span{display:block}.traffic-network{grid-template-columns:1fr 1fr}.traffic-record{grid-column:1 / -1}.traffic-record-parts{grid-template-columns:1fr}.traffic-record-parts>.traffic-field{min-height:65px}.traffic-cipher{min-height:135px}.traffic-detail{grid-template-columns:1fr;gap:6px}.traffic-transform{line-height:1.5}.traffic-decoded-parts{grid-template-columns:1fr 1fr}.traffic-decoded-parts>:first-child{grid-column:1 / -1}.traffic-decoded .traffic-field{padding:7px}.traffic-decoded .traffic-field strong{font-size:12px}}
+/* Host privacy follows the SSL diagram, with handshake and HTTP shown in time order. */
+.host-privacy h2{font-size:20px;margin:0 0 8px;letter-spacing:-.02em}
+.host-privacy .traffic-controls{margin-top:16px}
+.host-privacy .traffic-record-parts{grid-template-columns:1fr 1.5fr}
+.host-privacy .host-visible{background:#f8e2d7;color:#743627}
+.host-privacy .host-sealed{background:var(--dark);color:#e9f2e9}
+.host-privacy .host-phase{margin-top:16px}
+.host-privacy .traffic-field{min-height:85px}
+.host-history{font-size:13px;line-height:1.7;margin:16px 0}
+.host-history a{font-weight:650}
+#http11-host .workbench>.wire{margin-top:18px}
+@media(max-width:760px){.host-privacy .traffic-record-parts{grid-template-columns:1fr}.host-privacy .traffic-controls .switches{grid-template-columns:1fr}.host-history{font-size:12px}}
 </style>
 </head>
 <body>
@@ -668,8 +680,8 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "year": "1997",
       "chapter": "HTTP/1.1",
       "title": "Одна IP-адреса.\nКілька сайтів",
-      "why": "Після TCP-connect сервер знає IP, але ще не знає домен, який відкриває користувач.",
-      "change": "Host стає обов’язковим у запиті HTTP/1.1.",
+      "why": "Кілька сайтів можуть мати одну IP-адресу. Заголовок Host повідомляє HTTP-серверу, до якого з них звертається клієнт.",
+      "change": "Host обов’язковий у HTTP/1.1. У HTTPS він зашифрований, але ім’я сайту може бути видно раніше — у TLS SNI.",
       "code": "var badHost = http11 &&\n    (hosts.Count != 1 || hosts[0].Length == 0 ||\n     hosts[0].Contains(','));\nif (badHost) status = \"400 Bad Request\";",
       "file": "Program.cs",
       "commit": "c1d4b35",
@@ -1397,14 +1409,50 @@ function channelModel(kind){
  return '<div class="channel-model"><div class="channel-path"><strong>Браузер</strong><span>'+(sse?'← події':'↔ повідомлення')+'</span><strong>Сервер</strong></div><p>'+(sse?'SSE: одне HTTP-з’єднання для вхідних подій.':'WebSocket: кожна сторона надсилає, коли має дані.')+'</p></div>';
 }
 
+function hostPrivacyModel(){
+ return `<div class="host-privacy" data-mode="https" data-revealed="false">
+ <h2>HTTPS приховує запит. А ім’я сайту?</h2>
+ <p class="traffic-boundaries">Погляд уперед від Host (1997) до TLS SNI (2003) та ECH. Це схема приватності, а не реалізація ECH у демо. Натисни на поле, щоб розібрати його.</p>
+ <div class="traffic-controls"><div class="switches" role="group" aria-label="Захист імені сайту"><button type="button" data-host-mode="http" aria-pressed="false">HTTP</button><button type="button" data-host-mode="https" aria-pressed="true">HTTPS · без ECH</button><button type="button" data-host-mode="ech" aria-pressed="false">HTTPS + ECH</button></div><button type="button" class="traffic-reveal" aria-pressed="false" aria-controls="host-drawing">Показати вміст на сервері</button></div>
+ <div id="host-drawing"></div><div id="host-privacy-detail" class="traffic-detail" role="status" aria-live="polite" aria-atomic="true"></div>
+ <p class="host-history"><strong>Коли це виправляли?</strong> <a href="https://blog.cloudflare.com/encrypted-sni/" target="_blank" rel="noopener">2018 — експериментальний ESNI</a>; <a href="https://blog.cloudflare.com/announcing-encrypted-client-hello/" target="_blank" rel="noopener">2023 — впровадження ECH у Cloudflare</a>; <a href="https://www.rfc-editor.org/rfc/rfc9849.html" target="_blank" rel="noopener">березень 2026 — стандарт ECH, RFC 9849</a>. Захист діє лише там, де клієнт і сервер підтримують ECH та успішно його узгодили.</p>
+ <p class="traffic-boundaries">IP-адреси, розміри й час передавання залишаються видимими. Незашифрований DNS теж може розкрити домен. ECH захищає справжнє ім’я в ClientHello, але не робить з’єднання невидимим. <a href="https://www.rfc-editor.org/rfc/rfc3546.html#section-3.1" target="_blank" rel="noopener">SNI · RFC 3546, 2003</a>.</p></div>`;
+}
+function renderHostPrivacy(model){
+ const mode=model.dataset.mode, tls=mode!=='http', ech=mode==='ech', revealed=tls&&model.dataset.revealed==='true';
+ const field=(id,title,body,small,tone='')=>trafficField(id,title,body,small,'host-privacy-detail').replace('class="traffic-field"','class="traffic-field '+tone+'"');
+ const network=content=>'<div class="traffic-network">'+field('ip','IP','Адреси','Відкрито')+field('tcp','TCP','Порти','Відкрито')+'<div class="traffic-record">'+content+'</div></div>';
+ const sni=field('sni',ech?'Справжній SNI · всередині ECH':'SNI · ім’я сервера',ech&&!revealed?'Зашифровано':'example.com',ech?(revealed?'Розкрито сервером із ключем ECH':'Приховано від спостерігача'):'Відкрито · домен видно',ech?'host-sealed':'host-visible');
+ const hello='<div class="traffic-caption host-phase"><strong>1. TLS handshake · до HTTP-запиту</strong><span>ClientHello — початок домовленості про захист</span></div>'+network('<div class="traffic-record-title">ClientHello'+(ech?' · з ECH':' · без ECH')+'</div><div class="traffic-record-parts">'+field('outer',ech?'Зовнішній SNI':'Інші поля Hello',ech?'public.example':'Параметри TLS',ech?'Відкрите ім’я провайдера · умовний приклад':'Відкрита частина ClientHello')+sni+'</div>');
+ const request=field('request','Рядок запиту',tls&&!revealed?'Зашифровано':'GET / HTTP/1.1',tls?'Усередині захищеного HTTP':'Відкрито',tls?'host-sealed':'');
+ const host=field('host','HTTP-заголовок Host',tls&&!revealed?'Зашифровано':'Host: example.com',tls?(revealed?'Після розшифрування на сервері':'Разом з усім HTTP-запитом'):'Відкрито · домен видно',tls?'host-sealed':'host-visible');
+ model.querySelector('#host-drawing').innerHTML=(tls?hello:'')+'<div class="traffic-caption host-phase"><strong>'+(tls?'2. HTTP-запит · після TLS handshake':'HTTP-запит · без TLS')+'</strong><span>'+(revealed?'Вміст на кінцевій стороні з ключами':'У мережі · що бачить спостерігач')+'</span></div>'+network('<div class="traffic-record-title">'+(tls?'Захищені дані TLS · HTTP усередині':'Відкритий HTTP у TCP')+'</div><div class="traffic-record-parts">'+request+host+'</div>');
+ model.querySelectorAll('[data-host-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.hostMode===mode)));
+ const reveal=model.querySelector('.traffic-reveal');reveal.disabled=!tls;reveal.setAttribute('aria-pressed',String(revealed));reveal.textContent=!tls?'HTTP уже відкритий':revealed?'Повернути вигляд у мережі':'Показати вміст на сервері';
+ describeHostPrivacy(model,tls?'sni':'host');
+}
+function describeHostPrivacy(model,id){
+ const tls=model.dataset.mode!=='http', ech=model.dataset.mode==='ech';
+ const descriptions={
+ ip:['Адреси видно в усіх режимах','IP потрібен мережі для доставки. Навіть з ECH адреса сервера може допомогти здогадатися, який сайт відкрили.'],
+ tcp:['TCP не шифрується TLS','Спостерігач бачить порти та службові поля TCP, а також розміри й час передавання. Схема показує логічні частини, а не точні межі пакетів.'],
+ outer:[ech?'Зовнішнє ім’я залишається відкритим':'ClientHello йде до HTTP',ech?'Зовнішній ClientHello містить публічне ім’я сервера провайдера, що приймає з’єднання. Справжнє ім’я сайту міститься в зашифрованому ClientHelloInner. public.example — умовний приклад.':'Клієнт спочатку надсилає параметри TLS. SNI (Server Name Indication) допомагає серверу вибрати сайт і сертифікат ще до отримання HTTP-запиту.'],
+ sni:[ech?'ECH приховує справжнє ім’я':'Домен видно навіть із HTTPS',ech?'ECH шифрує внутрішній ClientHello разом зі справжнім SNI. Його відкриває сервер із ключем ECH; звичайний спостерігач у мережі його не читає.':'Без ECH значення SNI example.com передається відкрито в ClientHello — зокрема в TLS 1.3. Це окреме поле TLS, а не HTTP-заголовок Host.'],
+ host:[tls?'Host зашифрований у HTTPS':'Без TLS заголовок Host відкритий',tls?'Host: example.com — частина HTTP-запиту, тому TLS шифрує його разом із методом, шляхом, іншими заголовками та тілом. Витік імені без ECH відбувається раніше, через SNI.':'Host: example.com читається прямо в TCP-потоці. Спостерігач бачить домен, як і решту HTTP-запиту.'],
+ request:[tls?'Рядок запиту теж зашифрований':'Рядок запиту відкритий',tls?'GET, шлях / і HTTP/1.1 захищені разом із заголовком Host. Показ вмісту на сервері не означає, що ці байти стали відкритими в мережі.':'Без TLS метод, шлях і версію HTTP можна прочитати в мережі.']
+ };
+ const [title,body]=descriptions[id];model.querySelector('#host-privacy-detail').innerHTML='<h2>'+esc(title)+'</h2><p>'+esc(body)+'</p>';
+ model.querySelectorAll('[data-traffic-field]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.trafficField===id)));
+}
+
 function sslTrafficModel(){
  return `<div class="traffic-model" data-ssl="true" data-revealed="false">
  <div class="traffic-controls"><div class="switches" role="group" aria-label="Спосіб передавання"><button type="button" data-traffic-mode="plain" aria-pressed="false">Без SSL</button><button type="button" data-traffic-mode="ssl" aria-pressed="true">Із SSL3</button></div><button type="button" class="traffic-reveal" aria-pressed="false" aria-controls="traffic-drawing">Показати вміст на сервері</button></div>
  <div id="traffic-drawing"></div><div class="traffic-detail" id="traffic-detail" role="status" aria-live="polite" aria-atomic="true"></div>
  <p class="traffic-boundaries">У режимі SSL показано дані після handshake: SSL3 + 3DES-CBC + SHA-1 MAC, без стиснення. Тут запит умістився в один SSL-запис. Загалом TCP може розбити запис між сегментами або передати кілька записів разом; межі HTTP, SSL і TCP не зобов’язані збігатися.</p></div>`;
 }
-function trafficField(id,title,body,small=''){
- return '<button type="button" class="traffic-field" data-traffic-field="'+id+'" aria-pressed="false" aria-controls="traffic-detail"><strong>'+esc(title)+'</strong><code>'+esc(body)+'</code>'+(small?'<small>'+esc(small)+'</small>':'')+'</button>';
+function trafficField(id,title,body,small='',detail='traffic-detail'){
+ return '<button type="button" class="traffic-field" data-traffic-field="'+id+'" aria-pressed="false" aria-controls="'+detail+'"><strong>'+esc(title)+'</strong><code>'+esc(body)+'</code>'+(small?'<small>'+esc(small)+'</small>':'')+'</button>';
 }
 function renderTraffic(model){
  const ssl=model.dataset.ssl==='true', revealed=model.dataset.revealed==='true';
@@ -1451,7 +1499,7 @@ $('#deck').innerHTML=slides.map((s,i)=>{
  const first=s.full?'<details class="wire"><summary>Повний HTTP/0.9-сервер · 22 рядки</summary>'+codeCard(full,'Program.cs','C#','ПОВНИЙ ФАЙЛ · main / 0bb3812')+'</details>':'';
  const route=s.hero?'<div class="route" aria-label="HTTP 0.9, HTTP 1.x, HTTP 2, HTTP 3"><span>0.9</span><i>→</i><span>1.x</span><i>→</i><span>2</span><i>→</i><span>3</span></div><div class="hero-stats"><span><strong>22</strong>рядки першого сервера</span><span><strong>3</strong>мережеві класи .NET</span></div>':'';
  const final=s.final?'<div class="final-links"><a href="'+repo+'/tree/chronological" target="_blank" rel="noopener">Відкрити репозиторій ↗</a><a href="'+repo+'/pull/1" target="_blank" rel="noopener">PR для перегляду ↗</a></div>':'';
- return '<section class="slide '+category+(s.interactive==='ssl-traffic'?' traffic-slide':'')+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='ssl-traffic'?sslTrafficModel():s.interactive==='frame'?frameModel():'')+(s.channel?channelModel(s.channel):'')+beats+(s.code?codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
+ return '<section class="slide '+category+(['ssl-traffic','host'].includes(s.interactive)?' traffic-slide':'')+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='ssl-traffic'?sslTrafficModel():s.interactive==='host'?hostPrivacyModel():s.interactive==='frame'?frameModel():'')+(s.channel?channelModel(s.channel):'')+beats+(s.code?(s.interactive==='host'?'<details class="wire"><summary>Код демо · перевірка Host</summary>':'')+codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption)+(s.interactive==='host'?'</details>':''):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
 }).join('');
 let group='';$('.topics').innerHTML=slides.map((s,i)=>{let label='';const g=s.chapter;if(g!==group){group=g;label='<div class="topics-group">'+esc(g)+'</div>';}return label+'<button type="button" class="topic" data-go="'+i+'"><span>'+String(i+1).padStart(2,'0')+'</span><span>'+esc(s.year)+'</span><strong>'+esc(s.title.replace(/\n/g,' '))+'</strong></button>';}).join('');
 let index=-1;
@@ -1482,6 +1530,16 @@ $('#deck').addEventListener('pointerup',e=>{if(!touch)return;const dx=e.clientX-
 let toastTimer;function toast(message){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),2000);}
 $$('.copy').forEach(button=>button.addEventListener('click',async()=>{const code=button.closest('.code-card').querySelector('code').textContent;try{await navigator.clipboard.writeText(code);toast('Код скопійовано');}catch{toast('Виділи код і скопіюй вручну');}}));
 
+
+$$('.host-privacy').forEach(model=>{
+ renderHostPrivacy(model);
+ model.addEventListener('click',event=>{
+  const mode=event.target.closest('[data-host-mode]'),reveal=event.target.closest('.traffic-reveal'),field=event.target.closest('[data-traffic-field]');
+  if(mode){model.dataset.mode=mode.dataset.hostMode;model.dataset.revealed='false';renderHostPrivacy(model);}
+  else if(reveal&&!reveal.disabled){model.dataset.revealed=String(model.dataset.revealed!=='true');renderHostPrivacy(model);}
+  else if(field)describeHostPrivacy(model,field.dataset.trafficField);
+ });
+});
 
 $$('.traffic-model').forEach(model=>{
  renderTraffic(model);
