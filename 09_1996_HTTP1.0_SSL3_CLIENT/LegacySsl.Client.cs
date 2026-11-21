@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-static partial class LegacySsl
+internal static partial class LegacySsl
 {
     public static TlsStream Connect(Stream transport, string pin)
     {

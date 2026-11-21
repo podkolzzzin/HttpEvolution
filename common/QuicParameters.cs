@@ -1,7 +1,7 @@
-sealed class QuicParameters(byte[] bytes)
+internal sealed class QuicParameters(byte[] bytes)
 {
-    readonly Dictionary<ulong, byte[]> values = Parse(bytes);
-    static Dictionary<ulong, byte[]> Parse(byte[] bytes)
+    private readonly Dictionary<ulong, byte[]> values = Parse(bytes);
+    private static Dictionary<ulong, byte[]> Parse(byte[] bytes)
     {
         var input = new QuicData(bytes);
         var result = new Dictionary<ulong, byte[]>();

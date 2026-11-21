@@ -1,5 +1,5 @@
 // A small loopback recovery model: ACK ranges, packet-threshold loss and backed-off PTO.
-sealed class QuicRecovery
+internal sealed class QuicRecovery
 {
     public sealed class Frame(int level, byte[] bytes, bool reliable)
     {
@@ -13,15 +13,15 @@ sealed class QuicRecovery
         public ulong Number;
     }
 
-    sealed class Transmission(Frame frame, int size)
+    private sealed class Transmission(Frame frame, int size)
     {
         public readonly Frame Frame = frame;
         public int Size = size;
     }
 
-    readonly List<Frame> pending = [];
-    readonly Dictionary<(int Level, ulong Number), Transmission> sent = [];
-    long nextProbe;
+    private readonly List<Frame> pending = [];
+    private readonly Dictionary<(int Level, ulong Number), Transmission> sent = [];
+    private long nextProbe;
     public int Window
     {
         get;
@@ -29,7 +29,7 @@ sealed class QuicRecovery
     } = 12000;
     public int InFlight => sent.Values.Sum(packet => packet.Size);
 
-    static long Delay(Frame frame) => 1000L << Math.Min(Math.Max(0, frame.Attempts - 1), 3);
+    private static long Delay(Frame frame) => 1000L << Math.Min(Math.Max(0, frame.Attempts - 1), 3);
     public void Add(int level, byte[] bytes, bool reliable = true)
     {
         if (pending.Count >= 256)
@@ -121,7 +121,7 @@ sealed class QuicRecovery
         Clean();
     }
 
-    void Clean()
+    private void Clean()
     {
         pending.RemoveAll(frame => frame.Done);
         foreach (var key in sent.Where(pair => pair.Value.Frame.Done).Select(pair => pair.Key).ToArray())

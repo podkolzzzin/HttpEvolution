@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 
 // A disposable P-256 share and valid TLS1.3 ClientHello for the in-memory demos.
-static class DemoClientHello
+internal static class DemoClientHello
 {
     public static byte[] Create(
         string protocol = "http/1.1",

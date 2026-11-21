@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 
 // RFC 8446 section 7: HKDF-SHA256 with TLS 1.3 labels.
-static class TlsCrypto
+internal static class TlsCrypto
 {
     public static byte[] Extract(byte[] salt, byte[] input) => HMACSHA256.HashData(salt, input);
     public static byte[] Label(byte[] secret, string label, byte[] context, int length = 32)
@@ -20,17 +20,17 @@ static class TlsCrypto
         );
 }
 
-sealed class TlsCipher : IDisposable
+internal sealed class TlsCipher : IDisposable
 {
-    readonly AesGcm aes;
-    readonly byte[] iv;
+    private readonly AesGcm aes;
+    private readonly byte[] iv;
     public TlsCipher(byte[] secret, string prefix = "")
     {
         aes = new AesGcm(TlsCrypto.Label(secret, prefix + "key", [], 16), 16);
         iv = TlsCrypto.Label(secret, prefix + "iv", [], 12);
     }
 
-    byte[] Nonce(ulong sequence)
+    private byte[] Nonce(ulong sequence)
     {
         var nonce = iv.ToArray();
         for (var i = 0; i < 8; i++)

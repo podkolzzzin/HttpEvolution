@@ -1,9 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 
-sealed class TlsHandshake(string protocol) : IDisposable
+internal sealed class TlsHandshake(string protocol) : IDisposable
 {
-    TlsHello? retry;
+    private TlsHello? retry;
     public byte[] Transcript
     {
         get;

@@ -3,9 +3,9 @@ using System.Security.Cryptography;
 using System.Text;
 
 // The historical SSL 3.0 constructions from RFC 6101, before TLS PRF/HMAC.
-static class Ssl3Crypto
+internal static class Ssl3Crypto
 {
-    static byte[] Pad(int length, byte value) => Enumerable.Repeat(value, length).ToArray();
+    private static byte[] Pad(int length, byte value) => Enumerable.Repeat(value, length).ToArray();
     public static byte[] Expand(byte[] secret, byte[] seed, int length)
     {
         using var output = new MemoryStream();

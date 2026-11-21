@@ -1,9 +1,9 @@
 using System.Net;
 using System.Security.Cryptography;
 
-sealed class QuicSession : IDisposable
+internal sealed class QuicSession : IDisposable
 {
-    sealed class Space(byte[] client, byte[] server) : IDisposable
+    private sealed class Space(byte[] client, byte[] server) : IDisposable
     {
         public readonly QuicKeys Read = new(client);
         public readonly QuicKeys Write = new(server);
@@ -21,13 +21,13 @@ sealed class QuicSession : IDisposable
         }
     }
 
-    readonly Space?[] spaces = new Space?[3];
-    readonly TlsHandshake tls = new("h3");
-    readonly byte[] original;
-    byte[] peerId;
-    long received;
-    long sent;
-    bool validated;
+    private readonly Space?[] spaces = new Space?[3];
+    private readonly TlsHandshake tls = new("h3");
+    private readonly byte[] original;
+    private byte[] peerId;
+    private long received;
+    private long sent;
+    private bool validated;
     public byte[] Id { get; } = RandomNumberGenerator.GetBytes(8);
     public IPEndPoint Peer
     {
@@ -52,7 +52,7 @@ sealed class QuicSession : IDisposable
         spaces[0] = new(QuicKeys.Initial(original, false), QuicKeys.Initial(original, true));
     }
 
-    void Crypto(int level, byte[] message)
+    private void Crypto(int level, byte[] message)
     {
         var space = spaces[level]!;
         for (var offset = 0; offset < message.Length; offset += 800)
@@ -63,7 +63,7 @@ sealed class QuicSession : IDisposable
         }
     }
 
-    void Handshake(int level, byte[] message)
+    private void Handshake(int level, byte[] message)
     {
         if (level == 0)
         {

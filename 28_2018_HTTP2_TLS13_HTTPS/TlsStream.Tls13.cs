@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-sealed partial class TlsStream
+internal sealed partial class TlsStream
 {
     public static TlsStream? TryAccept(Stream transport, string protocol)
     {

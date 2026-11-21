@@ -2,9 +2,9 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
-static class LegacyIdentity
+internal static class LegacyIdentity
 {
-    sealed class Sha1Signer(RSA key) : X509SignatureGenerator
+    private sealed class Sha1Signer(RSA key) : X509SignatureGenerator
     {
         protected override PublicKey BuildPublicKey() =>
             X509SignatureGenerator.CreateForRSA(key, RSASignaturePadding.Pkcs1).PublicKey;
@@ -13,11 +13,11 @@ static class LegacyIdentity
             key.SignData(data, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
     }
 
-    static readonly RSA Key = RSA.Create(2048);
+    private static readonly RSA Key = RSA.Create(2048);
     public static byte[] Der { get; } = Create();
     public static string Pin => Convert.ToBase64String(SHA256.HashData(Key.ExportSubjectPublicKeyInfo()));
 
-    static byte[] Create()
+    private static byte[] Create()
     {
         var request = new CertificateRequest("CN=localhost", Key, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
         var names = new SubjectAlternativeNameBuilder();

@@ -1,12 +1,12 @@
 using System.Security.Cryptography;
 
-sealed class LegacyRecords(Stream stream, byte minor = 0) : IRecordLayer
+internal sealed class LegacyRecords(Stream stream, byte minor = 0) : IRecordLayer
 {
-    LegacyCipher? read;
-    LegacyCipher? write;
-    LegacyCipher? nextRead;
-    LegacyCipher? nextWrite;
-    byte[] pending = [];
+    private LegacyCipher? read;
+    private LegacyCipher? write;
+    private LegacyCipher? nextRead;
+    private LegacyCipher? nextWrite;
+    private byte[] pending = [];
     public Stream Transport => stream;
 
     public void Keys(byte[] block, bool server)

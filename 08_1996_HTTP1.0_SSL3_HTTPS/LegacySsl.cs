@@ -1,16 +1,16 @@
 using System.Security.Cryptography;
 using System.Buffers.Binary;
 
-static partial class LegacySsl
+internal static partial class LegacySsl
 {
-    static byte[] HelloRandom()
+    private static byte[] HelloRandom()
     {
         var random = RandomNumberGenerator.GetBytes(32);
         BinaryPrimitives.WriteUInt32BigEndian(random, (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
         return random;
     }
 
-    sealed class Exchange(LegacyRecords records)
+    private sealed class Exchange(LegacyRecords records)
     {
         public byte[] Transcript = [];
         public byte[] Read(byte expected)
@@ -42,7 +42,7 @@ static partial class LegacySsl
         }
     }
 
-    static void Keys(LegacyRecords records, byte[] master, byte[] client, byte[] server, bool serverSide)
+    private static void Keys(LegacyRecords records, byte[] master, byte[] client, byte[] server, bool serverSide)
     {
         var block = Ssl3Crypto.Expand(master, [.. server, .. client], 104);
         records.Keys(block, serverSide);

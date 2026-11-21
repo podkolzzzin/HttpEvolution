@@ -1,19 +1,19 @@
 using System.Security.Cryptography;
 
-sealed class LegacyCipher(byte[] mac, byte[] key, byte[] initialIv, byte minor = 0) : IDisposable
+internal sealed class LegacyCipher(byte[] mac, byte[] key, byte[] initialIv, byte minor = 0) : IDisposable
 {
-    readonly SymmetricAlgorithm cipher = Create(key);
-    readonly byte[] macSecret = mac.ToArray();
-    byte[] iv = initialIv.ToArray();
-    ulong sequence;
-    static SymmetricAlgorithm Create(byte[] key)
+    private readonly SymmetricAlgorithm cipher = Create(key);
+    private readonly byte[] macSecret = mac.ToArray();
+    private byte[] iv = initialIv.ToArray();
+    private ulong sequence;
+    private static SymmetricAlgorithm Create(byte[] key)
     {
         SymmetricAlgorithm cipher = key.Length == 16 ? Aes.Create() : TripleDES.Create();
         cipher.Key = key;
         return cipher;
     }
 
-    byte[] Mac(byte type, byte[] data)
+    private byte[] Mac(byte type, byte[] data)
     {
         if (sequence == ulong.MaxValue)
         {

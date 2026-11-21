@@ -1,4 +1,4 @@
-static class QuicAcks
+internal static class QuicAcks
 {
     public static byte[] Encode(SortedSet<ulong> received)
     {

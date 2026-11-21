@@ -1,12 +1,12 @@
 using System.Security.Cryptography;
 
-sealed class TlsRecords(Stream stream) : IRecordLayer
+internal sealed class TlsRecords(Stream stream) : IRecordLayer
 {
-    TlsCipher? read;
-    TlsCipher? write;
-    ulong readSequence;
-    ulong writeSequence;
-    byte[] handshake = [];
+    private TlsCipher? read;
+    private TlsCipher? write;
+    private ulong readSequence;
+    private ulong writeSequence;
+    private byte[] handshake = [];
     public Stream Transport => stream;
     public bool Compatibility
     {

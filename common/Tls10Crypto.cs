@@ -2,9 +2,9 @@ using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
 
-static class Tls10Crypto
+internal static class Tls10Crypto
 {
-    static byte[] Part(byte[] secret, byte[] seed, int length, bool md5)
+    private static byte[] Part(byte[] secret, byte[] seed, int length, bool md5)
     {
         Func<byte[], byte[], byte[]> hmac = md5 ? HMACMD5.HashData : HMACSHA1.HashData;
         using var output = new MemoryStream();

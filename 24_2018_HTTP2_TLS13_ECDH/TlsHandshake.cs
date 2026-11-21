@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 
-sealed class TlsHandshake(string protocol)
+internal sealed class TlsHandshake(string protocol)
 {
-    TlsHello? retry;
+    private TlsHello? retry;
     public byte[] Transcript
     {
         get;

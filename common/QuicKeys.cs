@@ -1,10 +1,10 @@
 using System.Security.Cryptography;
 
 // QUIC v1 packet and header protection (RFC 9001 section 5).
-sealed class QuicKeys : IDisposable
+internal sealed class QuicKeys : IDisposable
 {
-    readonly TlsCipher payload;
-    readonly Aes header;
+    private readonly TlsCipher payload;
+    private readonly Aes header;
     public QuicKeys(byte[] secret)
     {
         payload = new TlsCipher(secret, "quic ");
@@ -18,7 +18,7 @@ sealed class QuicKeys : IDisposable
         return TlsCrypto.Label(TlsCrypto.Extract(salt, destination), server ? "server in" : "client in", []);
     }
 
-    byte[] Mask(byte[] packet, int numberOffset)
+    private byte[] Mask(byte[] packet, int numberOffset)
     {
         if (numberOffset < 1 || numberOffset + 20 > packet.Length)
         {

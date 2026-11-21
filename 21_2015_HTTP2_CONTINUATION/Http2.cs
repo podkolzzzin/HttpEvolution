@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-static class Http2
+internal static class Http2
 {
     public static void Run()
     {
@@ -29,7 +29,7 @@ static class Http2
         }
     }
 
-    static void Serve(Stream stream)
+    private static void Serve(Stream stream)
     {
         var preface = new byte[24];
         stream.ReadExactly(preface);

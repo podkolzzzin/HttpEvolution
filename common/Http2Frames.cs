@@ -1,6 +1,6 @@
 using System.Buffers.Binary;
 
-static class Http2Frames
+internal static class Http2Frames
 {
     public static (byte Type, byte Flags, int Id, byte[] Data) Read(Stream stream)
     {

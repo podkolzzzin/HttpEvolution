@@ -1,6 +1,6 @@
-sealed class QuicStreams(QuicParameters peer)
+internal sealed class QuicStreams(QuicParameters peer)
 {
-    sealed class Output(ulong limit)
+    private sealed class Output(ulong limit)
     {
         public byte[] Bytes = [];
         public ulong Offset;
@@ -9,10 +9,10 @@ sealed class QuicStreams(QuicParameters peer)
         public bool Ended;
     }
 
-    readonly Dictionary<ulong, Output> output = [];
-    readonly Dictionary<ulong, ulong> ends = [];
-    ulong received;
-    ulong sent;
+    private readonly Dictionary<ulong, Output> output = [];
+    private readonly Dictionary<ulong, ulong> ends = [];
+    private ulong received;
+    private ulong sent;
     public Dictionary<ulong, QuicBuffer> Input { get; } = [];
     public HashSet<ulong> Reset { get; } = [];
 

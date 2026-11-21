@@ -1,12 +1,12 @@
 // CRYPTO and STREAM offsets allow reordered fragments and retransmissions.
-sealed class QuicBuffer(int capacity = 65536)
+internal sealed class QuicBuffer(int capacity = 65536)
 {
-    readonly byte[] data = new byte[capacity];
-    readonly bool[] present = new bool[capacity];
-    int contiguous;
-    int consumed;
-    int highest;
-    long final = -1;
+    private readonly byte[] data = new byte[capacity];
+    private readonly bool[] present = new bool[capacity];
+    private int contiguous;
+    private int consumed;
+    private int highest;
+    private long final = -1;
     public int Available => contiguous - consumed;
     public bool Finished => final >= 0 && contiguous == final;
 

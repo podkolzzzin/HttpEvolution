@@ -1,9 +1,9 @@
 using System.Text;
 
-sealed class Hpack
+internal sealed class Hpack
 {
     // RFC 7541 Appendix A: the 61 fixed entries, in wire-index order.
-    static readonly (string Name, string Value)[] Fixed = new[]
+    private static readonly (string Name, string Value)[] Fixed = new[]
     {
         ":authority",
         ":method=GET",
@@ -71,9 +71,9 @@ sealed class Hpack
         var parts = entry.Split('=', 2);
         return (parts[0], parts.Length == 2 ? parts[1] : "");
     }).ToArray();
-    readonly List<(string Name, string Value)> dynamic = [];
-    int capacity = 4096;
-    int size;
+    private readonly List<(string Name, string Value)> dynamic = [];
+    private int capacity = 4096;
+    private int size;
     public List<(string Name, string Value)> Decode(byte[] block)
     {
         using var input = new MemoryStream(block);
@@ -124,7 +124,7 @@ sealed class Hpack
         return fields;
     }
 
-    (string Name, string Value) At(int index)
+    private (string Name, string Value) At(int index)
     {
         if (index <= 0 || index > Fixed.Length + dynamic.Count)
         {
@@ -134,8 +134,8 @@ sealed class Hpack
         return index <= Fixed.Length ? Fixed[index - 1] : dynamic[index - Fixed.Length - 1];
     }
 
-    static int Bytes((string Name, string Value) field) => field.Name.Length + field.Value.Length + 32;
-    void Trim()
+    private static int Bytes((string Name, string Value) field) => field.Name.Length + field.Value.Length + 32;
+    private void Trim()
     {
         while (size > capacity)
         {
@@ -144,11 +144,11 @@ sealed class Hpack
         }
     }
 
-    static int Byte(Stream input) =>
+    private static int Byte(Stream input) =>
         input.ReadByte() is var value && value >= 0
             ? value
             : throw new InvalidDataException("Truncated HPACK.");
-    static int Integer(Stream input, int first, int bits)
+    private static int Integer(Stream input, int first, int bits)
     {
         var mask = (1 << bits) - 1;
         long value = first & mask;
@@ -175,7 +175,7 @@ sealed class Hpack
         throw new InvalidDataException("HPACK integer overflow.");
     }
 
-    static string Text(Stream input)
+    private static string Text(Stream input)
     {
         var first = Byte(input);
         var length = Integer(input, first, 7);

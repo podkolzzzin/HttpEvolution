@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 
-static class QuicServer
+internal static class QuicServer
 {
     public static async Task Run()
     {

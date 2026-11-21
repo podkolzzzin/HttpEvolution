@@ -1,8 +1,8 @@
 using System.Text;
 
-sealed class Http3
+internal sealed class Http3
 {
-    sealed class State
+    private sealed class State
     {
         public ulong? Type;
         public bool Settings;
@@ -11,9 +11,9 @@ sealed class Http3
         public List<(string Name, string Value)>? Headers;
     }
 
-    readonly QuicStreams streams;
-    readonly Dictionary<ulong, State> states = [];
-    readonly HashSet<ulong> critical = [];
+    private readonly QuicStreams streams;
+    private readonly Dictionary<ulong, State> states = [];
+    private readonly HashSet<ulong> critical = [];
     public Http3(QuicStreams streams)
     {
         this.streams = streams;
@@ -21,8 +21,8 @@ sealed class Http3
         streams.Send(3, [0, .. Frame(4, settings)], false); // Server control stream stays open.
     }
 
-    static byte[] Frame(ulong type, byte[] data) => [.. QuicData.Int(type), .. QuicData.Vector(data)];
-    static bool ReadFrame(QuicBuffer buffer, out ulong type, out byte[] data)
+    private static byte[] Frame(ulong type, byte[] data) => [.. QuicData.Int(type), .. QuicData.Vector(data)];
+    private static bool ReadFrame(QuicBuffer buffer, out ulong type, out byte[] data)
     {
         type = 0;
         data = [];
@@ -214,7 +214,7 @@ sealed class Http3
         }
     }
 
-    void Respond(ulong id, State state)
+    private void Respond(ulong id, State state)
     {
         var pseudo = new Dictionary<string, string>();
         bool regular = false;

@@ -3,12 +3,12 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-static partial class TlsCertificate
+internal static partial class TlsCertificate
 {
-    static readonly ECDsa Key = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+    private static readonly ECDsa Key = ECDsa.Create(ECCurve.NamedCurves.nistP256);
     public static byte[] Der { get; } = Create();
 
-    static byte[] Create()
+    private static byte[] Create()
     {
         var request = new CertificateRequest("CN=localhost", Key, HashAlgorithmName.SHA256);
         var names = new SubjectAlternativeNameBuilder();

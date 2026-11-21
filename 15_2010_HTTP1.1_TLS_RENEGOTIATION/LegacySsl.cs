@@ -1,24 +1,24 @@
 using System.Security.Cryptography;
 using System.Buffers.Binary;
 
-static partial class LegacySsl
+internal static partial class LegacySsl
 {
-    static byte[] HelloRandom()
+    private static byte[] HelloRandom()
     {
         var random = RandomNumberGenerator.GetBytes(32);
         BinaryPrimitives.WriteUInt32BigEndian(random, (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
         return random;
     }
 
-    static byte[] Expand(byte[] secret, string label, byte[] seed, int length, byte minor) =>
+    private static byte[] Expand(byte[] secret, string label, byte[] seed, int length, byte minor) =>
         minor == 0
             ? Ssl3Crypto.Expand(secret, seed, length)
             : Tls10Crypto.Prf(secret, label, seed, length);
-    static byte[] Finished(byte[] master, byte[] transcript, bool client, byte minor) =>
+    private static byte[] Finished(byte[] master, byte[] transcript, bool client, byte minor) =>
         minor == 0
             ? Ssl3Crypto.Finished(master, transcript, client)
             : Tls10Crypto.Finished(master, transcript, client);
-    sealed class Exchange(LegacyRecords records, byte minor)
+    private sealed class Exchange(LegacyRecords records, byte minor)
     {
         public byte[] Transcript = [];
         public byte[] Read(byte expected)
@@ -50,7 +50,7 @@ static partial class LegacySsl
         }
     }
 
-    static void Keys(LegacyRecords records, byte[] master, byte[] client, byte[] server, bool serverSide, byte minor)
+    private static void Keys(LegacyRecords records, byte[] master, byte[] client, byte[] server, bool serverSide, byte minor)
     {
         var block = Expand(master, "key expansion", [.. server, .. client], 104, minor);
         records.Keys(block, serverSide);

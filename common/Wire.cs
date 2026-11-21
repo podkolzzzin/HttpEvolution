@@ -1,7 +1,7 @@
 // The TLS length-prefixed byte vectors, without a protocol library.
-sealed class Wire(byte[] data)
+internal sealed class Wire(byte[] data)
 {
-    int offset;
+    private int offset;
     public int Left => data.Length - offset;
 
     public byte[] Take(int length)

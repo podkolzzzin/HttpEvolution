@@ -1,7 +1,7 @@
 // QUIC/HTTP/3 integers use 1, 2, 4 or 8 bytes; the top two bits select the width.
-sealed class QuicData(byte[] data)
+internal sealed class QuicData(byte[] data)
 {
-    readonly Wire input = new(data);
+    private readonly Wire input = new(data);
     public int Left => input.Left;
     public int Offset => data.Length - Left;
 

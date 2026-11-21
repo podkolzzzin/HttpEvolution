@@ -1,10 +1,10 @@
 using System.Text;
 
 // Dynamic capacity is advertised as zero: static references and literals suffice.
-static class Qpack
+internal static class Qpack
 {
     // RFC 9204 Appendix A, zero-based indices.
-    static readonly (string Name, string Value)[] Fixed = new[]
+    private static readonly (string Name, string Value)[] Fixed = new[]
     {
         ":authority",
         ":path=/",
@@ -110,7 +110,7 @@ static class Qpack
         var p = entry.Split('=', 2);
         return (p[0], p.Length == 2 ? p[1] : "");
     }).ToArray();
-    static (string Name, string Value) At(int index) =>
+    private static (string Name, string Value) At(int index) =>
         index < Fixed.Length
             ? Fixed[index]
             : throw new InvalidDataException("Invalid QPACK index.");

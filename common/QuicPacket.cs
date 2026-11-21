@@ -1,6 +1,6 @@
 using System.Buffers.Binary;
 
-sealed record QuicPacket(int Level, uint Version, byte[] Destination, byte[] Source, int NumberOffset, byte[] Bytes)
+internal sealed record QuicPacket(int Level, uint Version, byte[] Destination, byte[] Source, int NumberOffset, byte[] Bytes)
 {
     public static QuicPacket Read(byte[] datagram, int shortIdLength = 8)
     {

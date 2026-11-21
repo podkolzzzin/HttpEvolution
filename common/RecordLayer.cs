@@ -1,15 +1,15 @@
-interface IRecordLayer : IDisposable
+internal interface IRecordLayer : IDisposable
 {
-    Stream Transport
+    public Stream Transport
     {
         get;
     }
 
-    (byte Type, byte[] Data) Read();
-    void Write(byte type, byte[] data);
+    public (byte Type, byte[] Data) Read();
+    public void Write(byte type, byte[] data);
 }
 
-static class RecordMessages
+internal static class RecordMessages
 {
     public static byte[] Read(IRecordLayer records, ref byte[] pending)
     {

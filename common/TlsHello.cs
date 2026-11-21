@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-sealed class TlsHello
+internal sealed class TlsHello
 {
     public byte[] Random
     {
@@ -93,7 +93,7 @@ sealed class TlsHello
         }
     }
 
-    static byte[] Vector(byte[] data, int width = 2)
+    private static byte[] Vector(byte[] data, int width = 2)
     {
         var input = new Wire(data);
         var value = input.Vector(width);
@@ -101,7 +101,7 @@ sealed class TlsHello
         return value;
     }
 
-    static IEnumerable<int> Pairs(byte[] data)
+    private static IEnumerable<int> Pairs(byte[] data)
     {
         var input = new Wire(data);
         while (input.Left > 0)

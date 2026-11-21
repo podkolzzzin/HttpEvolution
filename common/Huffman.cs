@@ -1,7 +1,7 @@
 // Canonical code lengths from RFC 7541 Appendix B (also used by QPACK).
-static class Huffman
+internal static class Huffman
 {
-    static readonly byte[] Lengths = [
+    private static readonly byte[] Lengths = [
         13,
         23,
         28,
@@ -260,8 +260,8 @@ static class Huffman
         26,
         30,
     ];
-    static readonly Dictionary<(int Bits, uint Code), int> Codes = Build();
-    static Dictionary<(int, uint), int> Build()
+    private static readonly Dictionary<(int Bits, uint Code), int> Codes = Build();
+    private static Dictionary<(int, uint), int> Build()
     {
         var codes = new Dictionary<(int, uint), int>();
         uint code = 0;

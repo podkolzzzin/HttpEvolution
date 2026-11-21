@@ -1,11 +1,11 @@
 using System.Security.Cryptography;
 
-sealed partial class TlsStream(IRecordLayer records) : Stream
+internal sealed partial class TlsStream(IRecordLayer records) : Stream
 {
-    byte[] pending = [];
-    int offset;
-    bool closed;
-    bool disposed;
+    private byte[] pending = [];
+    private int offset;
+    private bool closed;
+    private bool disposed;
     public override int Read(byte[] buffer, int offset, int count) => Read(buffer.AsSpan(offset, count));
     public override int Read(Span<byte> buffer)
     {
