@@ -131,11 +131,17 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
 .hp-pane+.hp-pane{border-left:1px solid var(--line);padding:16px 0 18px 22px}
 .hp-pane h2{margin:0 0 4px;font-size:clamp(16px,2vw,23px);letter-spacing:-.02em}
 .hp-size{display:block;margin:0 0 12px;color:var(--muted);font-size:14px}
-.hp-wire{font:500 clamp(15px,1.65vw,21px)/1.75 ui-monospace,monospace;overflow-wrap:anywhere}
-.hp-wire button{display:inline;padding:3px 2px;border-radius:3px;color:var(--ink);font:inherit;background:none;text-decoration:underline dotted;text-underline-offset:.2em;max-width:100%;overflow-wrap:anywhere;text-align:left}
-.hp-wire button[aria-pressed="true"]{background:var(--accent);text-decoration:none;box-shadow:inset 0 -2px var(--ink)}
+.hp-pane{display:grid;grid-row:span 3;grid-template-rows:subgrid;align-content:start}
+.hp-line,.hp-field{display:flex;flex-wrap:wrap;align-content:flex-start;align-items:flex-start;gap:5px}
+.hp-line{padding:5px 0;min-width:0}
+.hp-field{max-width:100%;border-radius:4px;background:none;padding:3px 4px;color:var(--ink);text-align:left}
+button.hp-field{box-shadow:inset 0 -1px var(--line)}
+button.hp-field[aria-pressed="true"]{background:var(--accent);box-shadow:inset 0 -2px var(--ink)}
+.hp-unit{display:inline-flex;flex-direction:column;align-items:center;max-width:100%}
+.hp-unit small{font:500 12px/1.4 ui-monospace,monospace;color:var(--muted);overflow-wrap:anywhere}
+.hp-unit code{font:600 clamp(15px,1.6vw,20px)/1.4 ui-monospace,monospace;white-space:nowrap;color:var(--ink)}
 #hpack:has([data-selected="scheme"]) .hp-scheme{background:var(--accent);box-shadow:inset 0 -2px var(--ink)}
-.hp-wire button:focus-visible{outline-offset:1px}
+.hp-field:focus-visible{outline-offset:1px}
 .hp-result{margin:15px 0 0;line-height:1.5}
 .hp-result strong,.hp-result span{display:block}
 .hp-result strong{margin-bottom:3px}
@@ -146,7 +152,10 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
  .hp-pane{padding:12px 7px 13px 0}
  .hp-pane+.hp-pane{padding:12px 0 13px 8px}
  .hp-size{font-size:12px;margin-bottom:8px}
- .hp-wire{font-size:clamp(11px,3.1vw,15px);line-height:1.9}
+ .hp-line,.hp-field{gap:3px}
+ .hp-field{padding:3px 2px}
+ .hp-unit small{font-size:11px}
+ .hp-unit code{font-size:14px}
  .hp-result{font-size:15px}
 }
 </style>
@@ -999,7 +1008,7 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "year": "2015",
       "chapter": "HPACK",
       "title": "Один запит у HTTP/1.1 та HTTP/2",
-      "why": "Браузер відкриває http://www.example.com/. Натисни на текст або байт, щоб побачити відповідність.",
+      "why": "Браузер відкриває http://www.example.com/. Дрібним шрифтом над байтами видно, що вони означають. Натисни на поле, щоб підсвітити його в обох колонках.",
       "interactive": "hpack",
       "rfc": "7541"
     },
@@ -1704,34 +1713,48 @@ function describeTraffic(model,id){
 
 
 const hpDomain='www.example.com';
-const hpText='GET / HTTP/1.1\r\nHost: '+hpDomain+'\r\n\r\n';
-const hpBytes={
- method:[0x82],scheme:[0x86],path:[0x84],
- firstHost:[0x41,hpDomain.length,...new TextEncoder().encode(hpDomain)],repeatHost:[0xbe]
-};
-function hpField(field,content,label){
- return '<button type="button" data-hp-field="'+field+'" aria-label="'+esc(label)+'">'+esc(content)+'</button>';
+const hpControls={' ':'␠','\r':'CR','\n':'LF'};
+function hpUnit(label,byte){
+ const hex=byte.toString(16).padStart(2,'0').toUpperCase();
+ return '<span class="hp-unit"><small>'+esc(label)+'</small><code>'+hex+'</code></span>';
+}
+function hpLiteral(text){
+ return Array.from(text,char=>hpUnit(hpControls[char]||char,char.charCodeAt(0))).join('');
+}
+function hpField(field,units){
+ return '<button type="button" class="hp-field" data-hp-field="'+field+'">'+units+'</button>';
+}
+function hpPlain(text){
+ return '<span class="hp-field">'+hpLiteral(text)+'</span>';
 }
 function hpackModel(){
- const plain=hpField('method','GET','Метод GET')+' '+hpField('path','/','Шлях /')+' HTTP/1.1<br>'+
-  hpField('host','Host: '+hpDomain,'Домен у заголовку Host');
- const packed=['method','scheme','path'].map(field=>hpField(field,'',field)).join(' ')+'<br>'+hpField('host','','host');
+ const requestLine=hpField('method',hpLiteral('GET'))+hpPlain(' ')+hpField('path',hpLiteral('/'))+hpPlain(' ')+hpPlain('HTTP/1.1\r\n');
+ const hostLine=hpField('host',hpLiteral('Host: '+hpDomain))+hpPlain('\r\n\r\n');
+ const packed=hpField('method',hpUnit(':method = GET',0x82))+hpField('scheme',hpUnit(':scheme = http',0x86))+hpField('path',hpUnit(':path = /',0x84));
  return `<div class="hp-model">
   <div class="switches hp-controls" role="group" aria-label="Запит у тому самому з’єднанні">
    <button type="button" data-hp-request="first">Перший запит</button>
    <button type="button" data-hp-request="repeat">Повторний запит</button>
   </div>
   <div class="hp-compare">
-   <div class="hp-pane"><h2>HTTP/1.1</h2><span class="hp-size">Текст · ${hpText.length} байт</span><div class="hp-wire">${plain}</div></div>
-   <div class="hp-pane"><h2>HTTP/2 · HPACK</h2><span class="hp-size hp-packed-size"></span><div class="hp-wire hp-packed">${packed}</div></div>
+   <div class="hp-pane"><header><h2>HTTP/1.1</h2><span class="hp-size">HEX · 41 байт</span></header>
+    <div class="hp-line">${requestLine}</div><div class="hp-line">${hostLine}</div></div>
+   <div class="hp-pane hp-packed"><header><h2>HTTP/2 · HPACK</h2><span class="hp-size hp-packed-size"></span></header>
+    <div class="hp-line">${packed}</div><div class="hp-line">${hpField('host','')}</div></div>
   </div>
   <p class="hp-result" role="status"><strong></strong><span></span></p>
-  <p class="hp-count-note">Ліворуч враховано кінці рядків і завершальний порожній рядок. Праворуч рахуємо лише блок HPACK у кадрі HEADERS. Кожна група з двох знаків у правій колонці позначає один байт.</p>
+  <p class="hp-count-note">␠ позначає пробіл (20), а CR LF позначають кінець рядка (0D 0A). Ліворуч показано весь запит до кінця заголовків. Праворуч показано блок HPACK усередині кадру HEADERS.</p>
  </div>`;
 }
 function updateHpack(model,request,selected){
  const repeat=request==='repeat';
- const values={method:hpBytes.method,scheme:hpBytes.scheme,path:hpBytes.path,host:repeat?hpBytes.repeatHost:hpBytes.firstHost};
+ if(request!==model.dataset.request){
+  const host=model.querySelector('.hp-packed [data-hp-field="host"]');
+  host.innerHTML=repeat?hpUnit(':authority = '+hpDomain,0xbe):
+   hpUnit('зберегти :authority',0x41)+hpUnit(hpDomain.length+' байтів',hpDomain.length)+hpLiteral(hpDomain);
+  const count=model.querySelectorAll('.hp-packed code').length;
+  model.querySelector('.hp-packed-size').textContent='HEX · '+count+(repeat?' байти':' байтів');
+ }
  const details={
   method:['GET займає один байт','82 означає «візьми запис №2». У вбудованій таблиці клієнта й сервера під цим номером уже є :method = GET.'],
   scheme:['86 означає http','У рядку GET / HTTP/1.1 схема відсутня. Браузер знає її з адреси http://www.example.com/. У HTTP/2 він передає поле :scheme = http одним байтом, посилаючись на запис №6.'],
@@ -1744,14 +1767,6 @@ function updateHpack(model,request,selected){
  model.dataset.selected=selected;
  model.querySelectorAll('[data-hp-request]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.hpRequest===request)));
  model.querySelectorAll('[data-hp-field]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.hpField===selected)));
- model.querySelectorAll('.hp-packed button').forEach(b=>{
-  const field=b.dataset.hpField;
-  const hex=values[field].map(n=>n.toString(16).toUpperCase().padStart(2,'0')).join(' ');
-  b.textContent=hex;
-  b.setAttribute('aria-label','Байти поля :'+(field==='host'?'authority':field)+' — '+hex);
- });
- const size=Object.values(values).reduce((total,bytes)=>total+bytes.length,0);
- model.querySelector('.hp-packed-size').textContent='Байти (hex) · '+size+(size===4?' байти':' байтів');
  const [title,description]=details[selected];
  model.querySelector('.hp-result strong').textContent=title;
  model.querySelector('.hp-result span').textContent=description;
