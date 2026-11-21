@@ -119,6 +119,10 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
 #hpack .header-example td:nth-child(2){white-space:nowrap}
 .header-example th{font-size:13px;color:var(--muted)}
 .header-example td:first-child{white-space:nowrap;font-family:ui-monospace,monospace;font-weight:600}
+.connection-memory{max-width:46ch;margin:20px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#fbfcf6;font-size:14px;line-height:1.5}
+.connection-memory h2{margin:0 0 4px;font-size:13px}
+.connection-memory p{margin:0;color:var(--muted)}
+@media print{.connection-memory{break-inside:avoid;font-size:11px}}
 @media(max-width:760px){.header-example{font-size:14px}.header-example caption{font-size:18px}.header-example th,.header-example td{padding-right:8px}}
 
 #hpack .layout{display:block}
@@ -233,6 +237,7 @@ button.hp-field[aria-pressed="true"]{background:var(--accent);box-shadow:inset 0
       "title": "Один запит.\nОдин документ",
       "why": "Для раннього вебу цього достатньо: попросити віддалений документ і перейти за наступним посиланням.",
       "change": "Один рядок GET, HTML у відповідь і закриття TCP. Повний сервер наведено нижче.",
+      "memory": "Під час запиту є стан TCP і мережеві буфери в ОС та буфер читача в процесі. Після відповіді демо закриває сокет і звільняє читача.",
       "code": "var request = reader.ReadLine()?.Split(' ');\nif (request is not [\"GET\", var path, ..])\n{\n    continue;\n}\n\nvar html = path == \"/\" ? \"<h1>Hello!</h1>\" : \"Not found\";\nstream.Write(Encoding.ASCII.GetBytes(html));",
       "file": "Program.cs",
       "rfc": "w3c",
@@ -708,6 +713,7 @@ button.hp-field[aria-pressed="true"]{background:var(--accent);box-shadow:inset 0
       "why": "Перед HTTP сторони обмінюються повідомленнями й узгоджують ключі. Клієнт має перевірити, кому він їх довіряє.",
       "changeLabel": "Новий компроміс",
       "change": "До простого TCP додаються handshake, криптографічний стан і керування довірою.",
+      "memory": "Поки захищене з’єднання відкрите, обидві сторони тримають ключі, лічильники записів і буфери шифрування та читання.",
       "beats": [
         {
           "title": "Затримка й обчислення",
@@ -769,6 +775,7 @@ button.hp-field[aria-pressed="true"]{background:var(--accent);box-shadow:inset 0
       "title": "TCP-з’єднання\nможна зберегти",
       "why": "Раніше кожен ресурс вимагав нового TCP-connect. HTTP/1.1 робить повторне використання з’єднання типовим.",
       "change": "HTTP/1.1 читає наступний запит у тому самому з’єднанні.",
+      "memory": "Сокет, стан TCP і буфер читача тепер живуть навіть між запитами. У демо очікування читання має таймаут 5 секунд.",
       "code": "while (true)\n{\n    // Прочитати запит і записати відповідь.\n    var keepAlive = http11 && !close;\n    if (!keepAlive)\n    {\n        break;\n    }\n}",
       "file": "Program.cs",
       "rfc": "2068",
@@ -1102,24 +1109,24 @@ button.hp-field[aria-pressed="true"]{background:var(--accent);box-shadow:inset 0
         "caption": "Ті самі заголовки у двох запитах",
         "columns": [
           "Запит",
-          "Блок HPACK",
-          "Розмір"
+          "Блок у мережі",
+          "Таблиця після запиту"
         ],
         "rows": [
           [
             "Перший",
-            "82 86 84 41 0F + 15 байтів домену",
-            "20 байтів"
+            "20 байтів · 82 86 84 41 0F + 15 байтів домену",
+            "0 → 57 байтів"
           ],
           [
             "Повторний",
-            "82 86 84 BE",
-            "4 байти"
+            "4 байти · 82 86 84 BE",
+            "57 байтів, той самий запис"
           ]
         ]
       },
-      "rfc": "7541",
-      "note": "Рахуємо лише блок заголовків. На новому з’єднанні динамічна таблиця порожня. У цьому з’єднанні наступна вставка займе №62 і зсуне попередній запис на №63, якщо він ще поміщається. Для відповідей діє окрема таблиця."
+      "rfc": "7541-size",
+      "note": "Запис займає 10 + 15 + 32 = 57 байтів за правилами HPACK: ім’я :authority, значення www.example.com і фіксована надбавка. Це облік місткості однієї копії таблиці. На новому з’єднанні таблиця знову порожня. Наступна вставка займе №62 і зсуне попередній запис на №63, якщо він ще поміщається. Для відповідей діє окрема таблиця."
     },
     {
       "id": "huffman",
@@ -1195,8 +1202,12 @@ button.hp-field[aria-pressed="true"]{background:var(--accent);box-shadow:inset 0
       "change": "За ефективніше з’єднання платимо складнішим парсером і керуванням ресурсами.",
       "beats": [
         {
-          "title": "Ціну вже видно в коді",
-          "text": "Потрібні таблиця HPACK, вікна DATA й збирання CONTINUATION. Один короткий фрагмент не показує всього стану."
+          "title": "Один стан на з’єднання",
+          "text": "Дві динамічні таблиці HPACK, по одній для кожного напряму. Початковий ліміт — 4 КіБ на таблицю. Ліміт можна змінити через SETTINGS."
+        },
+        {
+          "title": "Стан кожного активного потоку",
+          "text": "Стан потоку, його вікно DATA й буфери за потреби. Загальні витрати залежать від того, скільки потоків відкрито одночасно."
         },
         {
           "title": "Обмеження залишилося нижче",
@@ -1229,6 +1240,7 @@ button.hp-field[aria-pressed="true"]{background:var(--accent);box-shadow:inset 0
       ],
       "rfc": "8446",
       "extraRefs": [],
+      "memory": "Для відновлення TLS-сесії клієнт може зберегти квиток і секрет після закриття з’єднання. Сервер може тримати окремий кеш сесій або кодувати стан у зашифрованому квитку. У демо відновлення немає.",
       "note": "0-RTT у демо немає. TLS 1.1/1.2 пропущені в кодовому маршруті. ECDHE та AEAD існували до TLS 1.3."
     },
     {
@@ -1430,6 +1442,7 @@ button.hp-field[aria-pressed="true"]{background:var(--accent);box-shadow:inset 0
       "title": "Стиснення заголовків\nдля незалежних потоків",
       "why": "HTTP/3 потребує свого формату заголовків, придатного до порядку доставки QUIC.",
       "change": "QPACK. У демо — static table + literals + Huffman.",
+      "memory": "Динамічна таблиця QPACK у демо має місткість 0. Якщо сторони дозволять більшу місткість, з’явиться стан таблиці, а деякі блоки заголовків можуть чекати на її оновлення.",
       "code": "using var output = new MemoryStream();\noutput.Write(new byte[] { 0, 0 }); // Без dynamic refs.\nforeach (var (name, value) in fields)\n{\n    var bytes = Encoding.Latin1.GetBytes(name);\n    Hpack.PutInteger(output, bytes.Length, 3, 0x20);\n    output.Write(bytes);\n    Hpack.PutText(output, value);\n}",
       "file": "Qpack.cs",
       "rfc": "9204",
@@ -1484,8 +1497,8 @@ button.hp-field[aria-pressed="true"]{background:var(--accent);box-shadow:inset 0
           "text": "Потоки ділять пропускну здатність і congestion control. Якщо мережа блокує UDP, клієнту потрібен перехід на HTTP через TCP."
         },
         {
-          "title": "Та сама історія в новому шарі",
-          "text": "0.9 спростив обмін документами. 1.x дав багатший обмін і повторне використання TCP. 2 додав паралельність. 3 переніс її в транспорт."
+          "title": "Що зберігає QUIC",
+          "text": "Сесія тримає ключі, дані для ACK і повторів. Кожен активний потік має свої вікна, зміщення й буфери для даних, які прийшли не по порядку. У демо сесії ділять один UDP-сокет."
         }
       ],
       "rfc": "9114",
@@ -1493,6 +1506,28 @@ button.hp-field[aria-pressed="true"]{background:var(--accent);box-shadow:inset 0
         "9000"
       ],
       "note": "Демо показує механіку QUIC, але не реалізує повний congestion control, migration чи 0-RTT."
+    },
+    {
+      "id": "connection-memory",
+      "year": "0.9 → 3",
+      "chapter": "Еволюція HTTP",
+      "title": "Що займає пам’ять\nв одному з’єднанні?",
+      "why": "Keep-alive продовжує життя сокета. Шифрування, стиснення заголовків і потоки додають свій стан. Його обсяг залежить від ОС, реалізації та навантаження.",
+      "changeLabel": "Приклад для 10 000 з’єднань",
+      "change": "10 000 повних таблиць HPACK по 4 КіБ — близько 39 МіБ за обліком протоколу. Рахуємо одну таблицю на з’єднання на одному боці. Фактичне споживання пам’яті залежить від представлення записів і решти стану.",
+      "example": {
+        "caption": "Що зберігає сервер",
+        "columns": ["Етап", "Стан і час життя"],
+        "rows": [
+          ["HTTP/0.9", "Сокет і буфери TCP на час одного обміну."],
+          ["SSL / TLS", "Ключі й буфери захищеного з’єднання. Кеш для відновлення сесій може жити довше за сокет."],
+          ["HTTP/1.1", "Той самий TCP-сокет і буфери лишаються між запитами."],
+          ["HTTP/2", "Таблиці HPACK на з’єднання. Вікна й буфери на активні потоки."],
+          ["HTTP/3", "Стан QUIC поверх UDP: ACK, повтори й буфери потоків. Динамічна таблиця QPACK у демо вимкнена."]
+        ]
+      },
+      "rfc": "9113",
+      "extraRefs": ["9000", "9204"]
     },
     {
       "id": "run",
@@ -1542,6 +1577,10 @@ button.hp-field[aria-pressed="true"]{background:var(--accent);box-shadow:inset 0
     "7541": [
       "RFC 7541",
       "https://www.rfc-editor.org/rfc/rfc7541.html"
+    ],
+    "7541-size": [
+      "RFC 7541 §4.1",
+      "https://www.rfc-editor.org/rfc/rfc7541.html#section-4.1"
     ],
     "9113": [
       "RFC 9113",
@@ -1742,6 +1781,7 @@ function hpackModel(){
    <div class="hp-pane hp-packed"><header><h2>HTTP/2 · HPACK</h2><span class="hp-size hp-packed-size"></span></header>
     <div class="hp-line">${packed}</div><div class="hp-line">${hpField('host','')}</div></div>
   </div>
+  <p class="hp-count-note">Динамічна таблиця HPACK · <strong class="hp-table-size"></strong> за обліком місткості</p>
   <p class="hp-result" role="status"><strong></strong><span></span></p>
   <p class="hp-count-note">␠ позначає пробіл (20), а CR LF позначають кінець рядка (0D 0A). Ліворуч показано весь запит до кінця заголовків. Праворуч показано блок HPACK усередині кадру HEADERS.</p>
  </div>`;
@@ -1754,6 +1794,8 @@ function updateHpack(model,request,selected){
    hpUnit('зберегти :authority',0x41)+hpUnit(hpDomain.length+' байтів',hpDomain.length)+hpLiteral(hpDomain);
   const count=model.querySelectorAll('.hp-packed code').length;
   model.querySelector('.hp-packed-size').textContent='HEX · '+count+(repeat?' байти':' байтів');
+  const entrySize=':authority'.length+hpDomain.length+32;
+  model.querySelector('.hp-table-size').textContent=(repeat?'':'0 → ')+entrySize+' байтів';
  }
  const details={
   method:['GET займає один байт','82 означає «візьми запис №2». У вбудованій таблиці клієнта й сервера під цим номером уже є :method = GET.'],
@@ -1788,7 +1830,8 @@ $('#deck').innerHTML=slides.map((s,i)=>{
  const first=s.full?'<details class="wire"><summary>Повний HTTP/0.9-сервер · '+firstServerLines+' '+firstServerLineWord+'</summary>'+codeCard(full,'Program.cs','C#','ПОВНИЙ ФАЙЛ · 01_1991_HTTP0.9_GET')+'</details>':'';
  const route=s.hero?'<div class="route" aria-label="HTTP 0.9, HTTP 1.x, HTTP 2, HTTP 3"><span>0.9</span><i>→</i><span>1.x</span><i>→</i><span>2</span><i>→</i><span>3</span></div><div class="hero-stats"><span><strong>'+firstServerLines+'</strong>'+firstServerLineWord+' першого сервера</span><span><strong>3</strong>мережеві класи .NET</span></div>':'';
  const final=s.final?'<div class="final-links"><a href="'+repo+'/tree/chronological" target="_blank" rel="noopener">Відкрити репозиторій ↗</a><a href="'+repo+'/pull/1" target="_blank" rel="noopener">PR для перегляду ↗</a></div>':'';
- return '<section class="slide '+category+(['ssl-traffic','host'].includes(s.interactive)?' traffic-slide':'')+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p>'+(s.change?'<div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>':'')+route+final+'</div><div class="workbench">'+(s.interactive==='ssl-traffic'?sslTrafficModel():s.interactive==='host'?hostPrivacyModel():s.interactive==='frame'?frameModel():s.interactive==='hpack'?hpackModel():'')+(s.channel?channelModel(s.channel):'')+beats+exampleTable+(s.code?(example?'<details class="wire"><summary>Приклад на C#</summary>':s.interactive==='host'?'<details class="wire"><summary>Код демо · перевірка Host</summary>':'')+codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption)+(example||s.interactive==='host'?'</details>':''):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
+ const memory=s.memory?'<div class="connection-memory"><h2>Що тримаємо в пам’яті</h2><p>'+esc(s.memory)+'</p></div>':'';
+ return '<section class="slide '+category+(['ssl-traffic','host'].includes(s.interactive)?' traffic-slide':'')+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p>'+(s.change?'<div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>':'')+route+final+memory+'</div><div class="workbench">'+(s.interactive==='ssl-traffic'?sslTrafficModel():s.interactive==='host'?hostPrivacyModel():s.interactive==='frame'?frameModel():s.interactive==='hpack'?hpackModel():'')+(s.channel?channelModel(s.channel):'')+beats+exampleTable+(s.code?(example?'<details class="wire"><summary>Приклад на C#</summary>':s.interactive==='host'?'<details class="wire"><summary>Код демо · перевірка Host</summary>':'')+codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption)+(example||s.interactive==='host'?'</details>':''):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
 }).join('');
 let group='';$('.topics').innerHTML=slides.map((s,i)=>{let label='';const g=s.chapter;if(g!==group){group=g;label='<div class="topics-group">'+esc(g)+'</div>';}return label+'<button type="button" class="topic" data-go="'+i+'"><span>'+String(i+1).padStart(2,'0')+'</span><span>'+esc(s.year)+'</span><strong>'+esc(s.title.replace(/\n/g,' '))+'</strong></button>';}).join('');
 let index=-1;
