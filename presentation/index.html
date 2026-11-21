@@ -120,6 +120,35 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
 .header-example th{font-size:13px;color:var(--muted)}
 .header-example td:first-child{white-space:nowrap;font-family:ui-monospace,monospace;font-weight:600}
 @media(max-width:760px){.header-example{font-size:14px}.header-example caption{font-size:18px}.header-example th,.header-example td{padding-right:8px}}
+
+#hpack .layout{display:block}
+#hpack h1{font-size:clamp(28px,3.4vw,46px);margin-bottom:10px}
+#hpack .lead{max-width:none;margin:0 0 18px}
+#hpack .eyebrow{margin-bottom:15px}
+.hp-controls{margin:0 0 14px}
+.hp-compare{display:grid;grid-template-columns:1fr 1fr;border-block:1px solid var(--line)}
+.hp-pane{min-width:0;padding:16px 22px 18px 0}
+.hp-pane+.hp-pane{border-left:1px solid var(--line);padding:16px 0 18px 22px}
+.hp-pane h2{margin:0 0 4px;font-size:clamp(16px,2vw,23px);letter-spacing:-.02em}
+.hp-size{display:block;margin:0 0 12px;color:var(--muted);font-size:14px}
+.hp-wire{font:500 clamp(15px,1.65vw,21px)/1.75 ui-monospace,monospace;overflow-wrap:anywhere}
+.hp-wire button{display:inline;padding:3px 2px;border-radius:3px;color:var(--ink);font:inherit;background:none;text-decoration:underline dotted;text-underline-offset:.2em;max-width:100%;overflow-wrap:anywhere;text-align:left}
+.hp-wire button[aria-pressed="true"]{background:var(--accent);text-decoration:none;box-shadow:inset 0 -2px var(--ink)}
+#hpack:has([data-selected="scheme"]) .hp-scheme{background:var(--accent);box-shadow:inset 0 -2px var(--ink)}
+.hp-wire button:focus-visible{outline-offset:1px}
+.hp-result{margin:15px 0 0;line-height:1.5}
+.hp-result strong,.hp-result span{display:block}
+.hp-result strong{margin-bottom:3px}
+.hp-count-note{font-size:13px;color:var(--muted);line-height:1.45;margin:13px 0 0}
+@media(max-width:760px){
+ #hpack .story{margin-bottom:0}
+ #hpack h1{letter-spacing:-.045em}
+ .hp-pane{padding:12px 7px 13px 0}
+ .hp-pane+.hp-pane{padding:12px 0 13px 8px}
+ .hp-size{font-size:12px;margin-bottom:8px}
+ .hp-wire{font-size:clamp(11px,3.1vw,15px);line-height:1.9}
+ .hp-result{font-size:15px}
+}
 </style>
 </head>
 <body>
@@ -969,42 +998,10 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "id": "hpack",
       "year": "2015",
       "chapter": "HPACK",
-      "title": "Що повторюється\nу двох запитах?",
-      "why": "Браузер двічі відкриває http://www.example.com/ через одне з’єднання HTTP/2. Обидва рази сервер має отримати ті самі чотири поля.",
-      "changeLabel": "Що стискає HPACK",
-      "change": "Клієнт кодує список полів у блоці заголовків кадру HEADERS. Сервер відновлює кожне ім’я та значення. Тіло повідомлення передається окремо в кадрах DATA.",
-      "example": {
-        "caption": "Поля обох запитів",
-        "columns": [
-          "Ім’я поля",
-          "Значення",
-          "Що воно задає"
-        ],
-        "rows": [
-          [
-            ":method",
-            "GET",
-            "Метод запиту"
-          ],
-          [
-            ":scheme",
-            "http",
-            "Схему URL"
-          ],
-          [
-            ":path",
-            "/",
-            "Шлях до ресурсу"
-          ],
-          [
-            ":authority",
-            "www.example.com",
-            "Ім’я хоста в цьому URL"
-          ]
-        ]
-      },
-      "rfc": "7541",
-      "note": "Двокрапка на початку імені позначає псевдозаголовок HTTP/2."
+      "title": "Один запит у HTTP/1.1 та HTTP/2",
+      "why": "Браузер відкриває http://www.example.com/. Натисни на текст або байт, щоб побачити відповідність.",
+      "interactive": "hpack",
+      "rfc": "7541"
     },
     {
       "id": "hpack-static",
@@ -1705,6 +1702,61 @@ function describeTraffic(model,id){
  model.querySelectorAll('[data-traffic-field]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.trafficField===id)));
 }
 
+
+const hpDomain='www.example.com';
+const hpText='GET / HTTP/1.1\r\nHost: '+hpDomain+'\r\n\r\n';
+const hpBytes={
+ method:[0x82],scheme:[0x86],path:[0x84],
+ firstHost:[0x41,hpDomain.length,...new TextEncoder().encode(hpDomain)],repeatHost:[0xbe]
+};
+function hpField(field,content,label){
+ return '<button type="button" data-hp-field="'+field+'" aria-label="'+esc(label)+'">'+esc(content)+'</button>';
+}
+function hpackModel(){
+ const plain=hpField('method','GET','Метод GET')+' '+hpField('path','/','Шлях /')+' HTTP/1.1<br>'+
+  hpField('host','Host: '+hpDomain,'Домен у заголовку Host');
+ const packed=['method','scheme','path'].map(field=>hpField(field,'',field)).join(' ')+'<br>'+hpField('host','','host');
+ return `<div class="hp-model">
+  <div class="switches hp-controls" role="group" aria-label="Запит у тому самому з’єднанні">
+   <button type="button" data-hp-request="first">Перший запит</button>
+   <button type="button" data-hp-request="repeat">Повторний запит</button>
+  </div>
+  <div class="hp-compare">
+   <div class="hp-pane"><h2>HTTP/1.1</h2><span class="hp-size">Текст · ${hpText.length} байт</span><div class="hp-wire">${plain}</div></div>
+   <div class="hp-pane"><h2>HTTP/2 · HPACK</h2><span class="hp-size hp-packed-size"></span><div class="hp-wire hp-packed">${packed}</div></div>
+  </div>
+  <p class="hp-result" role="status"><strong></strong><span></span></p>
+  <p class="hp-count-note">Ліворуч враховано кінці рядків і завершальний порожній рядок. Праворуч рахуємо лише блок HPACK у кадрі HEADERS. Кожна група з двох знаків у правій колонці позначає один байт.</p>
+ </div>`;
+}
+function updateHpack(model,request,selected){
+ const repeat=request==='repeat';
+ const values={method:hpBytes.method,scheme:hpBytes.scheme,path:hpBytes.path,host:repeat?hpBytes.repeatHost:hpBytes.firstHost};
+ const details={
+  method:['GET займає один байт','82 означає «візьми запис №2». У вбудованій таблиці клієнта й сервера під цим номером уже є :method = GET.'],
+  scheme:['86 означає http','У рядку GET / HTTP/1.1 схема відсутня. Браузер знає її з адреси http://www.example.com/. У HTTP/2 він передає поле :scheme = http одним байтом, посилаючись на запис №6.'],
+  path:['84 означає шлях /','У тексті шлях стоїть одразу після GET. У HPACK байт 84 вибирає запис №4 у вбудованій таблиці. Сервер отримує :path = /.'],
+  host:repeat?
+   ['Тепер увесь домен займає один байт','У першому запиті обидві сторони зберегли :authority = '+hpDomain+' під №62. Тепер BE означає «візьми пару №62». Ліворуч браузер знову передає весь рядок Host.']:
+   ['Першого разу домен іще треба передати','41 означає «це поле :authority, запам’ятай його зі значенням». 0F задає довжину, 15 байтів. Перші три байти домену (77 77 77) кодують літери www. Клієнт і сервер записують пару під №62.']
+ };
+ model.dataset.request=request;
+ model.dataset.selected=selected;
+ model.querySelectorAll('[data-hp-request]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.hpRequest===request)));
+ model.querySelectorAll('[data-hp-field]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.hpField===selected)));
+ model.querySelectorAll('.hp-packed button').forEach(b=>{
+  const field=b.dataset.hpField;
+  const hex=values[field].map(n=>n.toString(16).toUpperCase().padStart(2,'0')).join(' ');
+  b.textContent=hex;
+  b.setAttribute('aria-label','Байти поля :'+(field==='host'?'authority':field)+' — '+hex);
+ });
+ const size=Object.values(values).reduce((total,bytes)=>total+bytes.length,0);
+ model.querySelector('.hp-packed-size').textContent='Байти (hex) · '+size+(size===4?' байти':' байтів');
+ const [title,description]=details[selected];
+ model.querySelector('.hp-result strong').textContent=title;
+ model.querySelector('.hp-result span').textContent=description;
+}
+
 $('#deck').innerHTML=slides.map((s,i)=>{
  const category=/^(SSL|TLS|HTTPS)/.test(s.chapter)?'tls':/^(QUIC|HTTP\/3)/.test(s.chapter)?'quic':'';
  const source='chronological';
@@ -1721,7 +1773,7 @@ $('#deck').innerHTML=slides.map((s,i)=>{
  const first=s.full?'<details class="wire"><summary>Повний HTTP/0.9-сервер · '+firstServerLines+' '+firstServerLineWord+'</summary>'+codeCard(full,'Program.cs','C#','ПОВНИЙ ФАЙЛ · 01_1991_HTTP0.9_GET')+'</details>':'';
  const route=s.hero?'<div class="route" aria-label="HTTP 0.9, HTTP 1.x, HTTP 2, HTTP 3"><span>0.9</span><i>→</i><span>1.x</span><i>→</i><span>2</span><i>→</i><span>3</span></div><div class="hero-stats"><span><strong>'+firstServerLines+'</strong>'+firstServerLineWord+' першого сервера</span><span><strong>3</strong>мережеві класи .NET</span></div>':'';
  const final=s.final?'<div class="final-links"><a href="'+repo+'/tree/chronological" target="_blank" rel="noopener">Відкрити репозиторій ↗</a><a href="'+repo+'/pull/1" target="_blank" rel="noopener">PR для перегляду ↗</a></div>':'';
- return '<section class="slide '+category+(['ssl-traffic','host'].includes(s.interactive)?' traffic-slide':'')+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='ssl-traffic'?sslTrafficModel():s.interactive==='host'?hostPrivacyModel():s.interactive==='frame'?frameModel():'')+(s.channel?channelModel(s.channel):'')+beats+exampleTable+(s.code?(example?'<details class="wire"><summary>Приклад на C#</summary>':s.interactive==='host'?'<details class="wire"><summary>Код демо · перевірка Host</summary>':'')+codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption)+(example||s.interactive==='host'?'</details>':''):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
+ return '<section class="slide '+category+(['ssl-traffic','host'].includes(s.interactive)?' traffic-slide':'')+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p>'+(s.change?'<div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>':'')+route+final+'</div><div class="workbench">'+(s.interactive==='ssl-traffic'?sslTrafficModel():s.interactive==='host'?hostPrivacyModel():s.interactive==='frame'?frameModel():s.interactive==='hpack'?hpackModel():'')+(s.channel?channelModel(s.channel):'')+beats+exampleTable+(s.code?(example?'<details class="wire"><summary>Приклад на C#</summary>':s.interactive==='host'?'<details class="wire"><summary>Код демо · перевірка Host</summary>':'')+codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption)+(example||s.interactive==='host'?'</details>':''):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
 }).join('');
 let group='';$('.topics').innerHTML=slides.map((s,i)=>{let label='';const g=s.chapter;if(g!==group){group=g;label='<div class="topics-group">'+esc(g)+'</div>';}return label+'<button type="button" class="topic" data-go="'+i+'"><span>'+String(i+1).padStart(2,'0')+'</span><span>'+esc(s.year)+'</span><strong>'+esc(s.title.replace(/\n/g,' '))+'</strong></button>';}).join('');
 let index=-1;
@@ -1752,6 +1804,17 @@ $('#deck').addEventListener('pointerup',e=>{if(!touch)return;const dx=e.clientX-
 let toastTimer;function toast(message){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),2000);}
 $$('.copy').forEach(button=>button.addEventListener('click',async()=>{const code=button.closest('.code-card').querySelector('code').textContent;try{await navigator.clipboard.writeText(code);toast('Код скопійовано');}catch{toast('Виділи код і скопіюй вручну');}}));
 
+
+const hpModel=$('.hp-model');
+const hpLead=$('#hpack .lead');
+hpLead.innerHTML=esc(hpLead.textContent).replace('http://','<span class="hp-scheme">http</span>://');
+updateHpack(hpModel,'first','host');
+hpModel.addEventListener('click',event=>{
+ const button=event.target.closest('button');
+ if(!button)return;
+ if(button.dataset.hpRequest)updateHpack(hpModel,button.dataset.hpRequest,'host');
+ else if(button.dataset.hpField)updateHpack(hpModel,hpModel.dataset.request,button.dataset.hpField);
+});
 
 $$('.host-privacy').forEach(model=>{
  renderHostPrivacy(model);
