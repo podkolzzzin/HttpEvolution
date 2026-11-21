@@ -113,6 +113,13 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
 .host-history{font-size:13px;line-height:1.7;margin:20px 0 14px}.host-history a{font-weight:650}
 #http11-host .workbench>.wire{margin-top:18px}
 @media(max-width:760px){.host-privacy h2{font-size:22px}.host-intro{font-size:15px}.host-address{gap:8px}.host-address code{font-size:16px}.host-privacy .traffic-controls .switches{display:flex}.host-privacy .switches button{flex:1;min-width:140px}.host-ech{font-size:13px;margin-bottom:18px}.host-flow{grid-template-columns:1fr;gap:7px}.host-endpoint{padding:8px 0}.host-endpoint strong{margin-bottom:5px}.host-endpoint p{margin-top:5px}.host-arrow{transform:rotate(90deg);justify-self:center}.host-observer{padding:16px}.host-observer code{font-size:25px}.host-phase h3{font-size:18px}.host-history{font-size:12px}}
+.header-example{width:100%;border-collapse:collapse;text-align:left;font-size:16px;line-height:1.5;margin:0 0 20px}
+.header-example caption{text-align:left;font-weight:700;font-size:20px;margin-bottom:16px}
+.header-example th,.header-example td{border-bottom:1px solid var(--line);padding:10px 12px 10px 0;vertical-align:top;overflow-wrap:anywhere}
+#hpack .header-example td:nth-child(2){white-space:nowrap}
+.header-example th{font-size:13px;color:var(--muted)}
+.header-example td:first-child{white-space:nowrap;font-family:ui-monospace,monospace;font-weight:600}
+@media(max-width:760px){.header-example{font-size:14px}.header-example caption{font-size:18px}.header-example th,.header-example td{padding-right:8px}}
 </style>
 </head>
 <body>
@@ -962,33 +969,184 @@ dialog{border:1px solid var(--line);border-radius:17px;background:var(--paper);c
       "id": "hpack",
       "year": "2015",
       "chapter": "HPACK",
-      "title": "Заголовки можна\nне повторювати",
-      "why": "Імена та значення заголовків часто однакові між запитами.",
-      "change": "HPACK кодує індекси таблиці й літерали.",
-      "code": "var hpack = new Hpack(); // Стан одного з’єднання.\nvar fields = hpack.Decode(block.ToArray());\nvar method = fields.Find(f => f.Name == \":method\").Value;\nvar path = fields.Find(f => f.Name == \":path\").Value;",
-      "file": "Hpack.cs",
+      "title": "Що повторюється\nу двох запитах?",
+      "why": "Браузер двічі відкриває http://www.example.com/ через одне з’єднання HTTP/2. Обидва рази сервер має отримати ті самі чотири поля.",
+      "changeLabel": "Що стискає HPACK",
+      "change": "Клієнт кодує список полів у блоці заголовків кадру HEADERS. Сервер відновлює кожне ім’я та значення. Тіло повідомлення передається окремо в кадрах DATA.",
+      "example": {
+        "caption": "Поля обох запитів",
+        "columns": [
+          "Ім’я поля",
+          "Значення",
+          "Що воно задає"
+        ],
+        "rows": [
+          [
+            ":method",
+            "GET",
+            "Метод запиту"
+          ],
+          [
+            ":scheme",
+            "http",
+            "Схему URL"
+          ],
+          [
+            ":path",
+            "/",
+            "Шлях до ресурсу"
+          ],
+          [
+            ":authority",
+            "www.example.com",
+            "Ім’я хоста в цьому URL"
+          ]
+        ]
+      },
       "rfc": "7541",
-      "wire": "82 → :method: GET     (індекс 2)\n86 → :scheme: http    (індекс 6)\n84 → :path: /         (індекс 4)\n\nДинамічна таблиця зберігає нові поля з’єднання.",
-      "note": "HPACK стискає заголовки, не тіло HTML. Показані індекси — зі статичної таблиці. Це приклад використання декодера; сервер підключає його до запитів на етапі 19.",
+      "note": "Двокрапка на початку імені позначає псевдозаголовок HTTP/2."
+    },
+    {
+      "id": "hpack-static",
+      "year": "2015",
+      "chapter": "HPACK",
+      "title": "Як один байт\nозначає GET?",
+      "why": "У клієнта й сервера вже є однакова статична таблиця з 61 запису. У рядку №2 стоїть готова пара «:method» і «GET».",
+      "changeLabel": "Як прочитати 82",
+      "change": "Байт 82 у шістнадцятковому записі має біти 10000010. Перша 1 означає «візьми всю пару з таблиці». Решта сім бітів, 0000010, дають номер 2.",
+      "example": {
+        "caption": "Перші три байти блоку заголовків",
+        "columns": [
+          "Байт (hex)",
+          "Індекс",
+          "Сервер відновлює"
+        ],
+        "rows": [
+          [
+            "82",
+            "2",
+            ":method = GET"
+          ],
+          [
+            "86",
+            "6",
+            ":scheme = http"
+          ],
+          [
+            "84",
+            "4",
+            ":path = /"
+          ]
+        ]
+      },
+      "rfc": "7541",
+      "file": "Program.cs",
+      "sourceFile": "17_2015_HTTP2_HPACK/Program.cs",
+      "code": "var hpack = new Hpack();\nforeach (var (name, value) in hpack.Decode([0x82, 0x86, 0x84]))\n{\n    Console.WriteLine($\"{name}: {value}\");\n}",
+      "codeCaption": "Етап 17 · декодування трьох байтів",
       "step": "17_2015_HTTP2_HPACK",
-      "sourceFile": "17_2015_HTTP2_HPACK/Hpack.cs",
-      "codeTitle": "Використання Hpack",
       "command": "dotnet run --project 17_2015_HTTP2_HPACK"
+    },
+    {
+      "id": "hpack-literal",
+      "year": "2015",
+      "chapter": "HPACK",
+      "title": "Як сервер уперше\nдізнається домен?",
+      "why": "У рядку №1 статичної таблиці є ім’я :authority. Значення www.example.com там немає, тому клієнт передає його як літерал, тобто записує сам рядок.",
+      "changeLabel": "Що запам’ятають обидві сторони",
+      "change": "Разом зі значенням клієнт передає вказівку «запам’ятай цю пару». Так починає заповнюватися динамічна таблиця. Клієнт і сервер додають пару до своїх копій таблиці. В обох вона отримує індекс 62, одразу після 61 статичного запису.",
+      "example": {
+        "caption": "Четверте поле першого запиту",
+        "columns": [
+          "Що йде мережею",
+          "Як це читає сервер"
+        ],
+        "rows": [
+          [
+            "41 (hex)",
+            "Біти 01 означають «додай пару». Останні шість бітів, 000001, вказують на ім’я :authority під №1."
+          ],
+          [
+            "0F (hex)",
+            "Далі йдуть 15 байтів звичайного тексту."
+          ],
+          [
+            "www.example.com",
+            "Ці 15 байтів дають значення поля."
+          ]
+        ]
+      },
+      "rfc": "7541",
+      "file": "Hpack.cs",
+      "sourceFile": "17_2015_HTTP2_HPACK/Hpack.cs",
+      "step": "17_2015_HTTP2_HPACK",
+      "code": "if (indexed)\n{\n    dynamic.Insert(0, field);\n    size += Bytes(field);\n    Trim();\n}",
+      "codeCaption": "Етап 17 · нова пара стає першою в динамічній таблиці",
+      "note": "Перший блок займає 20 байтів. Три байти кодують метод, схему й шлях, ще 17 кодують поле :authority."
+    },
+    {
+      "id": "hpack-repeat",
+      "year": "2015",
+      "chapter": "HPACK",
+      "title": "Ті самі поля\nу чотирьох байтах",
+      "why": "Браузер знову запитує ту саму сторінку через це з’єднання. Блок заголовків тепер містить чотири байти у шістнадцятковому записі: 82 86 84 BE. Перші три сервер уже вміє читати.",
+      "changeLabel": "Звідки сервер бере домен",
+      "change": "BE має біти 10111110. Перша 1 знову означає «візьми всю пару». Решта бітів дає 62. За цим індексом сервер знаходить :authority зі значенням www.example.com.",
+      "example": {
+        "caption": "Ті самі заголовки у двох запитах",
+        "columns": [
+          "Запит",
+          "Блок HPACK",
+          "Розмір"
+        ],
+        "rows": [
+          [
+            "Перший",
+            "82 86 84 41 0F + 15 байтів домену",
+            "20 байтів"
+          ],
+          [
+            "Повторний",
+            "82 86 84 BE",
+            "4 байти"
+          ]
+        ]
+      },
+      "rfc": "7541",
+      "note": "Рахуємо лише блок заголовків. На новому з’єднанні динамічна таблиця порожня. У цьому з’єднанні наступна вставка займе №62 і зсуне попередній запис на №63, якщо він ще поміщається. Для відповідей діє окрема таблиця."
     },
     {
       "id": "huffman",
       "year": "2015",
       "chapter": "HPACK",
-      "title": "Коротші бітові коди\nдля частих символів",
-      "why": "Навіть значення, якого ще немає в таблиці, можна передати компактніше.",
-      "change": "Біт Huffman у довжині рядка вмикає декодер.",
-      "code": "var first = Byte(input);\nvar length = Integer(input, first, 7);\nvar bytes = new byte[length];\ninput.ReadExactly(bytes);\nif ((first & 128) != 0)\n{\n    bytes = Huffman.Decode(bytes);\n}\n\nreturn Encoding.Latin1.GetString(bytes);",
-      "file": "Hpack.cs",
+      "title": "Як 15 символів\nзаймають 12 байтів",
+      "why": "Повернімося до першого запиту, коли домен ще треба надіслати. Клієнт може закодувати його символи за фіксованою таблицею Гаффмана. Наприклад, літера «a» займає 5 бітів (00011) замість 8.",
+      "changeLabel": "Як сервер читає рядок",
+      "change": "У байті 8C старший біт дорівнює 1. Це ознака кодування за Гаффманом. Решта сім бітів дають 12. Сервер читає 12 байтів і відновлює ті самі 15 символів.",
+      "example": {
+        "caption": "Два способи передати значення www.example.com",
+        "columns": [
+          "Початок поля (hex)",
+          "Байти значення"
+        ],
+        "rows": [
+          [
+            "41 0F",
+            "15 байтів тексту www.example.com"
+          ],
+          [
+            "41 8C",
+            "12 байтів коду: F1 E3 C2 E5 F2 3A 6B A0 AB 90 F4 FF"
+          ]
+        ]
+      },
       "rfc": "7541",
-      "wire": "www.example.com\n      ↓ Huffman (RFC7541 C.4)\nf1 e3 c2 e5 f2 3a 6b a0 ab 90 f4 ff\n\n15 текстових байтів → 12 байтів коду",
-      "note": "Використовується фіксована таблиця кодів. Декодер перевіряє EOS і коректність padding.",
-      "step": "18_2015_HTTP2_HUFFMAN",
+      "note": "З Гаффманом перший блок займає 17 байтів замість 20. Блок другого запиту займає 4 байти, бо в ньому достатньо індексу.",
+      "file": "Hpack.cs",
       "sourceFile": "18_2015_HTTP2_HUFFMAN/Hpack.cs",
+      "code": "var first = Byte(input);\nvar length = Integer(input, first, 7);\nvar bytes = new byte[length];\ninput.ReadExactly(bytes);\nif ((first & 128) != 0)\n{\n    bytes = Huffman.Decode(bytes);\n}\n\nreturn Encoding.Latin1.GetString(bytes);",
+      "codeCaption": "Етап 18 · читання рядка HPACK",
+      "step": "18_2015_HTTP2_HUFFMAN",
       "command": "dotnet run --project 18_2015_HTTP2_HUFFMAN"
     },
     {
@@ -1554,6 +1712,8 @@ $('#deck').innerHTML=slides.map((s,i)=>{
  const extraLinks=(s.extraRefs||[]).map(id=>'<a href="'+refs[id][1]+'" target="_blank" rel="noopener">'+esc(refs[id][0])+'</a>').join('');
  const beats=s.beats?'<div class="story-beats">'+s.beats.map(b=>'<div class="story-beat"><h2>'+esc(b.title)+'</h2><p>'+esc(b.text)+'</p></div>').join('')+'</div>':'';
  const explain=s.explain?'<dl class="code-explanation">'+s.explain.map(([term,meaning])=>'<div><dt>'+esc(term)+'</dt><dd>'+esc(meaning)+'</dd></div>').join('')+'</dl>':'';
+ const example=s.example;
+ const exampleTable=example?'<table class="header-example"><caption>'+esc(example.caption)+'</caption><thead><tr>'+example.columns.map(c=>'<th scope="col">'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+example.rows.map(row=>'<tr>'+row.map(c=>'<td>'+esc(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table>':'';
  const keyTable=s.keyRows?'<table class="key-table"><caption>Позиції у block · нумерація з нуля</caption><thead><tr><th scope="col">Клієнт / сервер</th><th scope="col">Довжини</th><th scope="col">Призначення</th></tr></thead><tbody>'+s.keyRows.map(row=>'<tr>'+row.map(cell=>'<td>'+esc(cell)+'</td>').join('')+'</tr>').join('')+'</tbody></table>':'';
  const client=s.client?'<details class="wire"><summary>Клієнт у браузері · JavaScript</summary>'+codeCard(s.client,'Браузер','JavaScript','ПРИКЛАД · підключення до відповідного endpoint')+'</details>':'';
  const wire=s.wire?'<details class="wire"><summary>На дроті / схема</summary><pre>'+esc(s.wire)+'</pre></details>':'';
@@ -1561,7 +1721,7 @@ $('#deck').innerHTML=slides.map((s,i)=>{
  const first=s.full?'<details class="wire"><summary>Повний HTTP/0.9-сервер · '+firstServerLines+' '+firstServerLineWord+'</summary>'+codeCard(full,'Program.cs','C#','ПОВНИЙ ФАЙЛ · 01_1991_HTTP0.9_GET')+'</details>':'';
  const route=s.hero?'<div class="route" aria-label="HTTP 0.9, HTTP 1.x, HTTP 2, HTTP 3"><span>0.9</span><i>→</i><span>1.x</span><i>→</i><span>2</span><i>→</i><span>3</span></div><div class="hero-stats"><span><strong>'+firstServerLines+'</strong>'+firstServerLineWord+' першого сервера</span><span><strong>3</strong>мережеві класи .NET</span></div>':'';
  const final=s.final?'<div class="final-links"><a href="'+repo+'/tree/chronological" target="_blank" rel="noopener">Відкрити репозиторій ↗</a><a href="'+repo+'/pull/1" target="_blank" rel="noopener">PR для перегляду ↗</a></div>':'';
- return '<section class="slide '+category+(['ssl-traffic','host'].includes(s.interactive)?' traffic-slide':'')+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='ssl-traffic'?sslTrafficModel():s.interactive==='host'?hostPrivacyModel():s.interactive==='frame'?frameModel():'')+(s.channel?channelModel(s.channel):'')+beats+(s.code?(s.interactive==='host'?'<details class="wire"><summary>Код демо · перевірка Host</summary>':'')+codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption)+(s.interactive==='host'?'</details>':''):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
+ return '<section class="slide '+category+(['ssl-traffic','host'].includes(s.interactive)?' traffic-slide':'')+(s.walkthrough?' ssl-walkthrough':'')+(!s.code?' narrative':'')+(s.hero?' hero':'')+'" id="'+s.id+'" data-index="'+i+'" aria-label="Слайд '+(i+1)+' з '+slides.length+'" hidden>'+(!s.walkthrough?'<div class="eyebrow"><span class="year">'+esc(s.year)+'</span><span class="dot"></span><span>'+esc(s.chapter)+'</span></div>':'')+'<div class="layout"><div class="story"><h1 tabindex="-1">'+esc(s.title).replace(/\n/g,'<br>')+'</h1><p class="lead">'+esc(s.why)+'</p><div class="change"><span class="change-label">'+esc(s.changeLabel||'Що змінюємо')+'</span>'+esc(s.change)+'</div>'+route+final+'</div><div class="workbench">'+(s.interactive==='ssl-traffic'?sslTrafficModel():s.interactive==='host'?hostPrivacyModel():s.interactive==='frame'?frameModel():'')+(s.channel?channelModel(s.channel):'')+beats+exampleTable+(s.code?(example?'<details class="wire"><summary>Приклад на C#</summary>':s.interactive==='host'?'<details class="wire"><summary>Код демо · перевірка Host</summary>':'')+codeCard(s.code,s.codeTitle||s.file,s.language||'C#',s.codeCaption)+(example||s.interactive==='host'?'</details>':''):'')+keyTable+explain+'<div class="sources">'+links+extraLinks+'</div>'+client+(s.interactive==='host'?hostModel():s.interactive==='loss'?lossModel():'')+wire+run+first+(s.note?'<p class="note">'+esc(s.note)+'</p>':'')+'</div></div><div class="slide-base"><span class="section-color"></span><span>HTTP EVOLUTION</span><span class="rule"></span><span>'+String(i+1).padStart(2,'0')+' / '+slides.length+'</span></div></section>';
 }).join('');
 let group='';$('.topics').innerHTML=slides.map((s,i)=>{let label='';const g=s.chapter;if(g!==group){group=g;label='<div class="topics-group">'+esc(g)+'</div>';}return label+'<button type="button" class="topic" data-go="'+i+'"><span>'+String(i+1).padStart(2,'0')+'</span><span>'+esc(s.year)+'</span><strong>'+esc(s.title.replace(/\n/g,' '))+'</strong></button>';}).join('');
 let index=-1;
