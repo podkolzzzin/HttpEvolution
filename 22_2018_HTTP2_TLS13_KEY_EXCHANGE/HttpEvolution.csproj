@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="../common/Demo/DemoClientHello.cs" Link="common/Demo/DemoClientHello.cs" />
     <Compile Include="../common/Tls/TlsCrypto.cs" Link="common/Tls/TlsCrypto.cs" />
+    <Compile Include="../common/Tls/TlsConstants.cs" Link="common/Tls/TlsConstants.cs" />
     <Compile Include="../common/Tls/TlsHello.cs" Link="common/Tls/TlsHello.cs" />
     <Compile Include="../common/Wire/Wire.cs" Link="common/Wire/Wire.cs" />
   </ItemGroup>

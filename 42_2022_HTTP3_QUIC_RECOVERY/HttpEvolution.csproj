@@ -25,6 +25,7 @@
     <Compile Include="../41_2022_HTTP3_RESPONSE/Http3Connection.cs" Link="Http3Connection.cs" />
     <Compile Include="../common/HeaderCompression/Huffman.cs" Link="common/HeaderCompression/Huffman.cs" />
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyCipher.cs" Link="LegacyCipher.cs" />
+    <Compile Include="../common/Tls/TlsConstants.cs" Link="common/Tls/TlsConstants.cs" />
     <Compile Include="../common/Tls/LegacyIdentity.cs" Link="common/Tls/LegacyIdentity.cs" />
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyRecords.cs" Link="LegacyRecords.cs" />
     <Compile Include="../13_1999_HTTP1.1_TLS10/LegacySsl.Client.cs" Link="LegacySsl.Client.cs" />
@@ -33,6 +34,7 @@
     <Compile Include="../common/Quic/QuicAcks.cs" Link="common/Quic/QuicAcks.cs" />
     <Compile Include="../common/Quic/QuicBuffer.cs" Link="common/Quic/QuicBuffer.cs" />
     <Compile Include="../common/Quic/QuicData.cs" Link="common/Quic/QuicData.cs" />
+    <Compile Include="../common/Quic/QuicConstants.cs" Link="common/Quic/QuicConstants.cs" />
     <Compile Include="../common/Quic/QuicKeys.cs" Link="common/Quic/QuicKeys.cs" />
     <Compile Include="../common/Quic/QuicStrings.cs" Link="common/Quic/QuicStrings.cs" />
     <Compile Include="../common/Quic/QuicPacket.cs" Link="common/Quic/QuicPacket.cs" />

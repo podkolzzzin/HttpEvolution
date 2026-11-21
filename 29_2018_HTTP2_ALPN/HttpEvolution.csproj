@@ -17,6 +17,7 @@
     <Compile Include="../common/HeaderCompression/HeaderField.cs" Link="common/HeaderCompression/HeaderField.cs" />
     <Compile Include="../common/HeaderCompression/Huffman.cs" Link="common/HeaderCompression/Huffman.cs" />
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyCipher.cs" Link="LegacyCipher.cs" />
+    <Compile Include="../common/Tls/TlsConstants.cs" Link="common/Tls/TlsConstants.cs" />
     <Compile Include="../common/Tls/LegacyIdentity.cs" Link="common/Tls/LegacyIdentity.cs" />
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyRecords.cs" Link="LegacyRecords.cs" />
     <Compile Include="../13_1999_HTTP1.1_TLS10/LegacySsl.Client.cs" Link="LegacySsl.Client.cs" />

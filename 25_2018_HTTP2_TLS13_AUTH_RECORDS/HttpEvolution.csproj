@@ -10,6 +10,7 @@
     <Compile Include="../common/Tls/RecordLayer.cs" Link="common/Tls/RecordLayer.cs" />
     <Compile Include="../common/Tls/TlsCertificate.cs" Link="common/Tls/TlsCertificate.cs" />
     <Compile Include="../common/Tls/TlsCrypto.cs" Link="common/Tls/TlsCrypto.cs" />
+    <Compile Include="../common/Tls/TlsConstants.cs" Link="common/Tls/TlsConstants.cs" />
     <Compile Include="../common/Tls/TlsHello.cs" Link="common/Tls/TlsHello.cs" />
     <Compile Include="../common/Tls/TlsRecords.cs" Link="common/Tls/TlsRecords.cs" />
     <Compile Include="../common/Wire/Wire.cs" Link="common/Wire/Wire.cs" />

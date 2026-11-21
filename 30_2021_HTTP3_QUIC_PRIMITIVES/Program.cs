@@ -1,7 +1,7 @@
 using System.Text;
 
-byte[] destinationId = Convert.FromHexString("8394c8f03e515708");
-byte[] clientId = Convert.FromHexString("0102030405060708");
+byte[] destinationId = QuicConstants.DemoDestinationConnectionId;
+byte[] clientId = QuicConstants.DemoSourceConnectionId;
 
 Console.WriteLine("QUIC varint");
 ulong[] values = [37, 15293, 494878333, 151288809941952652];

@@ -8,7 +8,8 @@ internal static class LegacyIdentity
     {
         protected override PublicKey BuildPublicKey() =>
             X509SignatureGenerator.CreateForRSA(key, RSASignaturePadding.Pkcs1).PublicKey;
-        public override byte[] GetSignatureAlgorithmIdentifier(HashAlgorithmName algorithm) => Convert.FromHexString("300d06092a864886f70d0101050500");
+        public override byte[] GetSignatureAlgorithmIdentifier(HashAlgorithmName algorithm) =>
+            TlsConstants.Sha1WithRsaAlgorithmIdentifier;
         public override byte[] SignData(byte[] data, HashAlgorithmName algorithm) =>
             key.SignData(data, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
     }

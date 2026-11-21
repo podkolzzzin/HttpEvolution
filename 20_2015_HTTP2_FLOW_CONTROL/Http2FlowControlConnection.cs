@@ -12,10 +12,7 @@ internal class Http2FlowControlConnection(Stream stream) : Http2StreamConnection
     private sealed class PendingResponse(byte[] body, long window)
     {
         public byte[] Body { get; } = body;
-        public int Offset
-        {
-            get; set;
-        }
+        public int Offset { get; set; }
         public long Window { get; set; } = window;
     }
 

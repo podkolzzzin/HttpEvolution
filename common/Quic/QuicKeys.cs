@@ -16,7 +16,7 @@ internal sealed class QuicKeys : IDisposable
 
     public static byte[] Initial(byte[] destination, bool server)
     {
-        var salt = Convert.FromHexString(QuicStrings.Version1InitialSaltHex);
+        var salt = QuicConstants.Version1InitialSalt;
         return TlsCrypto.Label(TlsCrypto.Extract(salt, destination), server ? QuicStrings.ServerInitialLabel : QuicStrings.ClientInitialLabel, []);
     }
 

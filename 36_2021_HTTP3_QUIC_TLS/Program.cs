@@ -1,8 +1,8 @@
 // 36_2021_HTTP3_QUIC_TLS: QUIC: TLS handshake на рівнях шифрування.
 using System.Net;
 
-byte[] destination = Convert.FromHexString("8394c8f03e515708");
-byte[] source = Convert.FromHexString("0102030405060708");
+byte[] destination = QuicConstants.DemoDestinationConnectionId;
+byte[] source = QuicConstants.DemoSourceConnectionId;
 var hello = DemoClientHello.Create(QuicStrings.Http3Alpn, QuicData.Pair(15, source));
 byte[] crypto = [6, .. QuicData.Int(0), .. QuicData.Vector(hello)];
 using var keys = new QuicKeys(QuicKeys.Initial(destination, server: false));

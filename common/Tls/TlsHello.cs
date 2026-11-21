@@ -113,7 +113,7 @@ internal sealed class TlsHello
     public byte[] Reply(byte[]? share)
     {
         var random = share is null
-            ? Convert.FromHexString("cf21ad74e59a6111be1d8c021e65b891c2a211167abb8c5e079e09e2c8a8339c")
+            ? TlsConstants.HelloRetryRequestRandom
             : RandomNumberGenerator.GetBytes(32);
         byte[] key = share is null ? Wire.Size(23) : [.. Wire.Size(23), .. Wire.Vector(share)];
         byte[] extensions = [.. Wire.Extension(43, [3, 4]), .. Wire.Extension(51, key)];

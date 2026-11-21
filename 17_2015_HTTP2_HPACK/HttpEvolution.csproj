@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../common/Demo/DemoHpackBytes.cs" Link="common/Demo/DemoHpackBytes.cs" />
     <Compile Include="../common/HeaderCompression/Hpack.cs" Link="common/HeaderCompression/Hpack.cs" />
     <Compile Include="../common/HeaderCompression/HeaderCompression.cs" Link="common/HeaderCompression/HeaderCompression.cs" />
     <Compile Include="../common/HeaderCompression/HeaderField.cs" Link="common/HeaderCompression/HeaderField.cs" />

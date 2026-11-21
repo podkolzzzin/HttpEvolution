@@ -9,6 +9,7 @@
     <Compile Include="../common/Demo/DemoCommand.cs" Link="common/Demo/DemoCommand.cs" />
     <Compile Include="../12_1997_HTTP1.1_CHUNKED/Http11ChunkedConnection.cs" Link="Http11ChunkedConnection.cs" />
     <Compile Include="../common/Http1/Http1Server.cs" Link="common/Http1/Http1Server.cs" />
+    <Compile Include="../common/Tls/TlsConstants.cs" Link="common/Tls/TlsConstants.cs" />
     <Compile Include="../common/Tls/LegacyIdentity.cs" Link="common/Tls/LegacyIdentity.cs" />
     <Compile Include="../common/Tls/RecordLayer.cs" Link="common/Tls/RecordLayer.cs" />
     <Compile Include="../common/Tls/Ssl3Crypto.cs" Link="common/Tls/Ssl3Crypto.cs" />

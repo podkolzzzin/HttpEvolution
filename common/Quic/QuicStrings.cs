@@ -5,7 +5,6 @@ internal static class QuicStrings
     public const string HeaderProtectionLabel = KeyLabelPrefix + "hp";
     public const string ServerInitialLabel = "server in";
     public const string ClientInitialLabel = "client in";
-    public const string Version1InitialSaltHex = "38762cf7f55934b34d179ae6a4c80cadccbb7f0a";
     public const string HandshakeComplete = "QUIC handshake complete; ALPN " + Http3Alpn + ".";
     public const string ListenerProtocol = "QUIC/TLS 1.3";
     public const string MissingTransportParameters = "Missing QUIC parameters.";

@@ -13,6 +13,7 @@
     <Compile Include="../16_2015_HTTP2_FRAMES/Http2Server.cs" Link="Http2Server.cs" />
     <Compile Include="../16_2015_HTTP2_FRAMES/Http2Connection.cs" Link="Http2Connection.cs" />
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyCipher.cs" Link="LegacyCipher.cs" />
+    <Compile Include="../common/Tls/TlsConstants.cs" Link="common/Tls/TlsConstants.cs" />
     <Compile Include="../common/Tls/LegacyIdentity.cs" Link="common/Tls/LegacyIdentity.cs" />
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyRecords.cs" Link="LegacyRecords.cs" />
     <Compile Include="../13_1999_HTTP1.1_TLS10/LegacySsl.Client.cs" Link="LegacySsl.Client.cs" />

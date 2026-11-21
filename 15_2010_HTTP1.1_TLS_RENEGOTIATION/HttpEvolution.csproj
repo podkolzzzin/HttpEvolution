@@ -10,6 +10,7 @@
     <Compile Include="../12_1997_HTTP1.1_CHUNKED/Http11ChunkedConnection.cs" Link="Http11ChunkedConnection.cs" />
     <Compile Include="../common/Http1/Http1Server.cs" Link="common/Http1/Http1Server.cs" />
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyCipher.cs" Link="LegacyCipher.cs" />
+    <Compile Include="../common/Tls/TlsConstants.cs" Link="common/Tls/TlsConstants.cs" />
     <Compile Include="../common/Tls/LegacyIdentity.cs" Link="common/Tls/LegacyIdentity.cs" />
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyRecords.cs" Link="LegacyRecords.cs" />
     <Compile Include="../13_1999_HTTP1.1_TLS10/LegacySsl.Client.cs" Link="LegacySsl.Client.cs" />

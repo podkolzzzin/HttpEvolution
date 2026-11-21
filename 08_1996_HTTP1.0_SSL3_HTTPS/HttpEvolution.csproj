@@ -10,6 +10,7 @@
     <Compile Include="../03_1996_HTTP1.0_HEAD/Http10HeadConnection.cs" Link="Http10HeadConnection.cs" />
     <Compile Include="../common/Http1/Http1Server.cs" Link="common/Http1/Http1Server.cs" />
     <Compile Include="../04_1996_HTTP1.0_SSL3_PRIMITIVES/LegacyCipher.cs" Link="LegacyCipher.cs" />
+    <Compile Include="../common/Tls/TlsConstants.cs" Link="common/Tls/TlsConstants.cs" />
     <Compile Include="../common/Tls/LegacyIdentity.cs" Link="common/Tls/LegacyIdentity.cs" />
     <Compile Include="../04_1996_HTTP1.0_SSL3_PRIMITIVES/LegacyRecords.cs" Link="LegacyRecords.cs" />
     <Compile Include="../common/Tls/RecordLayer.cs" Link="common/Tls/RecordLayer.cs" />
