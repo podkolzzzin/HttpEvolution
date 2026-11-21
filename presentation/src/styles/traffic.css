@@ -1,0 +1,592 @@
+/* Traffic fields depict protocol containment, not TCP packet boundaries. */
+.traffic-slide {
+    padding-top: 24px;
+}
+.traffic-slide .layout {
+    display: block;
+}
+.traffic-slide .story {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 40px;
+    margin-bottom: 20px;
+}
+.traffic-slide h1 {
+    grid-row: 1 / 3;
+    font-size: 38px;
+    margin: 0;
+}
+.traffic-slide .lead {
+    margin: 0;
+    max-width: 55ch;
+}
+.traffic-slide .change {
+    font-size: 14px;
+    max-width: none;
+}
+.traffic-slide .change-label {
+    display: none;
+}
+.traffic-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+.traffic-controls .switches button {
+    font-size: 14px;
+    min-height: 44px;
+}
+.traffic-reveal {
+    padding: 10px 14px;
+    min-height: 44px;
+    border: 1px solid var(--ink);
+    border-radius: 7px;
+    background: transparent;
+    font-size: 14px;
+}
+.traffic-reveal[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--paper);
+}
+.traffic-reveal:hover:not(:disabled) {
+    background: #dfe8d5;
+    color: var(--ink);
+}
+.traffic-caption {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+.traffic-caption strong {
+    color: var(--ink);
+    font-weight: 650;
+}
+.traffic-http {
+    display: grid;
+    grid-template-columns: 1fr 1.35fr 0.6fr;
+    gap: 3px;
+}
+.traffic-field {
+    min-width: 0;
+    text-align: left;
+    padding: 13px 15px;
+    background: #dcecfb;
+    color: #183a54;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+}
+.traffic-field strong {
+    font-size: 14px;
+}
+.traffic-field code {
+    font:
+        12px/1.6 ui-monospace,
+        monospace;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+.traffic-field small {
+    font-size: 12px;
+    line-height: 1.4;
+}
+.traffic-field:hover {
+    filter: brightness(0.96);
+}
+.traffic-field[aria-pressed="true"] {
+    border-color: currentColor;
+    box-shadow: inset 0 0 0 1px currentColor;
+}
+.traffic-transform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 14px 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+.traffic-transform svg {
+    width: 20px;
+    height: 22px;
+    flex: none;
+}
+.traffic-network {
+    display: grid;
+    grid-template-columns: 105px 105px minmax(0, 1fr);
+    gap: 7px;
+    align-items: stretch;
+}
+.traffic-network > .traffic-field {
+    background: #e6e8df;
+    color: #33463d;
+    justify-content: center;
+}
+.traffic-record {
+    border: 1px solid #a8b7ae;
+    border-radius: 6px;
+    overflow: hidden;
+    min-width: 0;
+}
+.traffic-record-title {
+    padding: 9px 12px;
+    font-size: 12px;
+    font-weight: 650;
+    background: #e9eee4;
+}
+.traffic-record-parts {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 3px;
+    padding: 3px;
+}
+.traffic-record-parts > .traffic-field {
+    background: #e9eee4;
+    color: #33463d;
+    justify-content: center;
+}
+.traffic-cipher {
+    background: var(--dark);
+    color: #e9f2e9;
+    border-radius: 3px;
+    min-height: 142px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+.traffic-cipher > button {
+    width: 100%;
+    flex: 1;
+    background: transparent;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 24px;
+    text-align: left;
+    border: 2px solid transparent;
+    border-radius: 3px;
+}
+.traffic-cipher > button[aria-pressed="true"] {
+    border-color: #b7d77b;
+}
+.traffic-cipher > button:hover {
+    background: #203e32;
+}
+.traffic-cipher svg {
+    width: 30px;
+    height: 36px;
+    flex: none;
+}
+.traffic-cipher strong {
+    display: block;
+    font-size: 19px;
+    margin-bottom: 7px;
+}
+.traffic-cipher small {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #c0d2c5;
+    display: block;
+}
+.traffic-decoded {
+    padding: 10px;
+    background: #ebe4ff;
+    color: #392c59;
+    min-width: 0;
+}
+.traffic-decoded-label {
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0 0 8px;
+    font-weight: 650;
+}
+.traffic-decoded-parts {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 3px;
+}
+.traffic-decoded .traffic-field {
+    background: #f5f0ff;
+    color: #392c59;
+    padding: 10px;
+    min-height: 85px;
+}
+.traffic-decoded .traffic-field strong {
+    font-size: 13px;
+}
+.traffic-detail {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 15px;
+    padding: 15px 0;
+    margin-top: 15px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    min-height: 83px;
+}
+.traffic-detail h2 {
+    font-size: 16px;
+    margin: 0;
+    line-height: 1.5;
+}
+.traffic-detail p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+    color: var(--muted);
+}
+.traffic-boundaries {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--muted);
+    margin: 12px 0 0;
+    max-width: none;
+}
+.traffic-slide .sources {
+    margin: 8px 0 0;
+}
+.traffic-slide .slide-base {
+    margin-top: 20px;
+}
+@media (max-width: 1050px) {
+    .traffic-network {
+        grid-template-columns: 80px 80px minmax(0, 1fr);
+    }
+    .traffic-record-parts {
+        grid-template-columns: 140px minmax(0, 1fr);
+    }
+    .traffic-field {
+        padding: 10px;
+    }
+    .traffic-decoded-parts {
+        grid-template-columns: 1fr 1fr;
+    }
+    .traffic-decoded-parts > :first-child {
+        grid-column: 1 / -1;
+    }
+}
+@media (max-width: 760px) {
+    .traffic-slide .story {
+        display: block;
+    }
+    .traffic-slide h1 {
+        font-size: 34px;
+        margin-bottom: 18px;
+    }
+    .traffic-slide .lead {
+        margin-bottom: 15px;
+    }
+    .traffic-controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+    .traffic-controls .switches {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .traffic-http {
+        grid-template-columns: 1fr;
+    }
+    .traffic-field {
+        min-height: 64px;
+    }
+    .traffic-caption {
+        display: block;
+        line-height: 1.6;
+    }
+    .traffic-caption span {
+        display: block;
+    }
+    .traffic-network {
+        grid-template-columns: 1fr 1fr;
+    }
+    .traffic-record {
+        grid-column: 1 / -1;
+    }
+    .traffic-record-parts {
+        grid-template-columns: 1fr;
+    }
+    .traffic-record-parts > .traffic-field {
+        min-height: 65px;
+    }
+    .traffic-cipher {
+        min-height: 135px;
+    }
+    .traffic-detail {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+    .traffic-transform {
+        line-height: 1.5;
+    }
+    .traffic-decoded-parts {
+        grid-template-columns: 1fr 1fr;
+    }
+    .traffic-decoded-parts > :first-child {
+        grid-column: 1 / -1;
+    }
+    .traffic-decoded .traffic-field {
+        padding: 7px;
+    }
+    .traffic-decoded .traffic-field strong {
+        font-size: 12px;
+    }
+}
+/* Follow the same hostname from the browser, through the network, to the server. */
+.host-privacy h2 {
+    font-size: 24px;
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+}
+.host-intro {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 16px;
+    max-width: 76ch;
+}
+.host-address {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+    padding: 0 0 16px;
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+.host-address code {
+    font-size: 18px;
+    overflow-wrap: anywhere;
+}
+.host-address mark {
+    background: #f8e2d7;
+    color: #743627;
+    padding: 2px 4px;
+}
+.host-privacy .traffic-controls {
+    margin: 0 0 12px;
+}
+.host-privacy .switches button {
+    font-size: 14px;
+}
+.host-ech {
+    font-size: 14px;
+    line-height: 1.65;
+    margin: 0 0 24px;
+    max-width: 90ch;
+}
+.host-ech strong {
+    color: var(--ink);
+}
+.host-phase {
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+    margin-top: 22px;
+}
+.host-phase h3 {
+    font-size: 19px;
+    margin: 0 0 8px;
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+}
+.host-phase > p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 16px;
+    max-width: 90ch;
+    color: var(--muted);
+}
+.host-flow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 26px minmax(0, 1.5fr) 26px minmax(
+            0,
+            1fr
+        );
+    gap: 12px;
+    align-items: stretch;
+}
+.host-endpoint {
+    padding: 12px 0;
+    min-width: 0;
+}
+.host-endpoint strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 13px;
+}
+.host-endpoint code {
+    display: block;
+    font:
+        13px/1.8 ui-monospace,
+        monospace;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.host-endpoint p {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+    margin: 10px 0 0;
+}
+.host-arrow {
+    align-self: center;
+    width: 26px;
+    height: 24px;
+    color: var(--muted);
+}
+.host-observer {
+    padding: 16px 18px;
+    border-radius: 6px;
+    background: #f8e2d7;
+    color: #743627;
+    min-width: 0;
+    text-align: left;
+    border: 1px solid #cba995;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+.host-observer:hover {
+    filter: brightness(0.97);
+}
+.host-observer[aria-pressed="true"] {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+}
+.host-observer .host-observer-label {
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.5;
+}
+.host-observer code {
+    font:
+        600 clamp(19px, 2.2vw, 28px)/1.4 ui-monospace,
+        monospace;
+    overflow-wrap: anywhere;
+}
+.host-observer small code {
+    display: block;
+    font-size: 16px;
+    margin: 5px 0;
+}
+.host-observer b {
+    font-size: 14px;
+    line-height: 1.5;
+}
+.host-observer small {
+    font-size: 13px;
+    line-height: 1.5;
+}
+.host-observer.host-sealed {
+    background: var(--dark);
+    color: #e9f2e9;
+    border-color: var(--dark);
+}
+.host-sealed .host-observer-label,
+.host-sealed small {
+    color: #c0d2c5;
+}
+.host-lock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 650;
+}
+.host-lock svg {
+    width: 22px;
+    height: 26px;
+    flex: none;
+}
+.host-privacy .traffic-detail {
+    min-height: 0;
+    margin-top: 24px;
+}
+.host-privacy .traffic-detail h2 {
+    font-size: 16px;
+    margin: 0;
+}
+.host-privacy .traffic-detail p {
+    font-size: 14px;
+}
+.host-history {
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 20px 0 14px;
+}
+.host-history a {
+    font-weight: 650;
+}
+#http11-host .workbench > .wire {
+    margin-top: 18px;
+}
+@media (max-width: 760px) {
+    .host-privacy h2 {
+        font-size: 22px;
+    }
+    .host-intro {
+        font-size: 15px;
+    }
+    .host-address {
+        gap: 8px;
+    }
+    .host-address code {
+        font-size: 16px;
+    }
+    .host-privacy .traffic-controls .switches {
+        display: flex;
+    }
+    .host-privacy .switches button {
+        flex: 1;
+        min-width: 140px;
+    }
+    .host-ech {
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+    .host-flow {
+        grid-template-columns: 1fr;
+        gap: 7px;
+    }
+    .host-endpoint {
+        padding: 8px 0;
+    }
+    .host-endpoint strong {
+        margin-bottom: 5px;
+    }
+    .host-endpoint p {
+        margin-top: 5px;
+    }
+    .host-arrow {
+        transform: rotate(90deg);
+        justify-self: center;
+    }
+    .host-observer {
+        padding: 16px;
+    }
+    .host-observer code {
+        font-size: 25px;
+    }
+    .host-phase h3 {
+        font-size: 18px;
+    }
+    .host-history {
+        font-size: 12px;
+    }
+}
