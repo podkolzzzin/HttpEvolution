@@ -77,14 +77,14 @@ internal static partial class LegacySsl
 
             var client = hello.Take(32);
             hello.Vector(1);
-            var suites = hello.Vector().Chunk(2).Select(pair => new Wire(pair).Int()).ToArray();
-            records.UseAes = minor != 0 && suites.Contains(0x002f);
-            if ((!records.UseAes && !suites.Contains(10)) || !hello.Vector(1).Contains((byte)0))
+            var suites = hello.UInt16Vector().AsSpan();
+            records.UseAes = minor != 0 && suites.Contains((ushort)0x002f);
+            if ((!records.UseAes && !suites.Contains((ushort)10)) || !hello.Vector(1).AsSpan().Contains((byte)0))
             {
                 throw new IOException("RSA/CBC/SHA cipher required.");
             }
 
-            var renegotiation = minor != 0 && suites.Contains(0x00ff);
+            var renegotiation = minor != 0 && suites.Contains((ushort)0x00ff);
             if (minor != 0 && hello.Left > 0)
             {
                 var extensions = new Wire(hello.Vector());

@@ -1,52 +1,33 @@
 # common
 
-22 спільні допоміжні файли. Кожен проєкт явно підключає лише потрібний
-йому історичний набір через `Compile Include` і `Link`:
+Кожен проєкт підключає потрібні йому спільні файли через `Compile Include` і `Link`.
 
 ```xml
-<Compile Include="../common/Wire.cs" Link="common/Wire.cs" />
+<Compile Include="../common/Wire/Wire.cs" Link="common/Wire/Wire.cs" />
 ```
 
-`Include` задає шлях до вихідного файлу, `Link` показує його в IDE у папці `common`.
-Ці файли компілюються всередині кожного проєкту. Додаткова бібліотека не потрібна.
+`Include` задає шлях до вихідного файлу. `Link` показує його в тій самій підпапці
+`common` в IDE. Файли компілюються всередині проєкту етапу.
 
-`TlsStream.cs` містить спільну реалізацію потоку. TLS1.3 handshake підключається
-окремою частиною класу з [етапу 28](../28_2018_HTTP2_TLS13_HTTPS/TlsStream.Tls13.cs).
-`TlsCertificate.cs` створює сертифікат і підписи. Властивість SPKI pin додає
-окрема частина класу з [етапу 37](../37_2021_HTTP3_QUIC_UDP/TlsCertificate.Pin.cs).
-`Http2Frames.cs` читає й записує кадри; логіка обробки HTTP/2 залишається в етапах.
+| Папка | Вміст |
+| --- | --- |
+| [Demo](Demo/) | Аргументи командного рядка через System.CommandLine і ClientHello для консольних прикладів |
+| [HeaderCompression](HeaderCompression/) | HPACK, QPACK, Huffman і спільні формати заголовків |
+| [Http1](Http1/) | Цикл приймання TCP-з’єднань для HTTP/0.9 та HTTP/1.x |
+| [Http2](Http2/) | Типи кадрів, їх читання й запис |
+| [Quic](Quic/) | Пакети, ключі, ACK, транспортні параметри, потоки й відновлення |
+| [Tls](Tls/) | Записи, шифрування, ідентифікація й потоки SSL/TLS |
+| [Wire](Wire/) | Робота з цілими числами й векторами байтів для SSL/TLS та QUIC |
 
-`DemoClientHello` формує ClientHello з тимчасовим P-256 ключем для чотирьох
-консольних TLS/QUIC-демо. У кожного етапу власний локальний `Program.cs`;
-точки входу не підключаються як linked files.
-
-Історичні версії інших класів зберігаються один раз — у першому етапі, де вони
-з’явилися. Наступні проєкти явно підключають потрібну версію з цієї папки.
-Кожне посилання веде безпосередньо до C#-файлу; ранні етапи не залежать від пізніших.
-
-| Файл | Перший етап | Кількість проєктів |
-| --- | --- | --- |
-| [DemoClientHello.cs](DemoClientHello.cs) | 23 | 4 |
-| [Http2Frames.cs](Http2Frames.cs) | 16 | 27 |
-| [Huffman.cs](Huffman.cs) | 18 | 25 |
-| [LegacyIdentity.cs](LegacyIdentity.cs) | 06 | 37 |
-| [Qpack.cs](Qpack.cs) | 39 | 4 |
-| [QuicAcks.cs](QuicAcks.cs) | 34 | 9 |
-| [QuicBuffer.cs](QuicBuffer.cs) | 33 | 10 |
-| [QuicData.cs](QuicData.cs) | 31 | 12 |
-| [QuicKeys.cs](QuicKeys.cs) | 30 | 13 |
-| [QuicPacket.cs](QuicPacket.cs) | 32 | 11 |
-| [QuicParameters.cs](QuicParameters.cs) | 35 | 8 |
-| [QuicRecovery.cs](QuicRecovery.cs) | 38 | 5 |
-| [QuicStreams.cs](QuicStreams.cs) | 40 | 3 |
-| [RecordLayer.cs](RecordLayer.cs) | 05 | 38 |
-| [Ssl3Crypto.cs](Ssl3Crypto.cs) | 04 | 39 |
-| [Tls10Crypto.cs](Tls10Crypto.cs) | 13 | 30 |
-| [TlsCertificate.cs](TlsCertificate.cs) | 25 | 18 |
-| [TlsCrypto.cs](TlsCrypto.cs) | 22 | 21 |
-| [TlsHello.cs](TlsHello.cs) | 23 | 20 |
-| [TlsRecords.cs](TlsRecords.cs) | 27 | 16 |
-| [TlsStream.cs](TlsStream.cs) | 07 | 36 |
-| [Wire.cs](Wire.cs) | 04 | 39 |
+У кожного етапу власний `Program.cs`. Класи, що вводять нову поведінку,
+зберігаються у відповідних етапах. Наприклад, HTTP/2 починається з
+[кадрів і встановлення з’єднання](../16_2015_HTTP2_FRAMES/Http2Connection.cs),
+далі додає [відповіді в потоках](../19_2015_HTTP2_STREAMS/Http2StreamConnection.cs),
+[вікна](../20_2015_HTTP2_FLOW_CONTROL/Http2FlowControlConnection.cs),
+[CONTINUATION](../21_2015_HTTP2_CONTINUATION/Http2ContinuationConnection.cs)
+і [TLS з ALPN](../29_2018_HTTP2_ALPN/Http2Alpn.cs).
+TLS 1.3 handshake та SPKI pin підключаються як окремі частини класів
+з [етапу 28](../28_2018_HTTP2_TLS13_HTTPS/TlsStream.Tls13.cs) та
+[етапу 37](../37_2021_HTTP3_QUIC_UDP/TlsCertificate.Pin.cs).
 
 [Усі етапи й команди запуску](../README.md).

@@ -24,7 +24,7 @@ curl -k --http1.1 -i https://localhost:8443/
 Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
-diff -u ../27_2018_HTTP2_TLS13_RECORDS/Program.cs Program.cs
+diff -u ../25_2018_HTTP2_TLS13_AUTH_RECORDS/Program.cs Program.cs
 diff -u /dev/null TlsStream.Tls13.cs
 ```
 

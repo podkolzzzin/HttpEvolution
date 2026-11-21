@@ -1,6 +1,18 @@
-// 17_2015_HTTP2_HPACK: HPACK: таблиці заголовків.
-var hpack = new Hpack();
-foreach (var (name, value) in hpack.Decode([0x82, 0x86, 0x84]))
+var hpack = new Hpack(Huffman.Decode);
+var domain = Convert.FromHexString("f1e3c2e5f23a6ba0ab90f4ff");
+
+// 82 86 84 select static entries. 41 inserts :authority, 8c marks a 12-byte Huffman string.
+byte[] firstRequest = [0x82, 0x86, 0x84, 0x41, 0x8c, .. domain];
+PrintHeaders("First request", firstRequest);
+
+// BE selects entry 62, the first entry of the dynamic table on this connection.
+PrintHeaders("Repeated request", [0x82, 0x86, 0x84, 0xbe]);
+
+void PrintHeaders(string label, byte[] block)
 {
-    Console.WriteLine($"{name}: {value}");
+    Console.WriteLine($"{label} ({block.Length} bytes): {Convert.ToHexString(block)}");
+    foreach (var (name, value) in hpack.Decode(block))
+    {
+        Console.WriteLine($"{name}: {value}");
+    }
 }

@@ -18,11 +18,13 @@ curl --http1.1 --raw -i http://127.0.0.1:8080/chunks
 
 Код, доданий або змінений на цьому етапі:
 
+- [Http11ChunkedConnection.cs](Http11ChunkedConnection.cs).
 - [Program.cs](Program.cs).
 
 Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
+diff -u /dev/null Http11ChunkedConnection.cs
 diff -u ../11_1997_HTTP1.1_KEEP_ALIVE/Program.cs Program.cs
 ```
 

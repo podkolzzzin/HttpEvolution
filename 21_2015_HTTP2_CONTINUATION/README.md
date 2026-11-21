@@ -2,6 +2,8 @@
 
 HTTP/2: збирання блоків CONTINUATION.
 
+Будує на етапі 20. Збирає HEADERS і CONTINUATION одного потоку в один блок до декодування HPACK.
+
 Власне демо: [Program.cs](Program.cs). Із цієї папки:
 
 ```sh
@@ -18,13 +20,13 @@ curl --http2-prior-knowledge -i http://127.0.0.1:8081/
 
 Код, доданий або змінений на цьому етапі:
 
-- [Http2.cs](Http2.cs).
+- [Http2ContinuationConnection.cs](Http2ContinuationConnection.cs).
 - [Program.cs](Program.cs).
 
 Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
-diff -u ../20_2015_HTTP2_FLOW_CONTROL/Http2.cs Http2.cs
+diff -u /dev/null Http2ContinuationConnection.cs
 diff -u ../20_2015_HTTP2_FLOW_CONTROL/Program.cs Program.cs
 ```
 

@@ -13,13 +13,13 @@ dotnet run
 Код, доданий або змінений на цьому етапі:
 
 - [Program.cs](Program.cs).
-- [QuicRecovery.cs](../common/QuicRecovery.cs).
+- [QuicRecovery.cs](../common/Quic/QuicRecovery.cs).
 
 Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
 diff -u ../37_2021_HTTP3_QUIC_UDP/Program.cs Program.cs
-diff -u /dev/null ../common/QuicRecovery.cs
+diff -u /dev/null ../common/Quic/QuicRecovery.cs
 ```
 
 `Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).

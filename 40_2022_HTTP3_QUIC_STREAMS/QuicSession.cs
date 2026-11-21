@@ -22,7 +22,7 @@ internal sealed class QuicSession : IDisposable
     }
 
     private readonly Space?[] spaces = new Space?[3];
-    private readonly TlsHandshake tls = new("h3");
+    private readonly TlsHandshake tls = new(QuicStrings.Http3Alpn);
     private QuicStreams? streams;
     private readonly byte[] original;
     private byte[] peerId;
@@ -76,25 +76,25 @@ internal sealed class QuicSession : IDisposable
 
             if (!tls.PeerExtensions.TryGetValue(57, out var parameters))
             {
-                throw new InvalidDataException("Missing QUIC parameters.");
+                throw new InvalidDataException(QuicStrings.MissingTransportParameters);
             }
 
             var limits = new QuicParameters(parameters);
             limits.ValidateClient(peerId);
             streams = new(limits);
             spaces[1] = new(tls.ClientHandshakeTraffic, tls.ServerHandshakeTraffic);
-            Crypto(1, tls.ServerFlight(QuicParameters.Server(original, Id)).SelectMany(bytes => bytes).ToArray());
+            Crypto(1, Wire.Join(tls.ServerFlight(QuicParameters.Server(original, Id))));
             spaces[2] = new(tls.ClientTraffic, tls.ServerTraffic);
         }
         else if (level == 1)
         {
             tls.VerifyFinished(message);
             spaces[2]!.Pending.Enqueue([0x1e]);
-            Console.WriteLine("QUIC handshake complete; ALPN h3.");
+            Console.WriteLine(QuicStrings.HandshakeComplete);
         }
         else
         {
-            throw new InvalidDataException("Unexpected CRYPTO level.");
+            throw new InvalidDataException(QuicStrings.UnexpectedCryptoLevel);
         }
     }
 
@@ -105,7 +105,7 @@ internal sealed class QuicSession : IDisposable
             return;
         }
 
-        (byte Flags, ulong Number, byte[] Data) decoded;
+        DecryptedQuicPacket decoded;
         try
         {
             decoded = space.Read.Open(packet.Bytes, packet.NumberOffset, ref space.Largest);
@@ -124,7 +124,7 @@ internal sealed class QuicSession : IDisposable
 
         if ((decoded.Flags & (packet.Level == 2 ? 0x1c : 0x0c)) != 0)
         {
-            throw new InvalidDataException("Invalid reserved/key-phase bits.");
+            throw new InvalidDataException(QuicStrings.InvalidPacketFlags);
         }
 
         if (!space.Received.Add(decoded.Number))
@@ -144,7 +144,7 @@ internal sealed class QuicSession : IDisposable
             var type = input.Int();
             if (packet.Level < 2 && type is not (0 or 1 or 2 or 3 or 6 or 0x1c))
             {
-                throw new InvalidDataException("Frame at the wrong encryption level.");
+                throw new InvalidDataException(QuicStrings.WrongFrameLevel);
             }
 
             if (type is not (0 or 2 or 3 or 0x1c or 0x1d))
@@ -212,7 +212,7 @@ internal sealed class QuicSession : IDisposable
                     input.Take(16);
                     if (cid.Length is 0 or > 20)
                     {
-                        throw new InvalidDataException("Invalid new connection ID.");
+                        throw new InvalidDataException(QuicStrings.InvalidConnectionId);
                     }
 
                     if (retire > 0)
@@ -239,7 +239,7 @@ internal sealed class QuicSession : IDisposable
                     Stop();
                     return;
                 default:
-                    throw new InvalidDataException("Unknown QUIC frame.");
+                    throw new InvalidDataException(QuicStrings.UnknownFrame);
             }
         }
     }
@@ -269,7 +269,7 @@ internal sealed class QuicSession : IDisposable
                 byte[] plain = [.. ack, .. (include ? space.Pending.Peek() : [])];
                 if (plain.Length == 0)
                 {
-                    throw new InvalidDataException("Oversized outgoing QUIC frame.");
+                    throw new InvalidDataException(QuicStrings.OversizedOutgoingFrame);
                 }
 
                 var packet = level == 2

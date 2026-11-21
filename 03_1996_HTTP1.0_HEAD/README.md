@@ -18,11 +18,13 @@ curl --http1.0 -I http://127.0.0.1:8080/
 
 Код, доданий або змінений на цьому етапі:
 
+- [Http10HeadConnection.cs](Http10HeadConnection.cs).
 - [Program.cs](Program.cs).
 
 Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
+diff -u /dev/null Http10HeadConnection.cs
 diff -u ../02_1996_HTTP1.0_HEADERS/Program.cs Program.cs
 ```
 

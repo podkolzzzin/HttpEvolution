@@ -18,11 +18,13 @@ curl --http1.1 -i http://127.0.0.1:8080/
 
 Код, доданий або змінений на цьому етапі:
 
+- [Http11HostConnection.cs](Http11HostConnection.cs).
 - [Program.cs](Program.cs).
 
 Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
+diff -u /dev/null Http11HostConnection.cs
 diff -u ../09_1996_HTTP1.0_SSL3_CLIENT/Program.cs Program.cs
 ```
 

@@ -77,8 +77,8 @@ internal static partial class LegacySsl
 
             var client = hello.Take(32);
             hello.Vector(1);
-            if (!hello.Vector().Chunk(2).Any(pair => pair.AsSpan().SequenceEqual(new byte[] { 0, 10 }))
-                || !hello.Vector(1).Contains((byte)0))
+            if (!hello.UInt16Vector().AsSpan().Contains((ushort)10)
+                || !hello.Vector(1).AsSpan().Contains((byte)0))
             {
                 throw new IOException("RSA/3DES/SHA cipher required.");
             }

@@ -6,14 +6,18 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../common/Demo/DemoCommand.cs" Link="common/Demo/DemoCommand.cs" />
+    <Compile Include="../12_1997_HTTP1.1_CHUNKED/Http11ChunkedConnection.cs" Link="Http11ChunkedConnection.cs" />
+    <Compile Include="../common/Http1/Http1Server.cs" Link="common/Http1/Http1Server.cs" />
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyCipher.cs" Link="LegacyCipher.cs" />
-    <Compile Include="../common/LegacyIdentity.cs" Link="common/LegacyIdentity.cs" />
+    <Compile Include="../common/Tls/LegacyIdentity.cs" Link="common/Tls/LegacyIdentity.cs" />
     <Compile Include="../14_2002_HTTP1.1_TLS_AES/LegacyRecords.cs" Link="LegacyRecords.cs" />
     <Compile Include="../13_1999_HTTP1.1_TLS10/LegacySsl.Client.cs" Link="LegacySsl.Client.cs" />
-    <Compile Include="../common/RecordLayer.cs" Link="common/RecordLayer.cs" />
-    <Compile Include="../common/Ssl3Crypto.cs" Link="common/Ssl3Crypto.cs" />
-    <Compile Include="../common/Tls10Crypto.cs" Link="common/Tls10Crypto.cs" />
-    <Compile Include="../common/TlsStream.cs" Link="common/TlsStream.cs" />
-    <Compile Include="../common/Wire.cs" Link="common/Wire.cs" />
+    <Compile Include="../common/Tls/RecordLayer.cs" Link="common/Tls/RecordLayer.cs" />
+    <Compile Include="../common/Tls/Ssl3Crypto.cs" Link="common/Tls/Ssl3Crypto.cs" />
+    <Compile Include="../common/Tls/Tls10Crypto.cs" Link="common/Tls/Tls10Crypto.cs" />
+    <Compile Include="../common/Tls/TlsStream.cs" Link="common/Tls/TlsStream.cs" />
+    <Compile Include="../common/Wire/Wire.cs" Link="common/Wire/Wire.cs" />
+    <PackageReference Include="System.CommandLine" Version="2.0.15" />
   </ItemGroup>
 </Project>

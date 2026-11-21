@@ -3,8 +3,8 @@ using System.Security.Cryptography;
 internal sealed class LegacyCipher(byte[] mac, byte[] key, byte[] initialIv, byte minor = 0) : IDisposable
 {
     private readonly SymmetricAlgorithm cipher = Create(key);
-    private readonly byte[] macSecret = mac.ToArray();
-    private byte[] iv = initialIv.ToArray();
+    private readonly byte[] macSecret = mac.AsSpan().ToArray();
+    private byte[] iv = initialIv.AsSpan().ToArray();
     private ulong sequence;
     private static SymmetricAlgorithm Create(byte[] key)
     {
@@ -30,7 +30,9 @@ internal sealed class LegacyCipher(byte[] mac, byte[] key, byte[] initialIv, byt
         byte[] plain = [.. data, .. Mac(type, data)];
         var size = cipher.BlockSize / 8;
         var padding = size - 1 - plain.Length % size;
-        byte[] padded = [.. plain, .. Enumerable.Repeat((byte)padding, padding + 1)];
+        var padded = new byte[plain.Length + padding + 1];
+        plain.AsSpan().CopyTo(padded);
+        padded.AsSpan(plain.Length).Fill((byte)padding);
         var encrypted = cipher.EncryptCbc(padded, iv, PaddingMode.None);
         iv = encrypted[^size..];
         return encrypted;

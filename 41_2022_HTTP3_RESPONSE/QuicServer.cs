@@ -8,7 +8,7 @@ internal static class QuicServer
     {
         using var udp = new UdpClient(new IPEndPoint(IPAddress.Loopback, 8445));
         var routes = new Dictionary<string, QuicSession>();
-        Console.WriteLine("QUIC/TLS 1.3 on 127.0.0.1:8445 UDP. Stop with Ctrl+C.");
+        Console.WriteLine($"{QuicStrings.ListenerProtocol} on 127.0.0.1:8445 UDP. Stop with Ctrl+C.");
         Console.WriteLine($"Certificate SPKI pin: {TlsCertificate.Pin}");
         while (true)
         {

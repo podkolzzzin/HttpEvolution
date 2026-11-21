@@ -14,15 +14,15 @@ dotnet run
 
 Код, доданий або змінений на цьому етапі:
 
-- [DemoClientHello.cs](../common/DemoClientHello.cs).
+- [DemoClientHello.cs](../common/Demo/DemoClientHello.cs).
 - [Program.cs](Program.cs).
 - [QuicSession.cs](QuicSession.cs).
 
 Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
-diff -u /dev/null ../common/DemoClientHello.cs
-diff -u ../35_2021_HTTP3_QUIC_PARAMETERS/Program.cs Program.cs
+diff -u /dev/null ../common/Demo/DemoClientHello.cs
+diff -u ../30_2021_HTTP3_QUIC_PRIMITIVES/Program.cs Program.cs
 diff -u /dev/null QuicSession.cs
 ```
 

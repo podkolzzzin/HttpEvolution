@@ -20,15 +20,17 @@ printf 'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n\000\000\000\004\000\000\000\000\000' | 
 
 Код, доданий або змінений на цьому етапі:
 
-- [Http2.cs](Http2.cs).
-- [Http2Frames.cs](../common/Http2Frames.cs).
+- [Http2Server.cs](Http2Server.cs).
+- [Http2Frames.cs](../common/Http2/Http2Frames.cs).
+- [Http2Connection.cs](Http2Connection.cs).
 - [Program.cs](Program.cs).
 
-Порівняти з попереднім етапом (код завершення 1 означає відмінності):
+Порівняти із сервером HTTP/1.1 з етапу 15 (код завершення 1 означає відмінності):
 
 ```sh
-diff -u /dev/null Http2.cs
-diff -u /dev/null ../common/Http2Frames.cs
+diff -u /dev/null Http2Connection.cs
+diff -u /dev/null Http2Server.cs
+diff -u /dev/null ../common/Http2/Http2Frames.cs
 diff -u ../15_2010_HTTP1.1_TLS_RENEGOTIATION/Program.cs Program.cs
 ```
 

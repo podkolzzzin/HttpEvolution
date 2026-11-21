@@ -3,7 +3,7 @@ using System.Net;
 
 byte[] destination = Convert.FromHexString("8394c8f03e515708");
 byte[] source = Convert.FromHexString("0102030405060708");
-var hello = DemoClientHello.Create("h3", QuicData.Pair(15, source));
+var hello = DemoClientHello.Create(QuicStrings.Http3Alpn, QuicData.Pair(15, source));
 byte[] crypto = [6, .. QuicData.Int(0), .. QuicData.Vector(hello)];
 using var keys = new QuicKeys(QuicKeys.Initial(destination, server: false));
 var initial = QuicPacket.Long(0, destination, source, 0, crypto, keys);

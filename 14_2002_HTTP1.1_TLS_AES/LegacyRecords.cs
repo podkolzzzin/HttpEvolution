@@ -50,7 +50,7 @@ internal sealed class LegacyRecords(Stream stream, byte minor = 0) : IRecordLaye
         nextWrite = null;
     }
 
-    public (byte Type, byte[] Data) Read()
+    public TlsRecord Read()
     {
         var header = new byte[5];
         stream.ReadExactly(header);
@@ -79,7 +79,7 @@ internal sealed class LegacyRecords(Stream stream, byte minor = 0) : IRecordLaye
             throw new IOException("SSL plaintext too large.");
         }
 
-        return (header[0], data);
+        return new(header[0], data);
     }
 
     public void Write(byte type, byte[] data)

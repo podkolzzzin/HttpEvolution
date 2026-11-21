@@ -19,7 +19,7 @@ dotnet run
 
 ```sh
 diff -u /dev/null LegacySsl.cs
-diff -u ../07_1996_HTTP1.0_SSL3_STREAM/Program.cs Program.cs
+diff -u ../04_1996_HTTP1.0_SSL3_PRIMITIVES/Program.cs Program.cs
 ```
 
 `Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).

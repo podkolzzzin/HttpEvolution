@@ -5,4 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../common/Http1/Http1Server.cs" Link="common/Http1/Http1Server.cs" />
+  </ItemGroup>
 </Project>

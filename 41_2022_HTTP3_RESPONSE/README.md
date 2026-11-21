@@ -14,7 +14,7 @@ dotnet run
 
 Код, доданий або змінений на цьому етапі:
 
-- [Http3.cs](Http3.cs).
+- [Http3Connection.cs](Http3Connection.cs).
 - [Program.cs](Program.cs).
 - [QuicServer.cs](QuicServer.cs).
 - [QuicSession.cs](QuicSession.cs).
@@ -22,7 +22,7 @@ dotnet run
 Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
-diff -u /dev/null Http3.cs
+diff -u /dev/null Http3Connection.cs
 diff -u ../40_2022_HTTP3_QUIC_STREAMS/Program.cs Program.cs
 diff -u ../37_2021_HTTP3_QUIC_UDP/QuicServer.cs QuicServer.cs
 diff -u ../40_2022_HTTP3_QUIC_STREAMS/QuicSession.cs QuicSession.cs

@@ -12,7 +12,7 @@ dotnet run
 
 Клієнт HTTP/3 та SPKI pin описані в [головному README](../README.md#http3).
 
-За замовчуванням — HTTP/3 із recovery. Інші готові режими: `--http`, `--ssl3`, `--tls10`, `--tls`, `--h2`, `--h2 --tls` та pinned клієнти.
+За замовчуванням — HTTP/3 із recovery. Інші готові режими: `--http`, [`--sse` та `--ws`](../15b_2011_HTTP1.1_REALTIME/), `--ssl3`, `--tls10`, `--tls`, `--h2`, `--h2 --tls` та pinned клієнти.
 
 Код, доданий або змінений на цьому етапі:
 

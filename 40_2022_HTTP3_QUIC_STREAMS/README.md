@@ -14,14 +14,14 @@ dotnet run
 
 - [Program.cs](Program.cs).
 - [QuicSession.cs](QuicSession.cs).
-- [QuicStreams.cs](../common/QuicStreams.cs).
+- [QuicStreams.cs](../common/Quic/QuicStreams.cs).
 
 Порівняти з попереднім етапом (код завершення 1 означає відмінності):
 
 ```sh
 diff -u ../39_2022_HTTP3_QPACK/Program.cs Program.cs
 diff -u ../36_2021_HTTP3_QUIC_TLS/QuicSession.cs QuicSession.cs
-diff -u /dev/null ../common/QuicStreams.cs
+diff -u /dev/null ../common/Quic/QuicStreams.cs
 ```
 
 `Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
