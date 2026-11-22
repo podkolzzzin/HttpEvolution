@@ -10,5 +10,6 @@
     <Compile Include="../common/HeaderCompression/HeaderField.cs" Link="common/HeaderCompression/HeaderField.cs" />
     <Compile Include="../common/HeaderCompression/Huffman.cs" Link="common/HeaderCompression/Huffman.cs" />
     <Compile Include="../common/HeaderCompression/Qpack.cs" Link="common/HeaderCompression/Qpack.cs" />
+    <Compile Include="../common/HeaderCompression/QpackDynamicTable.cs" Link="common/HeaderCompression/QpackDynamicTable.cs" />
   </ItemGroup>
 </Project>

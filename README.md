@@ -157,7 +157,7 @@ SSL/TLS зазначено в короткій назві, а HTTP-префік�
 | 36 | [36_2021_HTTP3_QUIC_TLS](36_2021_HTTP3_QUIC_TLS/) | QUIC: TLS handshake на рівнях шифрування |
 | 37 | [37_2021_HTTP3_QUIC_UDP](37_2021_HTTP3_QUIC_UDP/) | QUIC: приймання сеансів через UdpClient |
 | 38 | [38_2021_HTTP3_QUIC_PTO](38_2021_HTTP3_QUIC_PTO/) | QUIC: облік ACK та probe timeout |
-| 39 | [39_2022_HTTP3_QPACK](39_2022_HTTP3_QPACK/) | HTTP/3: статичне кодування заголовків QPACK |
+| 39 | [39_2022_HTTP3_QPACK](39_2022_HTTP3_QPACK/) | HTTP/3: стиснення QPACK і блокування декодування |
 | 40 | [40_2022_HTTP3_QUIC_STREAMS](40_2022_HTTP3_QUIC_STREAMS/) | QUIC для HTTP/3: потоки й flow control |
 | 41 | [41_2022_HTTP3_RESPONSE](41_2022_HTTP3_RESPONSE/) | HTTP/3: GET/HEAD через QUIC, HEADERS/DATA/FIN |
 | 42 | [42_2022_HTTP3_QUIC_RECOVERY](42_2022_HTTP3_QUIC_RECOVERY/) | QUIC для HTTP/3: повтори з новими packet number |
@@ -257,8 +257,15 @@ google-chrome --user-data-dir="$(mktemp -d)" --origin-to-force-quic-on=127.0.0.1
 ```
 
 UDP:8445; QUIC v1, TLS1.3/ALPN h3, CRYPTO/STREAM, control SETTINGS,
-статичний QPACK і Huffman, GET/HEAD, HEADERS/DATA/FIN. Динамічну місткість QPACK
-узгоджено як 0. Є ACK-діапазони, захист від amplification, flow control,
+QPACK і Huffman, GET/HEAD, HEADERS/DATA/FIN. Для вхідних заголовків сервер дозволяє
+до 4 КіБ динамічної таблиці й один заблокований потік. У відповідях кодує поля літералами.
+Етап 39 показує блокування й розблокування в консолі:
+
+```sh
+dotnet run --project 39_2022_HTTP3_QPACK
+```
+
+Є ACK-діапазони, захист від amplification, flow control,
 повторна передача з новим packet number, PTO/backoff і видалення старих ключів.
 
 Це локальна модель: до 16 bidi та 16 uni потоків, 64 KiB на receive-потік,

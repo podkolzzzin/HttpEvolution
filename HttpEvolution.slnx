@@ -102,6 +102,7 @@
     <File Path="common/HeaderCompression/Hpack.cs" />
     <File Path="common/HeaderCompression/Huffman.cs" />
     <File Path="common/HeaderCompression/Qpack.cs" />
+    <File Path="common/HeaderCompression/QpackDynamicTable.cs" />
   </Folder>
   <Folder Name="/common/Http1/">
     <File Path="common/Http1/Http1Server.cs" />

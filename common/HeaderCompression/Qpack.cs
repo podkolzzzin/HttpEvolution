@@ -1,9 +1,10 @@
 using System.Text;
 using static HeaderCompression;
 
-// Dynamic capacity is advertised as zero: static references and literals suffice.
 internal static class Qpack
 {
+    public const int MaxFieldSectionSize = 65_536;
+
     // RFC 9204 Appendix A, zero-based indices.
     private static readonly HeaderField[] Fixed =
     [
@@ -127,67 +128,153 @@ internal static class Qpack
         return output.ToArray();
     }
 
-    public static List<HeaderField> Decode(byte[] block)
+    public sealed record FieldSection(byte[] Block, long FieldsOffset, int RequiredInsertCount, long Base);
+
+    public static List<HeaderField> Decode(byte[] block) => Decode(ReadFieldSection(block));
+
+    public static FieldSection ReadFieldSection(byte[] block, QpackDynamicTable? table = null)
     {
         using var input = new MemoryStream(block);
-        if (ReadInteger(input, ReadByte(input), 8) != 0)
-        {
-            throw new InvalidDataException("QPACK dynamic capacity is zero.");
-        }
-
+        var encodedCount = ReadInteger(input, ReadByte(input), 8);
+        var required = RequiredInsertCount(encodedCount, table);
         var firstBase = ReadByte(input);
-        ReadInteger(input, firstBase, 7);
-        if ((firstBase & 128) != 0)
+        var deltaBase = ReadInteger(input, firstBase, 7);
+        var @base = (firstBase & 0x80) != 0 ? required - (long)deltaBase - 1 : required + (long)deltaBase;
+        if (@base < 0)
         {
             throw new InvalidDataException("QPACK Base underflow.");
         }
 
+        return new(block, input.Position, required, @base);
+    }
+
+    private static int RequiredInsertCount(int encoded, QpackDynamicTable? table)
+    {
+        if (encoded == 0)
+        {
+            return 0;
+        }
+
+        // RFC 9204 §4.5.1.1. Recover the count from its wrapping wire value.
+        if (table is null)
+        {
+            throw new InvalidDataException("QPACK dynamic capacity is zero.");
+        }
+
+        var maxEntries = table.MaxCapacity / 32;
+        var fullRange = 2 * maxEntries;
+        if (encoded > fullRange)
+        {
+            throw new InvalidDataException("Invalid QPACK Encoded Insert Count.");
+        }
+
+        var maxValue = table.InsertCount + maxEntries;
+        var required = (maxValue / fullRange) * fullRange + encoded - 1;
+        if (required > maxValue)
+        {
+            required -= fullRange;
+        }
+
+        return required > 0 ? required : throw new InvalidDataException("Invalid QPACK Required Insert Count.");
+    }
+
+    public static List<HeaderField> Decode(FieldSection section, QpackDynamicTable? table = null)
+    {
+        using var input = new MemoryStream(section.Block);
+        input.Position = section.FieldsOffset;
         var fields = new List<HeaderField>();
         var fieldSectionSize = 0;
         while (input.Position < input.Length)
         {
-            var first = ReadByte(input);
-            if ((first & 128) != 0)
-            {
-                if ((first & 64) == 0)
-                {
-                    throw new InvalidDataException("Dynamic QPACK reference.");
-                }
-
-                fields.Add(At(ReadInteger(input, first, 6)));
-            }
-            else
-            {
-                string name;
-                if ((first & 64) != 0)
-                {
-                    if ((first & 16) == 0)
-                    {
-                        throw new InvalidDataException("Dynamic QPACK name.");
-                    }
-
-                    name = At(ReadInteger(input, first, 4)).Name;
-                }
-                else if ((first & 32) != 0)
-                {
-                    var length = ReadInteger(input, first, 3);
-                    name = ReadText(input, length, (first & 8) != 0, Huffman.Decode);
-                }
-                else
-                {
-                    throw new InvalidDataException("QPACK post-base reference with no dynamic table.");
-                }
-
-                fields.Add(new(name, ReadText(input, Huffman.Decode)));
-            }
-
-            fieldSectionSize += fields[^1].TableSize;
-            if (fields.Count > 128 || fieldSectionSize > 65536)
+            var field = ReadField(input, section, table);
+            fields.Add(field);
+            fieldSectionSize += field.TableSize;
+            if (fields.Count > 128 || fieldSectionSize > MaxFieldSectionSize)
             {
                 throw new InvalidDataException("QPACK field section too large.");
             }
         }
 
         return fields;
+    }
+
+    private static HeaderField ReadField(Stream input, FieldSection section, QpackDynamicTable? table)
+    {
+        var first = ReadByte(input);
+        if ((first & 0x80) != 0) // Indexed field line
+        {
+            var index = ReadInteger(input, first, 6);
+            return (first & 0x40) != 0 ? At(index) : DynamicAt(section, table, section.Base - 1 - index);
+        }
+
+        if ((first & 0xF0) == 0x10) // Indexed field line with post-Base index
+        {
+            return DynamicAt(section, table, section.Base + ReadInteger(input, first, 4));
+        }
+
+        var name = (first & 0x60) switch
+        {
+            0x40 or 0x60 => ReadReferencedName(input, first, section, table),
+            0x20 => ReadText(input, ReadInteger(input, first, 3), (first & 0x08) != 0, Huffman.Decode),
+            _ => DynamicAt(section, table, section.Base + ReadInteger(input, first, 3)).Name
+        };
+        return new(name, ReadText(input, Huffman.Decode));
+    }
+
+    private static string ReadReferencedName(Stream input, int first, FieldSection section, QpackDynamicTable? table)
+    {
+        var index = ReadInteger(input, first, 4);
+        return ((first & 0x10) != 0 ? At(index) : DynamicAt(section, table, section.Base - 1 - index)).Name;
+    }
+
+    private static HeaderField DynamicAt(FieldSection section, QpackDynamicTable? table, long index) =>
+        table is not null && index < section.RequiredInsertCount
+            ? table.At(index)
+            : throw new InvalidDataException("QPACK reference exceeds Required Insert Count.");
+
+    public static int ReadEncoderInstructions(byte[] bytes, QpackDynamicTable table)
+    {
+        using var input = new MemoryStream(bytes);
+        while (input.Position < input.Length)
+        {
+            var start = (int)input.Position;
+            try
+            {
+                ReadEncoderInstruction(input, table);
+            }
+            catch (InvalidDataException error) when (error.InnerException is EndOfStreamException)
+            {
+                return start;
+            }
+        }
+
+        return (int)input.Position;
+    }
+
+    private static void ReadEncoderInstruction(Stream input, QpackDynamicTable table)
+    {
+        var first = ReadByte(input);
+        if ((first & 0xE0) == 0x20)
+        {
+            table.SetCapacity(ReadInteger(input, first, 5));
+            return;
+        }
+
+        if ((first & 0xE0) == 0)
+        {
+            table.Insert(table.AtRelative(ReadInteger(input, first, 5)));
+            return;
+        }
+
+        var name = (first & 0x80) != 0
+            ? ReadEncoderNameReference(input, first, table)
+            : ReadText(input, ReadInteger(input, first, 5), (first & 0x20) != 0, Huffman.Decode);
+        table.Insert(new(name, ReadText(input, Huffman.Decode)));
+    }
+
+    private static string ReadEncoderNameReference(Stream input, int first, QpackDynamicTable table)
+    {
+        var index = ReadInteger(input, first, 6);
+        return ((first & 0x40) != 0 ? At(index) : table.AtRelative(index)).Name;
     }
 }

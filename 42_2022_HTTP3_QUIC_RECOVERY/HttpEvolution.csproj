@@ -31,6 +31,7 @@
     <Compile Include="../13_1999_HTTP1.1_TLS10/LegacySsl.Client.cs" Link="LegacySsl.Client.cs" />
     <Compile Include="../15_2010_HTTP1.1_TLS_RENEGOTIATION/LegacySsl.cs" Link="LegacySsl.cs" />
     <Compile Include="../common/HeaderCompression/Qpack.cs" Link="common/HeaderCompression/Qpack.cs" />
+    <Compile Include="../common/HeaderCompression/QpackDynamicTable.cs" Link="common/HeaderCompression/QpackDynamicTable.cs" />
     <Compile Include="../common/Quic/QuicAcks.cs" Link="common/Quic/QuicAcks.cs" />
     <Compile Include="../common/Quic/QuicBuffer.cs" Link="common/Quic/QuicBuffer.cs" />
     <Compile Include="../common/Quic/QuicData.cs" Link="common/Quic/QuicData.cs" />

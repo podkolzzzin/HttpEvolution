@@ -8,7 +8,7 @@ internal static class HeaderCompression
     public static int ReadByte(Stream input) =>
         input.ReadByte() is var value && value >= 0
             ? value
-            : throw new InvalidDataException("Truncated header block.");
+            : throw new InvalidDataException("Truncated header block.", new EndOfStreamException());
 
     public static void WriteInteger(Stream output, int value, int bits, int flags = 0)
     {
@@ -72,9 +72,14 @@ internal static class HeaderCompression
 
     public static string ReadText(Stream input, int length, bool huffman, HuffmanDecoder? decodeHuffman)
     {
-        if (length > 65536 || length > input.Length - input.Position)
+        if (length > 65536)
         {
             throw new InvalidDataException("Invalid header string length.");
+        }
+
+        if (length > input.Length - input.Position)
+        {
+            throw new InvalidDataException("Truncated header string.", new EndOfStreamException());
         }
 
         var bytes = new byte[length];

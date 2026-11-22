@@ -184,8 +184,8 @@ export function MemoryTimeline() {
                 </tbody>
             </table>
             <figcaption>
-                Пунктир — можливий кеш TLS-сесій. Демо працюють без відновлення
-                TLS-сесій і з нульовою місткістю QPACK.
+                Пунктир — можливий кеш TLS-сесій. Вимірювання HTTP/3 зроблені
+                з нульовою місткістю QPACK.
             </figcaption>
         </figure>
     );
