@@ -1281,6 +1281,17 @@ export const slides: readonly SlideDefinition[] = [
         extraRefs: ["7541-size", "8446", "9000", "9204"],
     },
     {
+        id: "server-memory",
+        year: "Бенчмарк",
+        chapter: "Еволюція HTTP",
+        title: "Пам’ять\nKestrel і nginx",
+        why: "Обидва сервери віддають той самий короткий HTML. Дивимося, як зростає резидентна пам’ять від десятків до сотень відкритих з’єднань.",
+        changeLabel: "Після закриття з’єднань",
+        change: "Через 2 с після того, як 512 HTTP/3-клієнтів закрили з’єднання, PSS був вищим за прогрітий рівень на 102 МіБ у Kestrel і на 44,66 МіБ у nginx.",
+        interactive: "server-memory",
+        extraRefs: ["linux-pss", "kestrel-http3", "nginx-http3"],
+    },
+    {
         id: "run",
         year: "Далі — код",
         chapter: "Практика",

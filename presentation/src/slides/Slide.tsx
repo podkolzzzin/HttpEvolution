@@ -6,6 +6,7 @@ import { HostPrivacyDemo } from "../demos/HostPrivacyDemo";
 import { HostValidationDemo } from "../demos/HostValidationDemo";
 import { HpackDemo } from "../demos/HpackDemo";
 import { PacketLossDemo } from "../demos/PacketLossDemo";
+import { ServerMemoryDemo } from "../demos/ServerMemoryDemo";
 import { SslTrafficDemo } from "../demos/SslTrafficDemo";
 import { SlideContent } from "./SlideContent";
 
@@ -63,6 +64,8 @@ export const Slide = memo(function Slide(props: Props) {
         }
         case "loss":
             return <SlideContent {...props} exercise={<PacketLossDemo />} />;
+        case "server-memory":
+            return <SlideContent {...props} visual={<ServerMemoryDemo />} />;
         default:
             return (
                 <SlideContent

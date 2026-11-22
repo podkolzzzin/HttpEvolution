@@ -7,7 +7,7 @@ export interface TableExample {
 }
 
 export type InteractiveDemo =
-    "ssl-traffic" | "host" | "frame" | "hpack" | "loss";
+    "ssl-traffic" | "host" | "frame" | "hpack" | "loss" | "server-memory";
 export type Channel = "sse" | "websocket";
 
 export interface SlideDefinition {

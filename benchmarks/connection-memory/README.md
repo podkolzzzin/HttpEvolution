@@ -2,6 +2,8 @@
 
 [Слайд](https://jm.tail65de18.ts.net/http-demo/#connection-memory) · [Сирий CSV](../../presentation/public/connection-memory.csv)
 
+[Порівняння Kestrel і nginx за резидентною пам’яттю](servers.md)
+
 Вимір від 21 листопада 2026 року. Код демо з `fd53db28ada6b517b8a87a4ffb8b5be25e5edfd0`, збірка Release, .NET SDK 10.0.101, runtime 10.0.1, Linux Mint 22.3 (Linux 6.17.0-29-generic, x86-64), AMD Ryzen 5 PRO 4650U. Клієнт на тому самому хості через IPv4 loopback, Python 3.12.3, h2 4.3.0 та aioquic 1.3.0.
 
 | Режим у CSV | Проєкт | Що відбувається після відповіді |

@@ -43,9 +43,10 @@ export function MemoryBenchmark() {
                 керовану купу сервера після GC. Буфери ОС і нативна пам’ять поза
                 виміром.
             </p>
-            <a href="./connection-memory.csv" download>
-                Сирі вимірювання (CSV)
-            </a>
+            <div className="memory-links">
+                <a href="./connection-memory.csv" download>Сирі вимірювання (CSV)</a>
+                <a href="#server-memory">Порівняти Kestrel і nginx →</a>
+            </div>
         </div>
     );
 }

@@ -141,6 +141,10 @@ class Http3Client(QuicConnectionProtocol):
         self.h3 = H3Connection(self._quic)
         self.events = asyncio.Queue()
 
+    @property
+    def closed(self):
+        return self._closed.is_set()
+
     def quic_event_received(self, event):
         if isinstance(event, QuicTerminated):
             self.events.put_nowait(event)
@@ -170,7 +174,7 @@ class Http3Client(QuicConnectionProtocol):
 
 
 @asynccontextmanager
-async def client(mode):
+async def client(mode, *, close_transport=False):
     if mode.alpn == "h3":
         config = QuicConfiguration(is_client=True, alpn_protocols=H3_ALPN,
                                    verify_mode=ssl.CERT_NONE)
@@ -192,7 +196,10 @@ async def client(mode):
         protocol = Http2Client if mode.name.startswith("h2") else Http1Client
         yield protocol(reader, writer, mode)
     finally:
-        writer.close()
+        if close_transport:
+            writer.transport.abort()
+        else:
+            writer.close()
         await writer.wait_closed()
 
 
@@ -203,14 +210,22 @@ async def get_all(connections):
 
 
 @asynccontextmanager
-async def batch(mode, count):
+async def batch(mode, count, *, requests=None, close_transport=False):
+    if requests is None:
+        requests = 2 if mode.name == "h3-two-streams" else 1
     stacks = [AsyncExitStack() for _ in range(count)]
     try:
-        async with asyncio.TaskGroup() as group:
-            tasks = [group.create_task(stack.enter_async_context(client(mode))) for stack in stacks]
-        connections = [task.result() for task in tasks]
-        await get_all(connections)
-        if mode.name == "h3-two-streams":
+        connections = []
+        for start in range(0, count, 64):
+            async with asyncio.TaskGroup() as group:
+                tasks = [
+                    group.create_task(stack.enter_async_context(
+                        client(mode, close_transport=close_transport)
+                    ))
+                    for stack in stacks[start:start + 64]
+                ]
+            connections.extend(task.result() for task in tasks)
+        for _ in range(requests):
             await get_all(connections)
         yield connections
     finally:

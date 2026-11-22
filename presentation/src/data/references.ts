@@ -1,4 +1,16 @@
 export const references = {
+    "linux-pss": [
+        "Linux · PSS",
+        "https://www.kernel.org/doc/html/latest/filesystems/proc.html",
+    ],
+    "kestrel-http3": [
+        "Kestrel · HTTP/3",
+        "https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/http3?view=aspnetcore-10.0",
+    ],
+    "nginx-http3": [
+        "nginx · HTTP/3",
+        "https://nginx.org/en/docs/http/ngx_http_v3_module.html",
+    ],
     w3c: ["W3C · HTTP/0.9", "https://www.w3.org/Protocols/HTTP/AsImplemented"],
     "1945": ["RFC 1945", "https://www.rfc-editor.org/rfc/rfc1945.html"],
     "2068": ["RFC 2068", "https://www.rfc-editor.org/rfc/rfc2068.html"],

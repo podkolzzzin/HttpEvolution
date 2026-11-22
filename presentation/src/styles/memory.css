@@ -188,3 +188,36 @@
         print-color-adjust: exact;
     }
 }
+
+.memory-links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 16px;
+}
+
+.server-memory .switches {
+    margin-bottom: 12px;
+}
+
+.server-memory-table th:first-child {
+    padding-right: 12px;
+}
+
+.server-memory-table th:not(:first-child),
+.server-memory-table td {
+    text-align: right;
+    padding-left: 8px;
+}
+
+.server-memory-table td {
+    white-space: nowrap;
+}
+
+.server-memory .memory-method .memory-results {
+    margin-top: 12px;
+}
+
+.server-memory-table td small {
+    display: block;
+    white-space: normal;
+}
