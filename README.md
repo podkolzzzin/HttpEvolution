@@ -17,9 +17,9 @@ TLS, QUIC, HPACK і QPACK написані тут; криптографічні 
 
 ## Окреме демо з QUIC-потоками
 
-[Нічна обсерваторія](demos/Http3Streams/) показує клієнт і сервер на
-`System.Net.Quic`. Три паралельні GET-запити йдуть окремими `QuicStream` через
-одне з’єднання. Запуск із кореня: `dotnet run --project demos/Http3Streams`.
+[Нічна обсерваторія](demos/Http3Streams/) показує клієнт і сервер із власною реалізацією
+QUIC поверх `UdpClient`. Три паралельні GET-запити йдуть через одне з’єднання.
+Кожному запиту належить свій `QuicStream : Stream`. Запуск із кореня: `dotnet run --project demos/Http3Streams`.
 
 ## Презентація
 

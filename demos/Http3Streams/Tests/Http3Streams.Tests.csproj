@@ -6,7 +6,6 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../Platforms.cs" Link="Platforms.cs" />
     <ProjectReference Include="../Http3Streams.csproj" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit" Version="2.9.3" />

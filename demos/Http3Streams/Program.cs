@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Quic;
 using System.Security.Cryptography;
 using Http3Streams.Application;
 using Http3Streams.Transport;
@@ -16,12 +15,6 @@ internal static class Program
         {
             Console.Error.WriteLine("Usage: Http3Streams [server | client <certificate-sha256>]");
             return 2;
-        }
-
-        if (!QuicListener.IsSupported || !QuicConnection.IsSupported)
-        {
-            Console.Error.WriteLine("System.Net.Quic needs MsQuic. See the setup in demos/Http3Streams/README.md.");
-            return 1;
         }
 
         using var shutdown = new CancellationTokenSource();
@@ -48,7 +41,7 @@ internal static class Program
         {
             return 0;
         }
-        catch (Exception error) when (error is QuicException or System.Security.Authentication.AuthenticationException)
+        catch (Exception error) when (error is IOException or InvalidDataException or CryptographicException or System.Security.Authentication.AuthenticationException or System.Net.Sockets.SocketException or TimeoutException)
         {
             Console.Error.WriteLine(error.Message);
             return 1;

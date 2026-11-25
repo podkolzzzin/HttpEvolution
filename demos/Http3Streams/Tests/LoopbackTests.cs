@@ -1,5 +1,6 @@
 using System.Net;
-using System.Net.Quic;
+using System.Net.Sockets;
+using System.Security.Authentication;
 using System.Security.Cryptography;
 using Http3Streams.Application;
 using Http3Streams.Transport;
@@ -8,7 +9,7 @@ namespace Http3Streams.Tests;
 
 public sealed class LoopbackTests
 {
-    [QuicFact]
+    [Fact]
     public async Task SecondRequestCompletesWhileFirstStreamIsStillOpen()
     {
         var handler = new PausedObservation();
@@ -31,26 +32,54 @@ public sealed class LoopbackTests
         });
     }
 
-    [QuicFact]
-    public async Task StandardHttpClientReadsTheUtf8ResponseOverHttp3()
+    [Fact]
+    public async Task RefusesAnUnpinnedCertificateAndStillAcceptsTheNextClient()
     {
         await WithServerAsync(new Observatory(), async (endpoint, fingerprint, token) =>
         {
-            using var handler = new HttpClientHandler
+            await Assert.ThrowsAsync<AuthenticationException>(
+                () => Http3Client.ConnectAsync(endpoint, new string('0', 64), token));
+
+            await using var client = await Http3Client.ConnectAsync(endpoint, fingerprint, token);
+            Assert.Equal(200, (await client.GetAsync("/saturn", token)).Status);
+        });
+    }
+
+    [Fact]
+    public async Task RetransmitsTheInitialWhenTheFirstDatagramIsLost()
+    {
+        await WithServerAsync(new Observatory(), async (server, fingerprint, token) =>
+        {
+            using var relay = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+            var relayEndpoint = (IPEndPoint)relay.Client.LocalEndPoint!;
+            using var forwarding = CancellationTokenSource.CreateLinkedTokenSource(token);
+
+            async Task ForwardAsync()
             {
-                UseProxy = false,
-                ServerCertificateCustomValidationCallback = (_, cert, _, _) =>
-                    cert?.GetCertHashString(HashAlgorithmName.SHA256) == fingerprint
-            };
-            using var client = new HttpClient(handler)
+                // Discard the first datagram. Keep the same relay port in both directions.
+                var first = await relay.ReceiveAsync(forwarding.Token);
+                var client = first.RemoteEndPoint;
+                while (true)
+                {
+                    var packet = await relay.ReceiveAsync(forwarding.Token);
+                    var destination = packet.RemoteEndPoint.Equals(server) ? client : server;
+                    await relay.SendAsync(packet.Buffer, destination, forwarding.Token);
+                }
+            }
+
+            var pump = ForwardAsync();
+            try
             {
-                DefaultRequestVersion = HttpVersion.Version30,
-                DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
-            };
-            using var response = await client.GetAsync($"https://localhost:{endpoint.Port}/saturn", token);
-            Assert.Equal(HttpVersion.Version30, response.Version);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Contains("Сатурн", await response.Content.ReadAsStringAsync(token));
+                await using var client = await Http3Client.ConnectAsync(relayEndpoint, fingerprint, token);
+                var result = await client.GetAsync("/moon", token);
+                Assert.Equal(200, result.Status);
+                Assert.Contains("Місяць", result.Body);
+            }
+            finally
+            {
+                await forwarding.CancelAsync();
+                await Assert.ThrowsAnyAsync<OperationCanceledException>(() => pump);
+            }
         });
     }
 
@@ -93,17 +122,6 @@ public sealed class LoopbackTests
             }
 
             return await observatory.HandleAsync(path, token);
-        }
-    }
-
-    private sealed class QuicFactAttribute : FactAttribute
-    {
-        public QuicFactAttribute()
-        {
-            if (!QuicListener.IsSupported || !QuicConnection.IsSupported)
-            {
-                Skip = "Loopback integration requires MsQuic.";
-            }
         }
     }
 }

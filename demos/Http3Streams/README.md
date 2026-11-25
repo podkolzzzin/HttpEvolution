@@ -4,13 +4,11 @@
 
 ## Запуск
 
-З кореня репозиторію, з .NET 10 SDK і MsQuic:
+З кореня репозиторію з .NET 10 SDK:
 
 ```sh
 dotnet run --project demos/Http3Streams
 ```
-
-На macOS встанови `brew install libmsquic`. Профіль запуску вже містить стандартні шляхи Homebrew для Apple Silicon та Intel. На Linux потрібен пакет `libmsquic`. Для Windows бібліотека входить до підтримуваного середовища .NET. [Платформні залежності .NET QUIC](https://learn.microsoft.com/en-us/dotnet/fundamentals/networking/quic/quic-overview#platform-dependencies)
 
 Демо саме вибирає вільний порт на loopback і завершує обидві сторони після відповідей. Для показу у двох терміналах запусти сервер на UDP-порту 8456:
 
@@ -24,12 +22,15 @@ dotnet run --project demos/Http3Streams -- server
 curl --http3-only -ki https://127.0.0.1:8456/moon
 ```
 
-## Де подивитися код
+## Від запиту до дейтаграми
 
-1. [Http3Client.GetAsync](Transport/Http3Client.cs) відкриває двонапрямний потік, пише запит і викликає `CompleteWrites()`. Це завершує надсилання запиту. Той самий потік залишається відкритим для читання відповіді.
-2. [Http3Server](Transport/Http3Server.cs) приймає запити паралельно. Він передає шлях обробнику через [IRequestHandler](Application/IRequestHandler.cs). [Observatory](Application/Observatory.cs) відповідає за маршрути й програму спостережень.
-3. [Http3Message](Protocol/Http3Message.cs) приймає звичайний `System.IO.Stream`. У мережі йому передають `System.Net.Quic.QuicStream`, у тестах — `MemoryStream`, який може видавати по одному байту. Код обробки HTTP-повідомлення в обох випадках той самий.
-4. [Http3Session](Transport/Http3Session.cs) володіє QUIC-з’єднанням і одностороннім керівним потоком із SETTINGS. Кодек реалізує HEADERS, DATA, статичний QPACK і читання Huffman. Приклад обмежений HTTPS GET без тіла, фінальними текстовими відповідями та розміром кадру й тіла до 64 КіБ. [HTTP/3](https://www.rfc-editor.org/rfc/rfc9114.html) · [QPACK](https://www.rfc-editor.org/rfc/rfc9204.html)
+1. `Http3Client.GetAsync` відкриває двонапрямний потік. Кодек записує HEADERS у `Stream` і клієнт викликає `CompleteWrites()`. FIN завершує надсилання запиту. З того самого потоку клієнт читає відповідь. [Клієнт](Transport/Http3Client.cs) · [HTTP/3-повідомлення](Protocol/Http3Message.cs)
+2. Власний `QuicStream : Stream` передає з’єднанню ID потоку, зміщення й байти. На прийманні він збирає фрагменти за зміщеннями та повертає їх читачеві по порядку. [Потік](Network/QuicStream.cs) · [Буфер](Network/ReceiveBuffer.cs)
+3. `QuicEngine` формує STREAM-кадри, нумерує й шифрує пакети, обробляє ACK і повторює втрачені дані. З’єднання передає готові дейтаграми через `UdpClient`. Сервер розподіляє їх за адресою відправника та connection ID. [З’єднання](Network/QuicConnection.cs) · [Пакети](Quic/QuicEngine.cs) · [UDP-сервер](Network/QuicListener.cs)
+4. Клієнт і сервер самі обмінюються TLS 1.3 handshake-повідомленнями через CRYPTO-кадри. Клієнт перевіряє відбиток сертифіката, підпис і Finished. Для P-256, SHA-256 і AES-GCM використовуються криптографічні примітиви .NET. [Клієнт TLS](Handshake/ClientHandshake.cs) · [Сервер TLS](Handshake/ServerHandshake.cs)
+5. HTTP/3-сервер декодує шлях і передає його в `IRequestHandler`. `Observatory` відповідає за маршрути й програму спостережень. У тесті цей обробник можна замінити так, щоб призупинити один запит і перевірити незалежність другого потоку. [HTTP/3-сервер](Transport/Http3Server.cs) · [Обробник](Application/Observatory.cs)
+
+Це навчальний профіль для loopback: QUIC v1, TLS 1.3 з ALPN `h3`, фіксовані вікна приймання, статична таблиця QPACK і GET із текстовою відповіддю до 64 КіБ. [QUIC](https://www.rfc-editor.org/rfc/rfc9000.html) · [Захист пакетів](https://www.rfc-editor.org/rfc/rfc9001.html) · [HTTP/3](https://www.rfc-editor.org/rfc/rfc9114.html)
 
 ## Тести
 
@@ -37,10 +38,4 @@ curl --http3-only -ki https://127.0.0.1:8456/moon
 dotnet test demos/Http3Streams/Tests
 ```
 
-На macOS передай тестовому процесу шлях до MsQuic:
-
-```sh
-dotnet test demos/Http3Streams/Tests -e DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix libmsquic)/lib"
-```
-
-Тести [кодека](Tests/MessageTests.cs) перевіряють байти кадрів, фрагментацію та UTF-8. У [мережевому тесті](Tests/LoopbackTests.cs) обробник призупиняє перший запит. Клієнт отримує відповідь на другому потоці, поки перший іще відкритий. Інший тест робить HTTP/3-запит стандартним `HttpClient`. Для цих двох тестів потрібен MsQuic.
+Мережеві тести запускають обидві сторони на UDP loopback. Один тест утримує перший запит відкритим, поки другий отримує відповідь. Інший відкидає першу дейтаграму та перевіряє, що клієнт повторює Initial і завершує запит. Є також перевірки відбитка сертифіката, повторного складання потоку, TLS-підпису, Finished і шифротексту Server Initial із RFC 9001. [Тести](Tests/)

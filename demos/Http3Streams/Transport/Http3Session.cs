@@ -1,4 +1,4 @@
-using System.Net.Quic;
+using Http3Streams.Network;
 using System.Runtime.CompilerServices;
 using Http3Streams.Protocol;
 
@@ -7,8 +7,6 @@ namespace Http3Streams.Transport;
 // Each peer owns one control stream for the entire lifetime of the connection.
 internal sealed class Http3Session : IAsyncDisposable
 {
-    internal const long NoError = 0x100;
-    internal const long RequestCancelled = 0x10c;
     private readonly QuicStream control;
     private int peerControlOpened;
 
@@ -28,7 +26,7 @@ internal sealed class Http3Session : IAsyncDisposable
         QuicStream? control = null;
         try
         {
-            control = await connection.OpenOutboundStreamAsync(QuicStreamType.Unidirectional, cancellationToken);
+            control = connection.OpenStream(bidirectional: false);
             // Stream type 0 (control), frame type 4 (SETTINGS), empty payload (static QPACK only).
             await control.WriteAsync(new byte[] { 0, 4, 0 }, cancellationToken);
             return new Http3Session(connection, control);
@@ -51,13 +49,18 @@ internal sealed class Http3Session : IAsyncDisposable
         {
             // Long-lived control streams must not occupy the last worker available to requests.
             await Parallel.ForEachAsync(AcceptStreamsAsync(),
-                new ParallelOptions { MaxDegreeOfParallelism = 32, CancellationToken = cancellationToken },
+                new ParallelOptions { MaxDegreeOfParallelism = QuicConnection.MaxInboundStreams, CancellationToken = cancellationToken },
                 async (stream, token) =>
                 {
                     await using (stream)
                     {
-                        if (stream.Type == QuicStreamType.Bidirectional && onRequest is not null)
+                        if (stream.Bidirectional)
                         {
+                            if (onRequest is null)
+                            {
+                                throw new InvalidDataException("Only the client can initiate HTTP/3 request streams.");
+                            }
+
                             await onRequest(stream, token);
                         }
                         else
@@ -67,14 +70,13 @@ internal sealed class Http3Session : IAsyncDisposable
                     }
                 });
         }
-        catch (QuicException error) when (error.QuicError is QuicError.ConnectionAborted
-            or QuicError.OperationAborted or QuicError.ConnectionIdle or QuicError.ConnectionTimeout)
-        {
-            // Local or remote shutdown ends the accept loop and its stream workers together.
-        }
         catch (Exception error) when (error is InvalidDataException or EndOfStreamException)
         {
-            await Connection.CloseAsync(0x101, CancellationToken.None); // H3_GENERAL_PROTOCOL_ERROR
+            await Connection.CloseAsync(0x101); // H3_GENERAL_PROTOCOL_ERROR
+        }
+        catch (IOException)
+        {
+            // Closing the QUIC connection releases the inbound stream readers.
         }
     }
 
@@ -83,7 +85,7 @@ internal sealed class Http3Session : IAsyncDisposable
     {
         while (true)
         {
-            yield return await Connection.AcceptInboundStreamAsync(cancellationToken);
+            yield return await Connection.AcceptStreamAsync(cancellationToken);
         }
     }
 
@@ -128,14 +130,7 @@ internal sealed class Http3Session : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        try
-        {
-            await Connection.CloseAsync(NoError, CancellationToken.None);
-        }
-        finally
-        {
-            await control.DisposeAsync();
-            await Connection.DisposeAsync();
-        }
+        await Connection.DisposeAsync();
+        await control.DisposeAsync();
     }
 }
