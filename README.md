@@ -15,6 +15,12 @@ TLS, QUIC, HPACK і QPACK написані тут; криптографічні 
 на окремих рядках, блоки для умов і циклів, окремі оголошення та оператори.
 Перевірка: `dotnet format HttpEvolution.slnx --verify-no-changes --no-restore`.
 
+## Окреме демо з QUIC-потоками
+
+[Нічна обсерваторія](demos/Http3Streams/) показує клієнт і сервер на
+`System.Net.Quic`. Три паралельні GET-запити йдуть окремими `QuicStream` через
+одне з’єднання. Запуск із кореня: `dotnet run --project demos/Http3Streams`.
+
 ## Презентація
 
 [Фронтенд](presentation/) на React, TypeScript і Vite. Потрібен Node.js

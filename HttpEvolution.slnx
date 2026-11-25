@@ -135,4 +135,9 @@
   <Folder Name="/common/Wire/">
     <File Path="common/Wire/Wire.cs" />
   </Folder>
+  <Folder Name="/demos/" />
+  <Folder Name="/demos/Http3Streams/">
+    <Project Path="demos/Http3Streams/Http3Streams.csproj" />
+    <Project Path="demos/Http3Streams/Tests/Http3Streams.Tests.csproj" />
+  </Folder>
 </Solution>
