@@ -1,5 +1,6 @@
 using System.Net;
 using System.Security.Cryptography;
+using System.Text.Encodings.Web;
 using Http3Streams.Application;
 using Http3Streams.Transport;
 
@@ -58,6 +59,8 @@ internal static class Program
 
         if (!runClient)
         {
+            server.RequestServed += (connectionId, id, path, status) =>
+                Console.WriteLine($"CID {connectionId}   stream {id,2}   GET {JavaScriptEncoder.Default.Encode(path),-8}   HTTP/3 {status}");
             Console.WriteLine($"dotnet run --project demos/Http3Streams -- client {fingerprint}");
             await server.RunAsync(cancellationToken);
             return;

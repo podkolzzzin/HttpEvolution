@@ -24,6 +24,7 @@ internal sealed class QuicConnection : IAsyncDisposable
 
     // The peer can open the advertised number of streams in each directionality class.
     internal const int MaxInboundStreams = 2 * TransportParameters.StreamCount;
+    internal string Id => Convert.ToHexString(engine.LocalId);
     internal object Gate { get; } = new();
     internal bool Ended
     {

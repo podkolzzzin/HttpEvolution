@@ -19,6 +19,7 @@ public sealed class Http3Server : IAsyncDisposable
     }
 
     public IPEndPoint LocalEndPoint => listener.LocalEndPoint;
+    internal event Action<string, long, string, int>? RequestServed;
 
     public static Task<Http3Server> ListenAsync(
         IPEndPoint endpoint, X509Certificate2 certificate, IRequestHandler handler,
@@ -38,7 +39,7 @@ public sealed class Http3Server : IAsyncDisposable
                 try
                 {
                     await using var session = await Http3Session.StartAsync(connection, token);
-                    await session.ReceiveAsync(ServeRequestAsync, token);
+                    await session.ReceiveAsync((stream, ct) => ServeRequestAsync(connection, stream, ct), token);
                 }
                 catch (IOException)
                 {
@@ -56,7 +57,7 @@ public sealed class Http3Server : IAsyncDisposable
         }
     }
 
-    private async Task ServeRequestAsync(QuicStream stream, CancellationToken cancellationToken)
+    private async Task ServeRequestAsync(QuicConnection connection, QuicStream stream, CancellationToken cancellationToken)
     {
         try
         {
@@ -64,6 +65,7 @@ public sealed class Http3Server : IAsyncDisposable
             var response = await handler.HandleAsync(path, cancellationToken);
             await Http3Message.WriteResponseAsync(stream, response.Status, response.Body, cancellationToken);
             stream.CompleteWrites();
+            RequestServed?.Invoke(connection.Id, stream.Id, path, response.Status);
         }
         catch (Exception error) when (error is InvalidDataException or EndOfStreamException)
         {
