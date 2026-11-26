@@ -1,0 +1,106 @@
+.hp-repeat {
+    font-size: clamp(16px, 1.5vw, 21px);
+    line-height: 1.45;
+}
+
+.hp-repeat table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.hp-repeat caption {
+    padding-bottom: 1em;
+    text-align: left;
+}
+
+.hp-repeat :is(th, td) {
+    padding: .65em .8em;
+    vertical-align: baseline;
+}
+
+.hp-repeat thead th {
+    color: var(--muted);
+    font-size: .85em;
+    border-bottom: 1px solid var(--line);
+}
+
+.hp-repeat tbody tr + tr {
+    border-top: 1px solid var(--line);
+}
+
+.hp-repeat tbody th {
+    font-weight: 550;
+}
+
+.hp-repeat code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    overflow-wrap: anywhere;
+    font-size: .93em;
+}
+
+.hp-repeat-index {
+    padding: .08em .35em;
+    background: var(--accent);
+    color: var(--dark);
+    font-weight: 750;
+}
+
+.hp-repeat small {
+    display: block;
+    margin-top: .35em;
+    color: var(--muted);
+    font-size: .8em;
+}
+
+.hp-repeat tfoot {
+    color: white;
+    background: var(--dark);
+}
+
+.hp-repeat tfoot td {
+    font-size: 1.25em;
+    font-weight: 700;
+}
+
+.hp-repeat tfoot td:last-child {
+    color: var(--accent);
+}
+
+.hp-repeat p {
+    max-width: 84ch;
+    margin: 1em 0 .4em;
+}
+
+.hp-repeat summary {
+    width: fit-content;
+    padding-block: .4em;
+    cursor: pointer;
+    font-weight: 650;
+    font-size: .9em;
+}
+
+.hp-repeat details p {
+    margin-top: .2em;
+}
+
+@media (max-width: 650px) {
+    .hp-repeat :is(th, td) {
+        padding: .6em .35em;
+    }
+
+    .hp-repeat thead th,
+    .hp-repeat tbody th,
+    .hp-repeat tfoot th {
+        font-size: .88em;
+    }
+
+    .hp-repeat tbody th code {
+        display: block;
+    }
+
+    .hp-repeat tfoot td {
+        font-size: 1.05em;
+    }
+}

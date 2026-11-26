@@ -1,34 +1,6 @@
-import type { ReactNode } from "react";
+import { HighlightedCode } from "./HighlightedCode";
 
 export type CopyCode = (code: string) => void;
-
-const tokenPattern =
-    /(\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:using|var|if|else|new|return|for|foreach|while|continue|break|true|false|null|int|byte|bool|throw|await|static|sealed|class|public|void|in|is|not|or|stackalloc)\b|\b(?:0x[\da-fA-F]+|\d+)\b)/g;
-
-function tokenClass(token: string) {
-    if (token.startsWith("//")) return "comment";
-    if (/^["']/.test(token)) return "str";
-    if (/^\d/.test(token)) return "num";
-    return "kw";
-}
-
-function highlight(code: string) {
-    const parts: ReactNode[] = [];
-    let offset = 0;
-
-    for (const { 0: token, index } of code.matchAll(tokenPattern)) {
-        parts.push(code.slice(offset, index));
-        parts.push(
-            <span className={tokenClass(token)} key={index}>
-                {token}
-            </span>,
-        );
-        offset = index + token.length;
-    }
-    parts.push(code.slice(offset));
-
-    return parts;
-}
 
 type Props = {
     code: string;
@@ -73,7 +45,7 @@ export function CodeCard({
                 )}
             </div>
             <pre tabIndex={0} aria-label="Приклад коду">
-                <code>{highlight(code)}</code>
+                <HighlightedCode code={code} language={language} />
             </pre>
             <div className="code-foot">{caption}</div>
         </div>

@@ -5,6 +5,9 @@
   <Folder Name="/02_1996_HTTP1.0_HEADERS/">
     <Project Path="02_1996_HTTP1.0_HEADERS/HttpEvolution.csproj" />
   </Folder>
+  <Folder Name="/02b_1996_HTTP1.0_CONTENT_ENCODING/">
+    <Project Path="02b_1996_HTTP1.0_CONTENT_ENCODING/HttpEvolution.csproj" />
+  </Folder>
   <Folder Name="/03_1996_HTTP1.0_HEAD/">
     <Project Path="03_1996_HTTP1.0_HEAD/HttpEvolution.csproj" />
   </Folder>

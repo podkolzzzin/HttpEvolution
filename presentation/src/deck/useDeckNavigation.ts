@@ -10,13 +10,24 @@ import { slides } from "../data/slides";
 const storageKey = "http-evolution-slide";
 const lastIndex = slides.length - 1;
 
+const legacySlides: Record<string, string> = {
+    "connection-memory": "server-memory",
+    "head-of-line": "mobile-loss",
+    "quic-udp": "quic-revolution",
+    "http3-response": "http3-arrives",
+    ...Object.fromEntries(["ssl3-premaster", "ssl3-master", "ssl3-keys", "ssl3-finished",
+        "ssl3-mac", "ssl3-records", "ssl3-pin", "https-price"].map(id => [id, "ssl3-messages"])),
+};
+
+function indexFromId(id: string | null) {
+    const slideId = id && (legacySlides[id] ?? id);
+    return Math.max(0, slides.findIndex((slide) => slide.id === slideId));
+}
+
 function indexFromHash() {
     try {
         const id = decodeURIComponent(window.location.hash.slice(1));
-        return Math.max(
-            0,
-            slides.findIndex((slide) => slide.id === id),
-        );
+        return indexFromId(id);
     } catch {
         return 0;
     }
@@ -27,10 +38,7 @@ function initialIndex() {
 
     try {
         const savedId = localStorage.getItem(storageKey);
-        return Math.max(
-            0,
-            slides.findIndex((slide) => slide.id === savedId),
-        );
+        return indexFromId(savedId);
     } catch {
         return 0;
     }

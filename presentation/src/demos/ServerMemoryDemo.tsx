@@ -1,6 +1,8 @@
 import { useState } from "react";
-import data from "../data/serverMemory.json";
+import loaded from "../data/serverMemory.json";
+import single from "../data/singleServerMemory.json";
 
+const loads = [0, 1, 64, 256, 512] as const;
 const protocols = [
     ["http11", "HTTP/1.1"],
     ["http11-tls", "HTTP/1.1 + TLS 1.3"],
@@ -8,112 +10,81 @@ const protocols = [
     ["h2-tls", "HTTP/2 + TLS 1.3"],
     ["h3", "HTTP/3 (QUIC)"],
 ] as const;
-const samples = [
-    ["warm", "Прогрітий"],
-    ["64", "64"],
-    ["256", "256"],
-    ["512", "512"],
-    ["closed", "Після закриття"],
-] as const;
-const controls = [
-    ["hpack", "HPACK · індексація заголовка на 4 000 ASCII-символів"],
-    ["quicStreams", "HTTP/3 · 8 завершених потоків замість одного"],
-] as const;
-const servers = ["kestrel", "nginx"] as const;
-const signedMiB = new Intl.NumberFormat("uk", {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 2,
-    signDisplay: "exceptZero",
-});
-const unsignedMiB = new Intl.NumberFormat("uk", {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 2,
-});
+const servers = [["demo", "Наш сервер"], ["nginx", "nginx"], ["kestrel", "Kestrel"]] as const;
+const mib = new Intl.NumberFormat("uk", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-function formatMemory(kib: number) {
-    return signedMiB.format(kib / 1024);
+function readPss(
+    protocol: (typeof protocols)[number][0],
+    server: (typeof servers)[number][0],
+    load: (typeof loads)[number],
+) {
+    if (load === 0 || load === 1) {
+        return single.modes[protocol][server][load === 0 ? "warm" : "idle"].pss;
+    }
+    if (server === "demo") return null;
+    return loaded.modes[protocol][server].idlePss[load];
 }
 
 export function ServerMemoryDemo() {
-    const [sample, setSample] = useState<(typeof samples)[number][0]>("512");
+    const [load, setLoad] = useState<(typeof loads)[number]>(1);
+
+    const rows = protocols.map(([id, title]) => ({
+        id,
+        title,
+        readings: servers.map(([server]) => ({ server, kib: readPss(id, server, load) })),
+    }));
+    const maxKiB = Math.max(...rows.flatMap(row => row.readings.map(({ kib }) => kib ?? 0)));
+
     return (
-        <div className="memory-benchmark server-memory">
-            <div className="switches" role="group" aria-label="Стан з’єднань">
-                {samples.map(([id, label]) => (
-                    <button key={id} type="button" aria-pressed={sample === id}
-                        onClick={() => setSample(id)}>
-                        {label}
-                    </button>
-                ))}
-            </div>
-            <table className="memory-results server-memory-table">
+        <div className="memory-benchmark">
+            <fieldset className="sample-picker">
+                <legend>Відкриті з’єднання</legend>
+                <div className="switches">
+                    {loads.map(count => (
+                        <button key={count} type="button" aria-pressed={load === count}
+                            onClick={() => setLoad(count)}>
+                            {count}
+                        </button>
+                    ))}
+                </div>
+            </fieldset>
+            <table className="memory-results">
                 <caption>
-                    {sample === "warm" ? "PSS, МіБ · прогрітий сервер без клієнтів" :
-                        `Δ PSS, МіБ · ${sample === "closed"
-                            ? "через 2 с після закриття 512 з’єднань"
-                            : `${sample} відкритих з’єднань`}`}
+                    Пам’ять процесів (PSS), МіБ
+                    <small>100% для цього навантаження — {mib.format(maxKiB / 1024)} МіБ</small>
                 </caption>
                 <thead>
                     <tr>
                         <th scope="col">Протокол</th>
-                        <th scope="col">Kestrel</th>
-                        <th scope="col">nginx</th>
+                        {servers.map(([id, title]) => <th scope="col" key={id} data-server={id}>{title}</th>)}
                     </tr>
                 </thead>
                 <tbody>
-                    {protocols.map(([id, title]) => (
+                    {rows.map(({ id, title, readings }) => (
                         <tr key={id}>
                             <th scope="row">{title}</th>
-                            {servers.map(server => {
-                                const row = data.modes[id][server];
-                                const memory = sample === "warm"
-                                    ? unsignedMiB.format(row.warm / 1024)
-                                    : formatMemory(sample === "closed" ? row.closed : row.idle[sample]);
-                                return <td key={server}>{memory}</td>;
+                            {readings.map(({ server, kib }) => {
+                                if (kib === null) return <td key={server}>—</td>;
+                                const value = kib / 1024;
+                                return (
+                                    <td key={server} data-server={server}>
+                                        {mib.format(value)}
+                                        <span className="pss-track" aria-hidden="true">
+                                            <span style={{ width: `${maxKiB > 0 ? 100 * kib / maxKiB : 0}%` }} />
+                                        </span>
+                                    </td>
+                                );
                             })}
                         </tr>
                     ))}
                 </tbody>
             </table>
-            <p>Медіана {data.repeats} запусків. PSS охоплює керовані й нативні сторінки та ділить спільні сторінки між процесами. Δ показує зміну відносно прогрітого сервера.</p>
-            <details className="wire memory-method">
-                <summary>Умови, HPACK і потоки HTTP/3</summary>
-                <div>
-                    <p>Kestrel .NET 10.0.1 і nginx 1.30.7 з двома воркерами. Linux, loopback, той самий сертифікат і відповідь на 22 байти. Мережеві буфери ядра залишаються поза PSS.</p>
-                    <table className="memory-results server-memory-table">
-                        <caption>Різниця PSS між контрольними сценаріями при 512 з’єднаннях, МіБ</caption>
-                        <thead>
-                            <tr>
-                                <th scope="col">Контроль</th>
-                                <th scope="col">Kestrel</th>
-                                <th scope="col">nginx</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {controls.map(([id, title]) => (
-                                <tr key={id}>
-                                    <th scope="row">{title}</th>
-                                    {servers.map(server => {
-                                        const { median, range } = data.controls[id][server];
-                                        return (
-                                            <td key={server}>
-                                                {formatMemory(median)}
-                                                <small>{range.map(formatMemory).join(" … ")}</small>
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <p>Під медіаною наведено діапазон повторів. Контроль HPACK порівнює той самий заголовок з індексацією та без неї. Різниця PSS охоплює весь процес, зокрема стан алокаторів і буферів.</p>
-                    <p>На HTTP/0.9 Kestrel повернув 400, nginx віддав HTML без заголовків. Після звичайного HTTP/1.0 без keep-alive обидва сервери закрили TCP.</p>
-                </div>
-            </details>
-            <div className="memory-links">
-                <a href="./server-memory.csv" download>Сирі вимірювання (CSV)</a>
-                <a href="./server-memory-legacy.csv" download>Проби HTTP/0.9 і 1.0 (CSV)</a>
-            </div>
+            {load > 1 && (
+                <p>Прочерк означає, що навантаження перевищує ліміт нашого демо. Воно обслуговує одного TCP-клієнта або до 32 одночасних QUIC-сесій.</p>
+            )}
+            <a href={load > 1 ? "./server-memory.csv" : "./single-server-memory.csv"} download>
+                Сирі виміри (CSV)
+            </a>
         </div>
     );
 }

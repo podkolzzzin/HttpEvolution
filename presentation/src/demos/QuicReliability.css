@@ -1,0 +1,51 @@
+.quic-overlap {
+    margin: 0;
+}
+.quic-overlap table {
+    width: 100%;
+    border-spacing: 3px 6px;
+    color: var(--qw-ink);
+    font-family: ui-monospace, monospace;
+}
+.quic-overlap caption {
+    padding-bottom: 20px;
+    text-align: left;
+    font: 650 clamp(18px, 1.8vw, 24px)/1.25 system-ui, sans-serif;
+}
+.quic-overlap th {
+    color: var(--qw-muted);
+    font-size: 13px;
+}
+.quic-overlap tr > th:first-child {
+    text-align: left;
+    padding-right: 4px;
+}
+.quic-overlap td {
+    width: 11%;
+    padding-block: 8px;
+    border-radius: 4px;
+    color: var(--qw-muted);
+    background: var(--qw-panel);
+    font-size: clamp(16px, 1.7vw, 23px);
+    font-weight: 650;
+    text-align: center;
+}
+.quic-overlap td.filled {
+    color: var(--qw-ink);
+    background: #395844;
+}
+.quic-overlap td.repeated {
+    color: var(--qw-bg);
+    background: var(--qw-lime);
+    text-decoration: underline double;
+}
+.quic-overlap tr:last-child td.filled {
+    background: transparent;
+    border-bottom: 2px solid var(--qw-lime);
+}
+.quic-overlap figcaption {
+    border-top: 1px solid var(--qw-edge);
+    margin-top: 16px;
+    padding-top: 14px;
+    font-size: 16px;
+}

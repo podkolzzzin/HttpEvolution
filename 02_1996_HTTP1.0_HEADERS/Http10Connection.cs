@@ -24,7 +24,13 @@ internal sealed class Http10Connection(Stream stream)
         var body = Encoding.ASCII.GetBytes(html);
         if (versioned)
         {
-            stream.Write(Encoding.ASCII.GetBytes($"HTTP/1.0 {status}\r\nContent-Type: text/html\r\nContent-Length: {body.Length}\r\n\r\n"));
+            var headers = $"""
+                HTTP/1.0 {status}
+                Content-Type: text/html
+                Content-Length: {body.Length}
+                """.ReplaceLineEndings("\r\n") + "\r\n\r\n";
+
+            stream.Write(Encoding.ASCII.GetBytes(headers));
         }
 
         stream.Write(body);

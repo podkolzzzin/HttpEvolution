@@ -16,23 +16,23 @@ function describe(field: Field, mode: Mode) {
     if (field === "sni") {
         return mode === "ech"
             ? [
-                  "Що саме змінив ECH",
-                  "ECH шифрує внутрішній ClientHello відкритим ключем сервера, який браузер отримав заздалегідь, зазвичай із DNS. Сервер може розшифрувати ім’я, спостерігач — ні. HTTP-запит шифрується і з ECH, і без нього.",
+                  "ECH · захист імені",
+                  "Відкритий ключ ECH із конфігурації, зазвичай через DNS → внутрішній ClientHello під шифруванням",
               ]
             : [
-                  "HTTPS без ECH: сайт видно, сторінку — ні",
-                  "Провайдер читає example.com у полі SNI першого повідомлення TLS. Шлях /orders і HTTP-заголовок Host уже зашифровані. Домен видає саме SNI, а не Host.",
+                  "Без ECH · відкритий SNI",
+                  "Спостерігач → example.com із ClientHello · шлях і Host усередині TLS",
               ];
     }
 
     return mode === "http"
         ? [
               "HTTP без шифрування",
-              "У мережі видно і Host: example.com, і GET /orders. Додавання HTTPS приховає цей запит, але без ECH ім’я сайту все ще читатиметься у привітанні TLS.",
+              "Відкриті дані → Host: example.com і GET /orders",
           ]
         : [
               "Host усередині зашифрованого HTTP",
-              "Host і SNI передають те саме ім’я на різних етапах. Host потрібен HTTP-серверу після встановлення TLS; SNI потрібен раніше, під час налаштування TLS. Без ECH саме ця рання копія імені лишається відкритою.",
+              "SNI → вибір сертифіката під час handshake · Host → вибір сайту після розшифрування HTTP",
           ];
 }
 
@@ -153,11 +153,10 @@ export function HostPrivacyDemo() {
 
     return (
         <div className="host-privacy">
-            <h2>Де саме видно домен у HTTPS?</h2>
+            <h2>Домен на двох рівнях</h2>
             <p className="host-intro">
-                Те саме ім’я сайту є у <strong>двох різних місцях</strong>: SNI
-                у привітанні TLS та Host у HTTP-запиті. HTTPS без ECH шифрує
-                лише другу з цих двох копій.
+                <strong>SNI</strong> у привітанні TLS · <strong>Host</strong> у
+                HTTP-запиті
             </p>
             <div className="host-address">
                 <span>Відкриваємо в браузері</span>
@@ -184,33 +183,26 @@ export function HostPrivacyDemo() {
                 </div>
             </div>
             <p className="host-ech">
-                <strong>
-                    ECH = Encrypted Client Hello — «зашифроване привітання
-                    клієнта».
-                </strong>{" "}
-                Розширення TLS 1.3: шифрує внутрішнє початкове повідомлення
-                браузера разом зі справжнім ім’ям сайту. Перемкни режим і
-                порівняй перший крок.
+                <strong>ECH · Encrypted Client Hello</strong> · TLS 1.3 ·
+                шифрування внутрішнього привітання й справжнього імені сайту
             </p>
             <div>
                 {tls && (
                     <section className="host-phase">
-                        <h3>1. Спочатку — «до якого сайту підключаємося?»</h3>
+                        <h3>1 · Ім’я сайту в TLS</h3>
                         <p>
-                            <strong>ClientHello</strong> — перше повідомлення
-                            браузера в TLS. <strong>SNI</strong> (Server Name
-                            Indication) — поле з іменем сайту, щоб сервер міг
-                            вибрати потрібний сертифікат.
+                            ClientHello → SNI (Server Name Indication) →
+                            сертифікат сайту
                         </p>
                         <Flow
                             browser={
                                 <Endpoint
-                                    title="Браузер готує привітання"
+                                    title="Браузер · привітання"
                                     code={"ClientHello\nSNI: example.com"}
                                     note={
                                         ech
-                                            ? "ECH шифрує внутрішнє привітання до відправлення."
-                                            : "Без ECH це привітання йде відкрито."
+                                            ? "Внутрішній ClientHello → ECH"
+                                            : "Відкритий ClientHello"
                                     }
                                 />
                             }
@@ -235,8 +227,7 @@ export function HostPrivacyDemo() {
                                                 ім’я:
                                                 <br />
                                                 <code>public.example</code>
-                                                Умовне спільне ім’я провайдера,
-                                                а не сайту.
+                                                Спільне ім’я провайдера
                                             </small>
                                         </>
                                     ) : (
@@ -245,23 +236,20 @@ export function HostPrivacyDemo() {
                                                 ClientHello → поле SNI
                                             </small>
                                             <code>example.com</code>
-                                            <b>Ось тут домен видно відкрито.</b>
-                                            <small>
-                                                Це можна прочитати без ключа
-                                                шифрування.
-                                            </small>
+                                            <b>Відкрите ім’я</b>
+                                            <small>Доступне спостерігачу</small>
                                         </>
                                     )}
                                 </Observer>
                             }
                             server={
                                 <Endpoint
-                                    title="Сервер отримує ім’я"
+                                    title="Сервер · вибір сертифіката"
                                     code="example.com"
                                     note={
                                         ech
-                                            ? "Розшифровує внутрішній ClientHello ключем ECH."
-                                            : "Читає SNI та вибирає сертифікат сайту."
+                                            ? "Розшифрування ключем ECH"
+                                            : "Ім’я сайту із SNI"
                                     }
                                 />
                             }
@@ -270,32 +258,22 @@ export function HostPrivacyDemo() {
                 )}
                 <section className="host-phase">
                     <h3>
-                        {tls
-                            ? "2. Потім — «дай сторінку /orders»"
-                            : "HTTP · запит одразу йде відкрито"}
+                        {tls ? "2 · Запит /orders" : "HTTP · відкритий запит"}
                     </h3>
                     <p>
-                        {tls ? (
-                            <>
-                                TLS уже узгодив ключі сеансу.{" "}
-                                <strong>
-                                    Тепер увесь HTTP-запит шифрується
-                                </strong>
-                                , включно із заголовком Host.
-                            </>
-                        ) : (
-                            "Без TLS немає ні захищеного привітання, ні шифрування HTTP-запиту."
-                        )}
+                        {tls
+                            ? "Ключі сеансу → шифрування всього HTTP-запиту"
+                            : "Без TLS · відкриті заголовки й тіло"}
                     </p>
                     <Flow
                         browser={
                             <Endpoint
-                                title="Браузер готує HTTP-запит"
+                                title="Браузер · HTTP-запит"
                                 code={request}
                                 note={
                                     tls
-                                        ? "Шифрує запит ключами сеансу TLS."
-                                        : "Передає текст у TCP без шифрування."
+                                        ? "Шифрування ключами сеансу"
+                                        : "Текст у TCP"
                                 }
                             />
                         }
@@ -309,35 +287,26 @@ export function HostPrivacyDemo() {
                                 {tls ? (
                                     <>
                                         <Sealed>HTTP-запит прихований</Sealed>
-                                        <b>
-                                            Ані /orders, ані Host не читаються.
-                                        </b>
-                                        <small>
-                                            У мережі — шифротекст. Зміст
-                                            доступний лише кінцевим сторонам із
-                                            ключами.
-                                        </small>
+                                        <b>Шлях і Host під шифруванням</b>
+                                        <small>У мережі · шифротекст</small>
                                     </>
                                 ) : (
                                     <>
                                         <code>Host: example.com</code>
-                                        <b>Домен і шлях /orders відкриті.</b>
-                                        <small>
-                                            Увесь HTTP-запит можна прочитати без
-                                            ключа.
-                                        </small>
+                                        <b>Домен і шлях /orders</b>
+                                        <small>Доступний увесь запит</small>
                                     </>
                                 )}
                             </Observer>
                         }
                         server={
                             <Endpoint
-                                title="HTTP-сервер читає запит"
+                                title="Сервер · запит HTTP"
                                 code={request}
                                 note={
                                     tls
-                                        ? "Після розшифрування TLS."
-                                        : "Той самий відкритий текст."
+                                        ? "Після розшифрування TLS"
+                                        : "Відкритий текст"
                                 }
                             />
                         }
@@ -354,7 +323,7 @@ export function HostPrivacyDemo() {
                 <p>{body}</p>
             </div>
             <p className="host-history">
-                <strong>Коли з’явився захист імені?</strong>{" "}
+                <strong>Захист імені</strong>{" "}
                 <a
                     href="https://blog.cloudflare.com/encrypted-sni/"
                     target="_blank"
@@ -362,7 +331,7 @@ export function HostPrivacyDemo() {
                 >
                     2018 — експериментальний ESNI (Encrypted SNI)
                 </a>
-                ;{" "}
+                ·{" "}
                 <a
                     href="https://blog.cloudflare.com/announcing-encrypted-client-hello/"
                     target="_blank"
@@ -370,7 +339,7 @@ export function HostPrivacyDemo() {
                 >
                     2023 — впровадження ECH у Cloudflare
                 </a>
-                ;{" "}
+                ·{" "}
                 <a
                     href="https://www.rfc-editor.org/rfc/rfc9849.html"
                     target="_blank"
@@ -378,21 +347,18 @@ export function HostPrivacyDemo() {
                 >
                     березень 2026 — стандарт ECH
                 </a>
-                . ECH має підтримуватися клієнтом і сервером та успішно
-                узгодитися.
+                · підтримка ECH обома сторонами
             </p>
             <p className="traffic-boundaries">
-                Схема показує вміст повідомлень, а не межі пакетів. Навіть з ECH
-                видно IP-адреси, розміри й час передавання; незашифрований DNS
-                також може видати домен. Host з’явився у HTTP/1.1 у 1997-му;{" "}
+                Метадані навіть з ECH · IP, розміри, час · ризик відкритого DNS.
+                1997 · Host.{" "}
                 <a
                     href="https://www.rfc-editor.org/rfc/rfc3546.html#section-3.1"
                     target="_blank"
                     rel="noopener"
                 >
-                    SNI стандартизували у 2003-му
+                    2003 · стандарт SNI
                 </a>
-                . Тут порівнюємо їхню подальшу роботу в HTTPS.
             </p>
         </div>
     );

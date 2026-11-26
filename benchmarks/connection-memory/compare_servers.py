@@ -9,7 +9,7 @@ from pathlib import Path
 
 from hpack import HeaderTuple, NeverIndexedHeaderTuple
 
-from run import BODY, HERE, HOST, Http3Client, Mode, batch
+from run import BODY, HERE, HOST, ROOT, MODES as DEMO_MODES, Http3Client, Mode, batch
 
 PORT = 18080
 LEVELS = (64, 256, 512)
@@ -89,7 +89,11 @@ async def server_process(server, binary, cpus, certificate, mode):
     protocol, alpn, _, _ = MODES[mode]
     with tempfile.TemporaryDirectory(prefix="http-server-") as temporary:
         directory = Path(temporary)
-        if server == "kestrel":
+        if server == "demo":
+            demo = next(item for item in DEMO_MODES if item.name == mode)
+            app = ROOT / demo.project / "bin/Release/net10.0/HttpEvolution.dll"
+            command = ["dotnet", str(app), *demo.args]
+        elif server == "kestrel":
             command = ["dotnet", str(KESTREL), protocol, str(PORT), str(certificate / "server.pfx")]
         else:
             command = nginx_command(binary, directory, certificate, protocol, bool(alpn))
@@ -99,9 +103,14 @@ async def server_process(server, binary, cpus, certificate, mode):
             )
             try:
                 async with asyncio.timeout(10):
-                    if server == "kestrel":
-                        if await process.stdout.readline() != b"ready\n":
-                            raise RuntimeError("Kestrel failed to start")
+                    if server != "nginx":
+                        ready = await process.stdout.readline()
+                        if server == "demo":
+                            started = f"on {HOST}:{demo.port}".encode() in ready
+                        else:
+                            started = ready == b"ready\n"
+                        if not started:
+                            raise RuntimeError(f"{server} failed to start: {ready!r}")
                         pids = (process.pid,)
                     else:
                         while process.returncode is None:

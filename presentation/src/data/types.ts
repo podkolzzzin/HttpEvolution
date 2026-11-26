@@ -7,8 +7,55 @@ export interface TableExample {
 }
 
 export type InteractiveDemo =
-    "ssl-traffic" | "host" | "frame" | "hpack" | "loss" | "server-memory";
+    | "body-gzip"
+    | "request-compression"
+    | "body-codecs"
+    | "ssl-traffic"
+    | "host"
+    | "frame"
+    | "hpack"
+    | "loss"
+    | "server-memory"
+    | "timeline"
+    | "resources"
+    | "ssl-design"
+    | "keepalive"
+    | "realtime-years"
+    | "ws-chat"
+    | "wss"
+    | "ws-bytes"
+    | "rtc"
+    | "queue"
+    | "streams"
+    | "literal"
+    | "repeat"
+    | "huffman-bits"
+    | "windows"
+    | "continuation"
+    | "h2-state"
+    | "gallery"
+    | "tls-changes"
+    | "tls-exchange"
+    | "tls-finished"
+    | "alpn-choice"
+    | "udp-stack"
+    | "quic-protection"
+    | "quic-reliability"
+    | "quic-offsets"
+    | "quic-flow"
+    | "quic-recovery"
+    | "operator-limits"
+    | "instagram-rollout";
 export type Channel = "sse" | "websocket";
+export type AnimationKind =
+    | "hpack" | "qpack" | "ssl-identity" | "realtime-delivery" | "sse-delivery"
+    | "mobile-loss" | "quic-migration" | "sse-chat" | "console" | "tls-exchange";
+
+export interface AnimationChapter {
+    at: number;
+    label: string;
+    detail: string;
+}
 
 export interface SlideDefinition {
     id: string;
@@ -24,6 +71,7 @@ export interface SlideDefinition {
     code?: string;
     file?: string;
     codeTitle?: string;
+    foldCode?: boolean;
     language?: string;
     codeCaption?: string;
     sourceFile?: string;
@@ -37,10 +85,15 @@ export interface SlideDefinition {
     example?: TableExample;
     keyRows?: readonly (readonly string[])[];
     interactive?: InteractiveDemo;
+    animation?: {
+        kind: AnimationKind;
+        chapters?: readonly AnimationChapter[];
+        media?: { mp4: string; poster?: { src: string; alt: string } };
+    };
     channel?: Channel;
     walkthrough?: boolean;
-    memoryTimeline?: boolean;
     full?: boolean;
-    hero?: boolean;
+    wide?: boolean;
+    points?: readonly string[];
     final?: boolean;
 }

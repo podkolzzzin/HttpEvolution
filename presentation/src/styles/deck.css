@@ -64,6 +64,10 @@
 }
 
 .deck {
+    --slide-height: calc(
+        100svh - var(--top) - var(--nav) - env(safe-area-inset-top) -
+            env(safe-area-inset-bottom)
+    );
     padding: calc(var(--top) + env(safe-area-inset-top)) 0
         calc(var(--nav) + env(safe-area-inset-bottom));
     touch-action: pan-y pinch-zoom;
@@ -71,10 +75,18 @@
 
 .deck > .slide {
     scroll-margin-top: calc(var(--top) + env(safe-area-inset-top));
-    min-height: calc(
-        100svh - var(--top) - var(--nav) - env(safe-area-inset-top) -
-            env(safe-area-inset-bottom)
-    );
+    min-height: var(--slide-height);
+}
+
+@media screen {
+    .deck:has(> #start.current) {
+        height: 100svh;
+        overflow: clip;
+    }
+    .deck > #start {
+        zoom: var(--slide-scale, 1);
+        min-height: calc(var(--slide-height) / var(--slide-scale, 1));
+    }
 }
 
 .slide.current {

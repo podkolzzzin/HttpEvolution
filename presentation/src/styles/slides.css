@@ -142,17 +142,24 @@
     font-family:
         ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
 }
-.kw {
+.highlighted-code {
+    color: #e9f2e9;
+    font-family: inherit;
+}
+.highlighted-code .syntax-keyword {
     color: #b6d5ff;
 }
-.str {
+.highlighted-code .syntax-string {
     color: #c5ed87;
 }
-.comment {
+.highlighted-code .syntax-comment {
     color: #90afa0;
 }
-.num {
+.highlighted-code .syntax-number {
     color: #ffcc8c;
+}
+.sse-event-code {
+    background: var(--dark);
 }
 .code-foot {
     padding: 11px 17px;
@@ -486,7 +493,10 @@
     .note {
         font-size: 10px;
     }
-    .code-card {
+    .code-card,
+    .assembly-code,
+    .qw-code-panel,
+    .sse-event-path {
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
     }
@@ -568,6 +578,77 @@
         gap: 18px;
     }
 }
+
+.animation-slide {
+    max-width: calc(56rem + 108px);
+    padding-top: 28px;
+}
+.video-slide {
+    max-width: calc(clamp(34rem, (100svh - 26.25rem) * 16 / 9, 56rem) + 108px);
+}
+.animation-slide .eyebrow {
+    margin-bottom: 12px;
+}
+.animation-slide .layout {
+    display: block;
+}
+.animation-slide .story {
+    margin-bottom: 16px;
+}
+.video-slide .workbench {
+    container-type: inline-size;
+}
+.animation-slide h1 {
+    font-size: clamp(30px, 4vw, 44px);
+    letter-spacing: -0.04em;
+    margin-bottom: 8px;
+    text-wrap: wrap;
+}
+.animation-slide .lead {
+    max-width: 72ch;
+    margin: 0;
+}
+.animation-slide .slide-base {
+    margin-top: 20px;
+}
+.slide-animation,
+.animation-poster {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    background: var(--dark);
+}
+.slide-animation {
+    display: block;
+    /* Keep the browser controls below the image and its captions. */
+    height: calc((100cqw - 2px) * 9 / 16 + 70px);
+    object-fit: contain;
+    object-position: center top;
+}
+.slide-animation:fullscreen {
+    object-position: center;
+}
+.animation-poster {
+    display: none;
+}
+@media (max-width: 760px) {
+    .animation-slide {
+        max-width: none;
+    }
+}
+@media print {
+    .animation-slide {
+        max-width: none;
+    }
+    .slide-animation {
+        display: none;
+    }
+    .animation-poster {
+        display: block;
+    }
+}
+
 /* Visible explanations for the SSL walkthrough. */
 .code-explanation {
     margin: 20px 0 0;

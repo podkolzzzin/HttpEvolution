@@ -73,7 +73,7 @@ function SlideCode({
             onCopy={onCopy}
         />
     );
-    if (slide.example)
+    if (slide.foldCode || slide.example)
         return <Disclosure label="Приклад на C#">{code}</Disclosure>;
     if (slide.interactive === "host")
         return (
@@ -86,7 +86,6 @@ function SlideCode({
 type WorkbenchProps = {
     slide: SlideDefinition;
     visual?: ReactNode;
-    memoryTimeline?: ReactNode;
     exercise?: ReactNode;
     onCopy?: CopyCode;
 };
@@ -94,7 +93,6 @@ type WorkbenchProps = {
 export function SlideWorkbench({
     slide,
     visual,
-    memoryTimeline,
     exercise,
     onCopy,
 }: WorkbenchProps) {
@@ -123,7 +121,6 @@ export function SlideWorkbench({
                 </div>
             )}
             {example && <DataTable className="header-example" {...example} />}
-            {memoryTimeline}
             <SlideCode slide={slide} onCopy={onCopy} />
             {keyRows && (
                 <DataTable

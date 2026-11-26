@@ -1,0 +1,28 @@
+{
+    "html": {
+        "source": "<html>\n<body>\n<ul>\n<li><a href=\"/photos/1\">Photograph 1</a></li>\n<li><a href=\"/photos/2\">Photograph 2</a></li>\n<li><a href=\"/photos/3\">Photograph 3</a></li>\n<li><a href=\"/photos/4\">Photograph 4</a></li>\n<li><a href=\"/photos/5\">Photograph 5</a></li>\n<li><a href=\"/photos/6\">Photograph 6</a></li>\n<li><a href=\"/photos/7\">Photograph 7</a></li>\n<li><a href=\"/photos/8\">Photograph 8</a></li>\n<li><a href=\"/photos/9\">Photograph 9</a></li>\n<li><a href=\"/photos/10\">Photograph 10</a></li>\n<li><a href=\"/photos/11\">Photograph 11</a></li>\n<li><a href=\"/photos/12\">Photograph 12</a></li>\n<li><a href=\"/photos/13\">Photograph 13</a></li>\n<li><a href=\"/photos/14\">Photograph 14</a></li>\n<li><a href=\"/photos/15\">Photograph 15</a></li>\n<li><a href=\"/photos/16\">Photograph 16</a></li>\n<li><a href=\"/photos/17\">Photograph 17</a></li>\n<li><a href=\"/photos/18\">Photograph 18</a></li>\n<li><a href=\"/photos/19\">Photograph 19</a></li>\n<li><a href=\"/photos/20\">Photograph 20</a></li>\n<li><a href=\"/photos/21\">Photograph 21</a></li>\n<li><a href=\"/photos/22\">Photograph 22</a></li>\n<li><a href=\"/photos/23\">Photograph 23</a></li>\n<li><a href=\"/photos/24\">Photograph 24</a></li>\n</ul>\n</body>\n</html>\n",
+        "sizes": {
+            "identity": 1175,
+            "gzip": 208,
+            "br": 133,
+            "zstd": 212
+        }
+    },
+    "ok": {
+        "source": "OK",
+        "sizes": {
+            "identity": 2,
+            "gzip": 22,
+            "br": 6,
+            "zstd": 11
+        }
+    },
+    "jpeg": {
+        "sizes": {
+            "identity": 14796,
+            "gzip": 14282,
+            "br": 14316,
+            "zstd": 14277
+        }
+    }
+}

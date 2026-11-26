@@ -25,6 +25,9 @@ export function SlideSources({ slide }: { slide: SlideDefinition }) {
 
     return (
         <div className="sources">
+            {slide.animation?.media && (
+                <a href={slide.animation.media.mp4} download>Завантажити MP4</a>
+            )}
             {file && (
                 <ExternalLink
                     href={`${repository}/blob/${branch}/${sourceFile || file}`}

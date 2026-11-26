@@ -1,0 +1,111 @@
+.upload-compression {
+    container-type: inline-size;
+}
+.upload-settings,
+.upload-settings label,
+.upload-action {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+}
+.upload-settings {
+    justify-content: space-between;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 16px;
+}
+.upload-settings label {
+    gap: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.upload-settings input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--dark);
+}
+.upload-exchange {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 12px;
+}
+.upload-exchange > div {
+    min-width: 0;
+    padding: clamp(14px, 2vw, 22px);
+    border-radius: 8px;
+}
+.upload-exchange h2 {
+    font-size: clamp(15px, 1.4vw, 19px);
+    margin-bottom: 14px;
+}
+.upload-request {
+    color: #fff;
+    background: var(--dark);
+}
+.upload-request small {
+    color: #c8d7ca;
+}
+.upload-exchange pre,
+.upload-exchange code {
+    display: block;
+    font-size: clamp(13px, 1.25vw, 17px);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.upload-exchange pre,
+.upload-response p {
+    margin: 10px 0;
+}
+.upload-prefix {
+    color: var(--accent);
+}
+.upload-meter {
+    height: 10px;
+    margin: 14px 0 4px;
+    background: #415449;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.upload-meter span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    transition: width 200ms ease;
+}
+.upload-response {
+    background: #e9f3d8;
+}
+.upload-response.rejected {
+    background: #fae7db;
+}
+.upload-status {
+    font: 650 clamp(35px, 4vw, 56px)/1 ui-monospace, monospace;
+    letter-spacing: -0.055em;
+}
+.upload-response p {
+    color: var(--muted);
+    line-height: 1.45;
+}
+.upload-response pre {
+    font-weight: 700;
+}
+.upload-action {
+    margin-top: 16px;
+    justify-content: flex-end;
+}
+.upload-action button {
+    border: 1px solid #a8c65d;
+    border-radius: 7px;
+    background: var(--accent);
+    padding: 10px 16px;
+    min-height: 42px;
+    font-weight: 650;
+}
+@container (max-width: 500px) {
+    .upload-exchange {
+        grid-template-columns: 1fr;
+    }
+}

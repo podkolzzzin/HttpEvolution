@@ -50,6 +50,7 @@ def summarize(path):
             modes[mode][server] = {
                 "warm": median(run["warm", 0] for run in runs),
                 "idle": {str(level): median(idle[level]) for level in LEVELS},
+                "idlePss": {str(level): median(run["idle", level] for run in runs) for level in LEVELS},
                 "closed": median(run["closed", 0] - run["warm", 0] for run in runs),
                 "range512": [min(idle[512]), max(idle[512])],
             }

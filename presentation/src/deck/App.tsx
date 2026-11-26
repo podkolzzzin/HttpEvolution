@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { slides } from "../data/slides";
+import { RunFinale } from "../demos/RunFinale";
 import { Slide } from "../slides/Slide";
 import { ContentsDialog } from "./ContentsDialog";
 import { TopBar, SlideNavigation } from "./DeckControls";
@@ -40,7 +41,7 @@ export function App() {
                 event.metaKey ||
                 (event.target instanceof Element &&
                     event.target.closest(
-                        "pre, button, a, input, summary, select, textarea, [contenteditable]",
+                        "pre, button, a, input, summary, select, textarea, video, [contenteditable]",
                     ))
             )
                 return;
@@ -71,6 +72,26 @@ export function App() {
         dialog.current
             .querySelector('[aria-current="step"]')
             ?.scrollIntoView({ block: "center" });
+    }
+
+    const [printing, setPrinting] = useState(false);
+    useEffect(() => {
+        const startPrint = () => setPrinting(true);
+        const endPrint = () => setPrinting(false);
+        window.addEventListener("beforeprint", startPrint);
+        window.addEventListener("afterprint", endPrint);
+        return () => {
+            window.removeEventListener("beforeprint", startPrint);
+            window.removeEventListener("afterprint", endPrint);
+        };
+    }, []);
+
+    if (slides[index].id === "run" && !printing) {
+        return (
+            <main aria-label={slides[index].title} {...swipe}>
+                <RunFinale onBack={() => goTo(index - 1)} />
+            </main>
+        );
     }
 
     return (

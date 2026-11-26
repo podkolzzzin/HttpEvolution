@@ -1,0 +1,116 @@
+.body-compression {
+    container-type: inline-size;
+    max-width: 56rem;
+    color: var(--ink);
+}
+.body-compression-chart {
+    display: grid;
+    gap: 2px;
+    margin: 12px 0;
+}
+.body-compression-chart button {
+    display: grid;
+    grid-template-columns: 7.3em minmax(0, 1fr) 5.4em;
+    gap: 0.75em;
+    align-items: center;
+    min-height: 42px;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background: transparent;
+    font-size: clamp(13px, 1.25vw, 18px);
+    text-align: start;
+}
+.body-compression-chart button:hover {
+    background: #e9ede2;
+}
+.body-compression-chart button[aria-pressed="true"] {
+    border-color: #889a78;
+    background: #e4ecd8;
+}
+.body-compression-chart strong {
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.body-compression-track {
+    display: block;
+    height: 0.75em;
+    border-radius: 2px;
+    background: #d3dbd1;
+    overflow: hidden;
+}
+.body-compression-track i {
+    display: block;
+    height: 100%;
+    background: #798e84;
+    transition: width 160ms ease;
+}
+.body-compression-chart button[aria-pressed="true"] .body-compression-track i {
+    background: #3e632f;
+}
+.body-compression-wire {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(12px, 2vw, 28px);
+    padding: clamp(12px, 2vw, 22px);
+    background: var(--dark);
+    color: #e5f0e3;
+    border-radius: 9px;
+}
+.body-compression-wire code,
+.body-compression-wire small {
+    display: block;
+}
+.body-compression-wire code {
+    font: 500 clamp(12px, 1.1vw, 16px)/1.5 ui-monospace, monospace;
+    overflow-wrap: anywhere;
+}
+.body-compression-wire small {
+    margin-bottom: 7px;
+    color: #b8cdbc;
+    font-size: 13px;
+}
+.body-compression-encoding {
+    color: var(--accent);
+}
+.body-compression-saving {
+    margin: 9px 0;
+    font-size: 17px;
+    font-weight: 650;
+}
+.body-compression-method,
+.body-compression-edit summary {
+    color: var(--muted);
+    font-size: 13px;
+}
+.body-compression-edit summary {
+    width: fit-content;
+    padding-block: 9px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+.body-compression-edit textarea {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #879589;
+    border-radius: 4px;
+    background: #fbfcf6;
+    font: 14px/1.4 ui-monospace, monospace;
+    color: var(--ink);
+    resize: vertical;
+}
+@container (max-width: 480px) {
+    .body-compression-wire {
+        grid-template-columns: 1fr;
+    }
+}
+@container (max-width: 350px) {
+    .body-compression-chart button {
+        grid-template-columns: 6.2em minmax(0, 1fr) 4.8em;
+        gap: 5px;
+        padding-inline: 5px;
+    }
+}

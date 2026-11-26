@@ -1,0 +1,98 @@
+.console-stage {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: #121816;
+    touch-action: pan-y pinch-zoom;
+}
+.console-stage[data-controls="false"] { cursor: none; }
+.console-stage .protocol-console {
+    height: 100%;
+    display: grid;
+    align-content: center;
+    padding: 0;
+}
+.console-stage .pc-shell {
+    width: 100vw;
+    max-width: none;
+    perspective: none;
+}
+.console-stage .pc-topline {
+    width: 100%;
+    padding: 0 clamp(16px, 5vw, 90px);
+    margin-bottom: clamp(18px, 4vh, 58px);
+    align-items: center;
+}
+.console-stage .pc-topline h2 { font-size: clamp(24px, 3.4vw, 62px); }
+.console-stage .pc-counter strong { font-size: clamp(24px, 3.5vw, 62px); }
+.console-stage .pc-panel {
+    width: max(132vw, 1220px);
+    padding: clamp(16px, 4vh, 70px) clamp(18px, 2vw, 60px);
+    transform-origin: center;
+    transform: translateX(calc((100vw - 100%) * var(--travel)))
+        perspective(1700px) rotateX(calc(8deg + 3deg * var(--drift)))
+        translateY(calc(1.4vh * var(--drift)));
+    will-change: transform;
+}
+.console-stage .pc-track { display: block; }
+.console-stage .pc-track-name {
+    font-size: clamp(15px, 1.4vw, 30px);
+    color: #c7b796;
+}
+.console-stage .pc-rail {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 0;
+}
+.console-stage .pc-rail::before { top: 50%; left: 5%; right: 5%; }
+.console-stage .pc-stop {
+    display: grid;
+    justify-items: center;
+    grid-template-rows: 1fr auto 1fr;
+    height: clamp(94px, 18vh, 245px);
+    align-content: center;
+}
+.console-stage .pc-terms, .console-stage .pc-year, .console-stage .pc-version {
+    grid-column: 1;
+    min-height: 0;
+    font-size: clamp(12px, 1.1vw, 24px);
+    padding: 0;
+    max-width: none;
+}
+.console-stage .pc-terms { grid-row: 1; align-self: end; margin-bottom: 5px; }
+.console-stage .pc-year { grid-row: 3; align-self: end; }
+.console-stage .pc-version { grid-row: 3; align-self: start; margin-top: 3px; }
+.console-stage .pc-socket {
+    grid-area: 2 / 1;
+    width: clamp(35px, 4vw, 78px);
+    height: auto;
+    aspect-ratio: 1;
+    margin: 0;
+}
+.console-stage .pc-bulb { width: 47%; height: 47%; transition: box-shadow .65s; }
+.console-stage .pc-progress { margin: clamp(20px, 4vh, 54px) 5vw 0; }
+.console-tools {
+    position: absolute;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s;
+}
+.console-stage[data-controls="true"] .console-tools, .console-tools:focus-within {
+    opacity: 1;
+    pointer-events: auto;
+}
+.console-tools button {
+    background: #222a25;
+    border: 1px solid #756b57;
+    color: #eee4d0;
+    padding: 8px 16px;
+    min-height: 44px;
+    border-radius: 5px;
+}
+@media (max-width: 600px) {
+    .console-stage .pc-current-term { display: block; margin: 4px 0 0; }
+}

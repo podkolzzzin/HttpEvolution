@@ -8,6 +8,8 @@ import "./styles/demos.css";
 import "./styles/traffic.css";
 import "./styles/memory.css";
 import "./styles/hpack.css";
+import "./styles/compression-animation.css";
+import "./styles/protocol-diagrams.css";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>

@@ -16,7 +16,7 @@ export function useSwipe(onSwipe: (direction: -1 | 1) => void) {
                 !event.isPrimary ||
                 (event.target instanceof Element &&
                     event.target.closest(
-                        "pre, button, a, summary, input, details",
+                        "pre, button, a, summary, input, select, details, video",
                     ))
             )
                 return;

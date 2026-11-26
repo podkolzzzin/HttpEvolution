@@ -1,0 +1,225 @@
+{
+  "repeats": 5,
+  "modes": {
+    "http11": {
+      "demo": {
+        "warm": {
+          "pss": 12418,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 12458,
+          "delta": 40
+        },
+        "closed": {
+          "pss": 12578,
+          "delta": 160
+        }
+      },
+      "nginx": {
+        "warm": {
+          "pss": 4992,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 4985,
+          "delta": 6
+        },
+        "closed": {
+          "pss": 4997,
+          "delta": 27
+        }
+      },
+      "kestrel": {
+        "warm": {
+          "pss": 32269,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 32445,
+          "delta": 176
+        },
+        "closed": {
+          "pss": 32464,
+          "delta": 188
+        }
+      }
+    },
+    "http11-tls": {
+      "demo": {
+        "warm": {
+          "pss": 16914,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 17631,
+          "delta": 713
+        },
+        "closed": {
+          "pss": 17665,
+          "delta": 753
+        }
+      },
+      "nginx": {
+        "warm": {
+          "pss": 5991,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 5995,
+          "delta": 4
+        },
+        "closed": {
+          "pss": 5988,
+          "delta": -38
+        }
+      },
+      "kestrel": {
+        "warm": {
+          "pss": 38352,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 38540,
+          "delta": 196
+        },
+        "closed": {
+          "pss": 38559,
+          "delta": 232
+        }
+      }
+    },
+    "h2": {
+      "demo": {
+        "warm": {
+          "pss": 12454,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 12630,
+          "delta": 176
+        },
+        "closed": {
+          "pss": 12691,
+          "delta": 237
+        }
+      },
+      "nginx": {
+        "warm": {
+          "pss": 5100,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 5107,
+          "delta": 4
+        },
+        "closed": {
+          "pss": 5107,
+          "delta": 4
+        }
+      },
+      "kestrel": {
+        "warm": {
+          "pss": 31649,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 31917,
+          "delta": 236
+        },
+        "closed": {
+          "pss": 31949,
+          "delta": 272
+        }
+      }
+    },
+    "h2-tls": {
+      "demo": {
+        "warm": {
+          "pss": 16713,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 17359,
+          "delta": 636
+        },
+        "closed": {
+          "pss": 17458,
+          "delta": 725
+        }
+      },
+      "nginx": {
+        "warm": {
+          "pss": 6014,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 6008,
+          "delta": 3
+        },
+        "closed": {
+          "pss": 6008,
+          "delta": 4
+        }
+      },
+      "kestrel": {
+        "warm": {
+          "pss": 37587,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 37883,
+          "delta": 268
+        },
+        "closed": {
+          "pss": 37963,
+          "delta": 344
+        }
+      }
+    },
+    "h3": {
+      "demo": {
+        "warm": {
+          "pss": 23761,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 30864,
+          "delta": 7112
+        },
+        "closed": {
+          "pss": 31565,
+          "delta": 7757
+        }
+      },
+      "nginx": {
+        "warm": {
+          "pss": 5815,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 6254,
+          "delta": 29
+        },
+        "closed": {
+          "pss": 6254,
+          "delta": 29
+        }
+      },
+      "kestrel": {
+        "warm": {
+          "pss": 41852,
+          "delta": 0
+        },
+        "idle": {
+          "pss": 41972,
+          "delta": 124
+        },
+        "closed": {
+          "pss": 43020,
+          "delta": 1191
+        }
+      }
+    }
+  }
+}

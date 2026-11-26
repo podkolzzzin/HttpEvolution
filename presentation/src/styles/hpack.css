@@ -150,3 +150,15 @@ button.hp-field[aria-pressed="true"] {
         font-size: 15px;
     }
 }
+.hpack-static-reference .header-example {
+    margin: 0 16px 12px;
+    width: calc(100% - 32px);
+}
+
+.hpack-static-reference caption {
+    font-size: 1rem;
+}
+
+.hpack-static-reference td span {
+    color: var(--muted);
+}

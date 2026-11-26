@@ -7,7 +7,7 @@ const fields = [
         bytes: "00 00 05",
         size: "3 байти",
         description:
-            "Довжина: 00 00 05 означає 5 байтів даних після заголовка. Самі 9 байтів заголовка сюди не входять.",
+            "5 байтів вмісту · заголовок окремо. Типовий ліміт 16 384 Б. Одержувач задає SETTINGS_MAX_FRAME_SIZE від 16 384 до 16 777 215 Б (24 біти).",
     },
     {
         id: "type",
@@ -61,6 +61,49 @@ export function FrameDemo() {
             <p className="frame-explanation" role="status">
                 {selected.description}
             </p>
+            {selected.id === "type" && (
+                <dl className="frame-catalog" aria-label="Базові типи HTTP/2">
+                    {[
+                        ["00 · DATA", "Тіло"],
+                        ["01 · HEADERS", "Заголовки"],
+                        ["02 · PRIORITY", "Пріоритет (застарілий)"],
+                        ["03 · RST_STREAM", "Скидання потоку"],
+                        ["04 · SETTINGS", "Параметри"],
+                        ["05 · PUSH_PROMISE", "Обіцяний потік"],
+                        ["06 · PING", "Перевірка зв’язку"],
+                        ["07 · GOAWAY", "Завершення з’єднання"],
+                        ["08 · WINDOW_UPDATE", "Дозвіл на DATA"],
+                        ["09 · CONTINUATION", "Продовження заголовків"],
+                    ].map(([name, meaning]) => (
+                        <div key={name}>
+                            <dt>{name}</dt>
+                            <dd>{meaning}</dd>
+                        </div>
+                    ))}
+                </dl>
+            )}
+            {selected.id === "flags" && (
+                <dl
+                    className="frame-catalog"
+                    aria-label="Базові прапорці за типом кадру"
+                >
+                    {[
+                        ["01 · END_STREAM", "DATA, HEADERS"],
+                        ["01 · ACK", "SETTINGS, PING"],
+                        [
+                            "04 · END_HEADERS",
+                            "HEADERS, PUSH_PROMISE, CONTINUATION",
+                        ],
+                        ["08 · PADDED", "DATA, HEADERS, PUSH_PROMISE"],
+                        ["20 · PRIORITY", "HEADERS (застарілий)"],
+                    ].map(([name, types]) => (
+                        <div key={name}>
+                            <dt>{name}</dt>
+                            <dd>{types}</dd>
+                        </div>
+                    ))}
+                </dl>
+            )}
             <div className="frame-payload">
                 <span>Дані · 5 байтів ASCII</span>
                 <strong>Hello</strong>

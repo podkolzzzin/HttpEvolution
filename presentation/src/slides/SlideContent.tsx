@@ -3,41 +3,7 @@ import type { ReactNode, Ref } from "react";
 import type { SlideDefinition } from "../data/types";
 import type { CopyCode } from "./CodeCard";
 import { FinalLinks } from "./SlideSources";
-import { firstServerLines, firstServerLineWord } from "../data/first-server";
 import { SlideWorkbench } from "./SlideWorkbench";
-import {
-    MemoryBenchmark,
-    MemoryMethod,
-    MemoryTimeline,
-} from "./MemoryComparison";
-
-function HeroRoute() {
-    return (
-        <>
-            <div
-                className="route"
-                aria-label="HTTP 0.9, HTTP 1.x, HTTP 2, HTTP 3"
-            >
-                <span>0.9</span>
-                <i>→</i>
-                <span>1.x</span>
-                <i>→</i>
-                <span>2</span>
-                <i>→</i>
-                <span>3</span>
-            </div>
-            <div className="hero-stats">
-                <span>
-                    <strong>{firstServerLines}</strong>
-                    {firstServerLineWord} першого сервера
-                </span>
-                <span>
-                    <strong>3</strong>мережеві класи .NET
-                </span>
-            </div>
-        </>
-    );
-}
 
 type Props = {
     slide: SlideDefinition;
@@ -76,7 +42,9 @@ export function SlideContent({
             "traffic-slide",
         slide.walkthrough && "ssl-walkthrough",
         !slide.code && "narrative",
-        slide.hero && "hero",
+        slide.animation && "animation-slide",
+        slide.animation?.chapters && "chapter-slide",
+        slide.wide && "wide-slide",
         active && "current",
     ]
         .filter(Boolean)
@@ -118,9 +86,18 @@ export function SlideContent({
                             </Fragment>
                         ))}
                     </h1>
-                    <p className="lead">{lead ?? slide.why}</p>
-                    {slide.memoryTimeline ? <MemoryBenchmark /> : changeBlock}
-                    {slide.hero && <HeroRoute />}
+                    {(lead || slide.why) && (
+                        <p className="lead">{lead ?? slide.why}</p>
+                    )}
+                    {slide.points && (
+                        <ul className="slide-points">
+                            {slide.points.map((point) => (
+                                <li key={point}>{point}</li>
+                            ))}
+                        </ul>
+                    )}
+                    {slide.interactive === "ws-bytes" && visual}
+                    {changeBlock}
                     {slide.final && <FinalLinks />}
                     {slide.memory && (
                         <div className="connection-memory">
@@ -131,15 +108,8 @@ export function SlideContent({
                 </div>
                 <SlideWorkbench
                     slide={slide}
-                    visual={visual}
-                    memoryTimeline={
-                        slide.memoryTimeline && (
-                            <>
-                                <MemoryTimeline />
-                                {changeBlock}
-                                <MemoryMethod />
-                            </>
-                        )
+                    visual={
+                        slide.interactive === "ws-bytes" ? undefined : visual
                     }
                     exercise={exercise}
                     onCopy={onCopy}
