@@ -3,7 +3,7 @@ using System.Text;
 internal static class ServerSentEvents
 {
     public const string Page = """
-        <!doctype html><html lang="uk"><meta charset="utf-8"><title>Server-Sent Events</title>
+        <!doctype html><html lang="en"><meta charset="utf-8"><title>Server-Sent Events</title>
         <h1>Server-Sent Events</h1><pre id="log"></pre>
         <script>
         const events = new EventSource("/events");

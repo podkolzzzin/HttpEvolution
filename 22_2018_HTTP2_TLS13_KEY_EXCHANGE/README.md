@@ -1,19 +1,19 @@
-# 22 · 2018 · TLS 1.3 · Обмін ключами
+# 22 · 2018 · TLS 1.3 · Key exchange
 
-[Program.cs](Program.cs) показує, як сервер після ClientHello отримує ключі для захисту наступних повідомлень handshake. Запуск із цієї папки:
+[Program.cs](Program.cs) shows how the server derives keys after ClientHello to protect the remaining handshake messages. Run it from this directory.
 
 ```sh
 dotnet run
 ```
 
-У першому прикладі клієнт підтримує P-256, і надсилає розширення `key_share` із порожнім списком ключів. Сервер відповідає HelloRetryRequest. У другому прикладі нове з’єднання одразу починається з P-256 key share. [TlsHandshake.cs](TlsHandshake.cs) формує ServerHello й обчислює ECDH-секрет. З нього та історії повідомлень виводяться окремі ключові секрети для клієнта і сервера.
+In the first example, the client supports P-256 and sends an empty `key_share` list. The server replies with HelloRetryRequest. In the second example, a new connection starts with a P-256 key share. [TlsHandshake.cs](TlsHandshake.cs) constructs ServerHello and calculates the ECDH shared secret. The shared secret and handshake transcript produce separate client and server handshake traffic secrets.
 
-Останні два рядки показують шифротекст із тегом AES-GCM та розшифроване повідомлення EncryptedExtensions із внутрішнім типом 22 (handshake). На кожному запуску ключі нові. Обидва приклади працюють у пам’яті.
+The last two lines show the ciphertext with its AES-GCM tag and the decrypted EncryptedExtensions message with inner type 22 (handshake). Both examples run in memory and generate fresh keys on each run.
 
-Порівняти з попереднім етапом:
+Compare with the previous step.
 
 ```sh
 diff -u ../21_2015_HTTP2_CONTINUATION/Program.cs Program.cs
 ```
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

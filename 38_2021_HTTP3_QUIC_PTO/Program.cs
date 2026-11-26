@@ -1,4 +1,4 @@
-// 38_2021_HTTP3_QUIC_PTO: QUIC: облік ACK та probe timeout.
+// 38_2021_HTTP3_QUIC_PTO: QUIC ACK tracking and probe timeout.
 var recovery = new QuicRecovery();
 recovery.Add(0, [1]); // Reliable PING for a synthetic clock, without waiting.
 var frame = recovery.Ready(0, 0).Single();

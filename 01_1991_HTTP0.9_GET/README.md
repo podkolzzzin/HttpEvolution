@@ -1,26 +1,26 @@
 # 01 · 1991 · HTTP/0.9 · GET
 
-GET → HTML → закриття TCP.
+GET → HTML → TCP close.
 
-Власне демо: [Program.cs](Program.cs). Із цієї папки:
+Run [Program.cs](Program.cs) from this directory.
 
 ```sh
 dotnet run
 ```
 
-Демо запускає локальний сервер; зупинка — Ctrl+C.
+The demo starts a local server. Press Ctrl+C to stop it.
 
-Клієнт в іншому терміналі:
+Run the client in a second terminal.
 
 ```sh
 printf 'GET /\r\n' | nc 127.0.0.1 8080
 ```
 
-Код, доданий або змінений на цьому етапі:
+## Files added or changed in this step
 
 - [Http09Connection.cs](Http09Connection.cs).
 - [Program.cs](Program.cs).
 
-`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+This demo has its own `Program.cs`. [HttpEvolution.csproj](HttpEvolution.csproj) links to shared files in [`common/`](../common/) and to the stages that introduced each version of a helper class.
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

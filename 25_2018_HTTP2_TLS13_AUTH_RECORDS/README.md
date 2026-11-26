@@ -1,19 +1,19 @@
-# 25 · 2018 · TLS 1.3 · Автентифікація й захищені записи
+# 25 · 2018 · TLS 1.3 · Authentication and protected records
 
-[Program.cs](Program.cs) продовжує обмін ключами та передає перший запис із даними застосунку. Запуск із цієї папки:
+[Program.cs](Program.cs) continues the key exchange and sends the first application data record. Run it from this directory.
 
 ```sh
 dotnet run
 ```
 
-Сервер виводить дані сертифіката localhost та послідовність повідомлень від EncryptedExtensions до Finished. У CertificateVerify він підписує історію handshake ключем ECDSA. Потім демо обчислює клієнтський Finished у пам’яті та передає його на перевірку серверу.
+The server prints the localhost certificate details and the message sequence from EncryptedExtensions to Finished. In CertificateVerify, it signs the handshake transcript with its ECDSA key. The demo then computes the client Finished in memory and passes it to the server for verification.
 
-Після `Client Finished verified: True` сервер записує зашифроване повідомлення в MemoryStream. Клієнт читає його з ключем серверного трафіку й отримує внутрішній тип 23 та текст `Hello inside a TLS1.3 record!`. Наступний [приклад HTTPS](../28_2018_HTTP2_TLS13_HTTPS/) виконує handshake із мережевим клієнтом.
+After `Client Finished verified: True`, the server writes an encrypted message to a `MemoryStream`. The client uses the server traffic key to recover inner type 23 and the text `Hello inside a TLS1.3 record!`. The next [HTTPS example](../28_2018_HTTP2_TLS13_HTTPS/) performs the handshake with a network client.
 
-Порівняти дві версії обробника handshake:
+Compare the two versions of the handshake handler.
 
 ```sh
 diff -u ../22_2018_HTTP2_TLS13_KEY_EXCHANGE/TlsHandshake.cs TlsHandshake.cs
 ```
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

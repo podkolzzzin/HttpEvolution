@@ -1,28 +1,18 @@
 # HttpEvolution
 
-Від HTTP/0.9 до HTTP/3 у **31 навчальному проєкті на C#**.
+Follow HTTP from 0.9 to HTTP/3 through **31 runnable C# demos**. Each project adds a protocol feature, from a single GET over TCP to HTTP/3 over QUIC.
 
-[Відкрити інтерактивну презентацію](https://slides.podkolzin.consulting/http-evolution/)
+[Open the interactive presentation](https://slides.podkolzin.consulting/http-evolution/)
 
-Префікс папки задає порядок проходження, далі вказано рік і тему.
-Номери збережено після об’єднання споріднених прикладів. У кожному проєкті свій `Program.cs`.
-Незмінні та попередні версії допоміжних класів підключені як linked files.
-Відкривай `HttpEvolution.slnx` або `HttpEvolution.csproj` у папці потрібного етапу.
+Each directory starts with the step number and includes a year and a topic. Some numbers are skipped because related examples were combined. Open `HttpEvolution.slnx` to browse all steps, or open `HttpEvolution.csproj` in the directory of a particular step.
 
-Мережеві API — тільки `TcpListener`, `TcpClient`, `UdpClient` і потоки байтів.
-TLS, QUIC, HPACK і QPACK написані тут; криптографічні примітиви — з .NET BCL.
-Аргументи серверних демо обробляє NuGet-пакет `System.CommandLine`.
-Потрібен **.NET 10 SDK**; усі режими слухають лише loopback.
-Демо призначені для навчання, зокрема для відтворення застарілих версій SSL і TLS.
+The demos use `TcpListener`, `TcpClient`, `UdpClient`, and byte streams. The project implements TLS, QUIC, HPACK, and QPACK directly and uses the .NET base class library for cryptographic primitives. `System.CommandLine` handles the server command-line arguments. Build with the **.NET 10 SDK**. The servers listen on loopback and are designed for local learning, including demonstrations of legacy SSL and TLS.
 
-Форматування C# закріплено в [`.editorconfig`](.editorconfig): 4 пробіли, дужки
-на окремих рядках, блоки для умов і циклів, окремі оголошення та оператори.
-Перевірка: `dotnet format HttpEvolution.slnx --verify-no-changes --no-restore`.
+The [`.editorconfig`](.editorconfig) specifies four-space indentation, braces on separate lines, blocks for conditionals and loops, and separate declarations and statements. Check formatting with `dotnet format HttpEvolution.slnx --verify-no-changes --no-restore`.
 
-## Презентація
+## Presentation
 
-[Фронтенд](presentation/) на React, TypeScript і Vite. Потрібен Node.js
-20.19+ у гілці 20 або 22.12+. Запуск із кореня репозиторію:
+The [front end](presentation/) uses React, TypeScript, and Vite. It requires Node.js 20.19 or later in the 20.x series, or Node.js 22.12 or later. Run these commands from the repository root.
 
 ```sh
 cd presentation
@@ -30,152 +20,94 @@ npm ci
 npm run dev
 ```
 
-`npm run build` перевіряє типи й збирає статичний сайт у `presentation/dist/`.
-`npm run preview` запускає локальний перегляд збірки. Публікуй вміст `dist/`
-на статичному сервері. Посилання на слайди використовують хеш, тож працюють і
-в підкаталозі на кшталт `/http-demo/`.
+`npm run build` checks types and writes a static site to `presentation/dist/`. `npm run preview` serves the build locally. Slide URLs use fragments, so the build can be hosted at a subpath such as `/http-evolution/`.
 
-Є 68 слайдів про розвиток HTTP із фрагментами коду, командами й посиланнями
-на відповідні етапи. На телефоні працюють свайпи, кнопки навігації та зміст.
-Стискання тіла можна простежити на трьох слайдах: `#http10-gzip` (розмір відповіді),
-`#request-compression` (стиснений POST і повтор після 415)
-та `#brotli-zstd` (порівняння кодеків). Додай відповідний хеш до адреси презентації.
-[Локальний сервер для показу](02b_1996_HTTP1.0_CONTENT_ENCODING/) дає повторити GET і POST через curl.
+The 68 slides include code, runnable commands, and links to the corresponding steps. On a phone, navigate with swipes, buttons, or the table of contents.
 
-Є моделі перевірки Host і втрати пакета в TCP/QUIC.
-SSE (чернетка 2009) показує події в HTTP-відповіді та клієнт EventSource;
-WebSocket (API 2009 → RFC 2011) — Upgrade, кадри й двосторонній обмін.
-Анімація чату на SSE показує окремі POST-запити та відкриті відповіді `text/event-stream`. Схема WebSocket показує той самий діалог через двобічні канали. Демо WebRTC передає тестове відео й текст між двома учасниками в одній вкладці.
-Обидва серверні приклади можна [запустити локально](15b_2011_HTTP1.1_REALTIME/) і відкрити в браузері.
-Історія SSL починається з потреб Netscape, невипущеної SSL1 та недоліків SSL2;
-окремо пояснено, чому реалізація демо починається із SSL3.
-Шість слайдів SSL пов’язують потреби магазину з механізмами захисту. Анімація показує поля сертифіката, SPKI pin у демо, обмін RSA та ключі записів.
-Інтерактивна схема SSL порівнює відкритий HTTP із захищеним записом:
-видимі IP/TCP/SSL-заголовки та зашифровані HTTP, MAC і доповнення.
-Поля можна натискати; вміст запису розкривається у вигляді на сервері.
-На слайді Host схема порівнює HTTP, HTTPS без ECH і HTTPS з ECH:
-два послідовні повідомлення від браузера до сервера, окремо — те, що
-читає провайдер. Відкритий домен виділено в SNI; Host захищено всередині
-HTTP-запиту. ECH розшифровано й пояснено безпосередньо біля перемикача.
-Примітка з джерелами розрізняє ESNI (2018), впровадження ECH (2023)
-і стандарт RFC 9849 (березень 2026).
-Інтерактивний слайд HPACK показує поруч HEX-байти HTTP/1.1 та HPACK у HTTP/2. Над кожним байтом видно відповідний символ або значення поля. Натискання підсвічує відповідне поле, а перемикач показує перший і повторний запити до www.example.com.
-Анімація [HPACK](https://slides.podkolzin.consulting/http-evolution/#hpack-animation) показує статичні записи й те, як нові заголовки витісняють найстаріші з динамічної таблиці. В анімації [QPACK](https://slides.podkolzin.consulting/http-evolution/#qpack-animation) видно, які записи декодер уже має і на які ще чекає секція заголовків. Обидві анімації можна запустити, призупинити й перемотати.
-[Втрата пакета](https://slides.podkolzin.consulting/http-evolution/#mobile-loss) показує, коли застосунок може прочитати потік B. [Міграція QUIC](https://slides.podkolzin.consulting/http-evolution/#quic-migration) простежує одне завантаження при переходах між Wi-Fi та двома вишками.
+- **Body compression.** Open `#http10-gzip` for response sizes, `#request-compression` for a compressed POST and retry after a 415, or `#brotli-zstd` to compare codecs. The [local compression server](02b_1996_HTTP1.0_CONTENT_ENCODING/) reproduces the GET and POST examples with curl.
+- **Real-time delivery.** SSE shows events in an HTTP response and an EventSource client. The WebSocket slides cover the upgrade, frames, and two-way messaging. The SSE chat animation uses POST requests alongside open `text/event-stream` responses. The WebSocket animation shows the same conversation over two-way channels. The WebRTC demo exchanges test video and text between two peers in one tab. Run the [SSE and WebSocket servers](15b_2011_HTTP1.1_REALTIME/) locally to see the exchanges in the browser.
+- **SSL and host privacy.** The SSL slides cover Netscape's needs, the unreleased SSL 1.0, the limitations of SSL 2.0, and the decision to start the demo at SSL 3.0. They show certificate fields, SPKI pinning, RSA key exchange, and record keys. An interactive record diagram compares what is visible on the wire with the HTTP data, MAC, and padding recovered on the server. The Host slides model header validation and compare HTTP, HTTPS, and HTTPS with ECH. They show what the network can read from SNI and why the Host header is protected inside HTTPS. The references distinguish ESNI (2018), ECH deployment (2023), and RFC 9849 (March 2026).
+- **Header compression.** The interactive HPACK comparison shows the bytes and values of HTTP/1.1 and HTTP/2 headers side by side for an initial and repeated request to `www.example.com`. The [HPACK animation](https://slides.podkolzin.consulting/http-evolution/#hpack-animation) shows static entries and dynamic table eviction. The [QPACK animation](https://slides.podkolzin.consulting/http-evolution/#qpack-animation) shows which entries the decoder has and which ones a field section is waiting for. Both animations support playback, pause, and seeking.
+- **QUIC.** [Packet loss](https://slides.podkolzin.consulting/http-evolution/#mobile-loss) shows when the application can read stream B over TCP and QUIC. [Connection migration](https://slides.podkolzin.consulting/http-evolution/#quic-migration) follows a single download as it moves from Wi-Fi to two cell towers.
+- **Memory.** The [server memory slide](https://slides.podkolzin.consulting/http-evolution/#server-memory) compares PSS in MiB at 0, 1, 64, 256, and 512 open connections. A dash marks a load the demo does not support. See the [managed heap benchmark](benchmarks/connection-memory/) and the [PSS benchmark](benchmarks/connection-memory/servers.md) for methodology and raw data.
 
-Мережеві анімації вбудовано як React-компоненти. Кадр визначає позиція програвача в секундах.
-[Слайд про пам’ять серверів](https://slides.podkolzin.consulting/http-evolution/#server-memory) показує PSS у МіБ для 0, 1, 64, 256 і 512 відкритих з’єднань в одній таблиці. Прочерк у колонці демо позначає навантаження понад можливості реалізації.
-[Методика демо](benchmarks/connection-memory/) · [Методика вимірювання PSS](benchmarks/connection-memory/servers.md).
-Повний перший сервер доступний на слайді HTTP/0.9.
+The HTTP/0.9 slide includes the complete first server. Slide order and content live in [slides.ts](presentation/src/data/slides.ts), navigation and the table of contents in [src/deck](presentation/src/deck), and interactive diagrams in [src/demos](presentation/src/demos). The animation player passes the time in seconds to each React scene. [SlideContent](presentation/src/slides/SlideContent.tsx) can also be rendered independently of the application.
 
-Опис і порядок слайдів у [src/data/slides.ts](presentation/src/data/slides.ts).
-[src/deck](presentation/src/deck) відповідає за навігацію й зміст,
-а [src/demos](presentation/src/demos) містить інтерактивні схеми.
-[SlideContent](presentation/src/slides/SlideContent.tsx) можна рендерити окремо
-від застосунку.
-
-## Показати перший крок
+## Run the first step
 
 ```sh
 dotnet run --project 01_1991_HTTP0.9_GET
-# В іншому терміналі:
+# In another terminal:
 printf 'GET /\r\n' | nc 127.0.0.1 8080
 # <h1>Hello, HTTP/0.9!</h1>
 ```
 
-HTTP/0.9: один рядок GET; відповідь — HTML без статусу і заголовків,
-після неї сервер закриває TCP-з'єднання. `/missing` повертає HTML «Not found».
+The HTTP/0.9 server reads one GET line, returns HTML without status or headers, and closes the TCP connection. `/missing` returns a “Not found” HTML page.
 
-## Пройти історію
+## Walk through the steps
 
-Переходь між папками за номером; перемикати Git не потрібно.
-У кожній папці є короткий README із запуском і порівнянням із попереднім кроком.
-Наприклад, із кореня репозиторію:
+Follow the numbered directories in this checkout. Each step has a README with a run command and a comparison with its predecessor. For example, run these commands from the repository root.
 
 ```sh
 dotnet run --project 09_1996_HTTP1.0_SSL3_CLIENT -- --ssl3
 diff -ru --exclude=bin --exclude=obj --exclude=README.md 02_1996_HTTP1.0_HEADERS 03_1996_HTTP1.0_HEAD
 ```
 
-Код завершення `diff` 1 означає, що відмінності знайдено. Для решти етапів
-README містить команди порівняння фактичних C#-файлів, з урахуванням linked files.
-Фізичний склад папок відображає нові версії та їхні підключення.
+Exit status 1 means `diff` found differences. The step READMEs also show how to compare the specific C# files used by each project, including linked files.
 
-У кожного етапу свій фізичний `Program.cs`: `dotnet run` одразу запускає його демо.
-Підготовчі етапи показують роботу класів у пам’яті й завершуються; готові сервери
-слухають loopback до Ctrl+C. `Program.cs` ніколи не підключається з іншого етапу.
+Each step owns its `Program.cs`. Run it with `dotnet run` from its directory. In-memory examples print their results and exit. Server examples listen on loopback until Ctrl+C. Use `dotnet run -- --help` for demos with multiple modes. The final step defaults to HTTP/3 and exposes the earlier server modes through flags.
 
-Незмінні допоміжні файли зібрані в [`common/`](common/). Кожна історична версія
-іншого класу зберігається один раз — у першому етапі, де з’явився цей код.
-Наступні `.csproj` підключають саме її через `Compile Include` та `Link`, наприклад:
+Shared helpers live in [`common/`](common/). Each historical version of a helper class lives in the step that introduced it. Projects include the appropriate version with `Compile Include` and `Link`.
 
 ```xml
 <Compile Include="../21_2015_HTTP2_CONTINUATION/Http2ContinuationConnection.cs" Link="Http2ContinuationConnection.cs" />
 ```
 
-В IDE кожен проєкт показує всі свої файли. Посилання ведуть безпосередньо до
-потрібної версії C#-файлу; посилань із ранніх етапів на пізні немає. Для запуску
-потрібен checkout репозиторію з `common/` та папками етапів.
-Щоб додати наступну історичну зміну, створи нову версію лише потрібного файлу
-в новому етапі й онови його `.csproj`. Попередня версія залишається на місці.
+The IDE shows linked files inside each project and opens the relevant source version. Keep `common/` and the numbered directories in the same checkout. To add a historical step, put the new version of a changed file in the new step, update its `.csproj`, and keep the earlier version available to its existing callers.
 
-Спільний потік `TlsStream` і створення `TlsCertificate` винесені в `common`;
-TLS1.3 handshake та SPKI pin додаються окремими частинами `partial` на своїх етапах.
-`Http2Frames` містить однакові для всіх версій читання й запис кадрів.
-Етапи HTTP/2 послідовно додають обробку кадрів (16), заголовки й відповіді
-потоків (19), керування потоком (20), CONTINUATION (21) та TLS з ALPN (29).
-README кожного етапу пояснює його демо та показує потрібні клієнтські команди.
-У демо з прапорцями `dotnet run -- --help` показує доступні режими.
-Останній етап за замовчуванням запускає HTTP/3; усі попередні готові режими
-також доступні через прапорці.
+The projects share `TlsStream`, certificate generation, and `Http2Frames`. TLS 1.3 handshakes and SPKI pinning extend the shared types through partial classes. The HTTP/2 steps add frame handling (16), streamed header and response handling (19), flow control (20), CONTINUATION (21), and TLS with ALPN (29).
 
-Рік — історичний орієнтир протоколу або можливості, не дата написання коду.
-HTTP3 у папках 2021 року позначає напрям наступного етапу: там будується QUIC v1,
-на якому працює HTTP/3 (2022). HTTPS — HTTP у захищеному каналі;
-SSL/TLS зазначено в короткій назві, а HTTP-префікс показує поточний етап HTTP.
+The year in each directory marks a milestone for the protocol or feature. The 2021 HTTP/3 directories introduce QUIC v1, the transport used by HTTP/3 in 2022. SSL and TLS appear in the feature names alongside the relevant HTTP version.
 
-| № | Папка | Що додається |
+| Step | Directory | What it adds |
 | --- | --- | --- |
-| 01 | [01_1991_HTTP0.9_GET](01_1991_HTTP0.9_GET/) | GET → HTML → закриття TCP |
-| 02 | [02_1996_HTTP1.0_HEADERS](02_1996_HTTP1.0_HEADERS/) | Статус, заголовки та Content-Length |
-| 02b | [02b_1996_HTTP1.0_CONTENT_ENCODING](02b_1996_HTTP1.0_CONTENT_ENCODING/) | Стиснена відповідь HTTP/1.0 і окремий приклад запиту за RFC 7694 |
-| 03 | [03_1996_HTTP1.0_HEAD](03_1996_HTTP1.0_HEAD/) | HEAD: заголовки без тіла відповіді |
-| 04 | [04_1996_HTTP1.0_SSL3_PRIMITIVES](04_1996_HTTP1.0_SSL3_PRIMITIVES/) | SSL3: шифрування записів, handshake, сертифікат і потік байтів |
-| 08 | [08_1996_HTTP1.0_SSL3_HTTPS](08_1996_HTTP1.0_SSL3_HTTPS/) | HTTPS через власний SSL3 handshake |
-| 09 | [09_1996_HTTP1.0_SSL3_CLIENT](09_1996_HTTP1.0_SSL3_CLIENT/) | SSL3: TcpClient із перевіркою SPKI pin |
-| 10 | [10_1997_HTTP1.1_HOST](10_1997_HTTP1.1_HOST/) | Обов’язковий Host для HTTP/1.1 |
-| 11 | [11_1997_HTTP1.1_KEEP_ALIVE](11_1997_HTTP1.1_KEEP_ALIVE/) | Кілька запитів через одне TCP-з’єднання |
-| 12 | [12_1997_HTTP1.1_CHUNKED](12_1997_HTTP1.1_CHUNKED/) | Передавання відповіді частинами: chunked |
-| 13 | [13_1999_HTTP1.1_TLS10](13_1999_HTTP1.1_TLS10/) | TLS1.0: PRF, HMAC і новий Finished |
-| 14 | [14_2002_HTTP1.1_TLS_AES](14_2002_HTTP1.1_TLS_AES/) | TLS1.0: AES-CBC замість 3DES |
-| 15 | [15_2010_HTTP1.1_TLS_RENEGOTIATION](15_2010_HTTP1.1_TLS_RENEGOTIATION/) | TLS: renegotiation indication |
-| 15b | [15b_2011_HTTP1.1_REALTIME](15b_2011_HTTP1.1_REALTIME/) | SSE у потоці HTTP-відповіді та WebSocket після Upgrade |
-| 16 | [16_2015_HTTP2_FRAMES](16_2015_HTTP2_FRAMES/) | HTTP/2: preface, SETTINGS і кадри через TCP |
-| 17 | [17_2015_HTTP2_HPACK](17_2015_HTTP2_HPACK/) | HPACK: таблиці заголовків і кодування рядків Huffman |
-| 19 | [19_2015_HTTP2_STREAMS](19_2015_HTTP2_STREAMS/) | HTTP/2: відповіді GET/HEAD у потоках |
-| 20 | [20_2015_HTTP2_FLOW_CONTROL](20_2015_HTTP2_FLOW_CONTROL/) | HTTP/2: вікна flow control |
-| 21 | [21_2015_HTTP2_CONTINUATION](21_2015_HTTP2_CONTINUATION/) | HTTP/2: збирання блоків CONTINUATION |
-| 22 | [22_2018_HTTP2_TLS13_KEY_EXCHANGE](22_2018_HTTP2_TLS13_KEY_EXCHANGE/) | TLS 1.3: ClientHello, обмін ключами P-256 і ключі трафіку |
-| 25 | [25_2018_HTTP2_TLS13_AUTH_RECORDS](25_2018_HTTP2_TLS13_AUTH_RECORDS/) | TLS 1.3: сертифікат, Finished і захищені записи |
-| 28 | [28_2018_HTTP2_TLS13_HTTPS](28_2018_HTTP2_TLS13_HTTPS/) | HTTPS через власний потік TLS1.3 |
-| 29 | [29_2018_HTTP2_ALPN](29_2018_HTTP2_ALPN/) | HTTP/2 через TLS1.3 з ALPN h2 |
-| 30 | [30_2021_HTTP3_QUIC_PRIMITIVES](30_2021_HTTP3_QUIC_PRIMITIVES/) | QUIC v1: varint, формат і захист пакета, зміщення, ACK і транспортні параметри |
-| 36 | [36_2021_HTTP3_QUIC_TLS](36_2021_HTTP3_QUIC_TLS/) | QUIC: TLS handshake на рівнях шифрування |
-| 37 | [37_2021_HTTP3_QUIC_UDP](37_2021_HTTP3_QUIC_UDP/) | QUIC: приймання сеансів через UdpClient |
-| 38 | [38_2021_HTTP3_QUIC_PTO](38_2021_HTTP3_QUIC_PTO/) | QUIC: облік ACK та probe timeout |
-| 39 | [39_2022_HTTP3_QPACK](39_2022_HTTP3_QPACK/) | HTTP/3: стиснення QPACK і блокування декодування |
-| 40 | [40_2022_HTTP3_QUIC_STREAMS](40_2022_HTTP3_QUIC_STREAMS/) | QUIC для HTTP/3: потоки й flow control |
-| 41 | [41_2022_HTTP3_RESPONSE](41_2022_HTTP3_RESPONSE/) | HTTP/3: GET/HEAD через QUIC, HEADERS/DATA/FIN |
-| 42 | [42_2022_HTTP3_QUIC_RECOVERY](42_2022_HTTP3_QUIC_RECOVERY/) | QUIC для HTTP/3: повтори з новими packet number |
+| 01 | [01_1991_HTTP0.9_GET](01_1991_HTTP0.9_GET/) | GET, HTML, and TCP close |
+| 02 | [02_1996_HTTP1.0_HEADERS](02_1996_HTTP1.0_HEADERS/) | Status, headers, and Content-Length |
+| 02b | [02b_1996_HTTP1.0_CONTENT_ENCODING](02b_1996_HTTP1.0_CONTENT_ENCODING/) | Compressed HTTP/1.0 responses and a separate RFC 7694 request example |
+| 03 | [03_1996_HTTP1.0_HEAD](03_1996_HTTP1.0_HEAD/) | HEAD returns response headers without a body |
+| 04 | [04_1996_HTTP1.0_SSL3_PRIMITIVES](04_1996_HTTP1.0_SSL3_PRIMITIVES/) | SSL 3.0 record protection, handshake records, certificate, and byte stream |
+| 08 | [08_1996_HTTP1.0_SSL3_HTTPS](08_1996_HTTP1.0_SSL3_HTTPS/) | HTTPS with a custom SSL 3.0 handshake |
+| 09 | [09_1996_HTTP1.0_SSL3_CLIENT](09_1996_HTTP1.0_SSL3_CLIENT/) | SSL 3.0 client with SPKI pin verification |
+| 10 | [10_1997_HTTP1.1_HOST](10_1997_HTTP1.1_HOST/) | The required Host header in HTTP/1.1 |
+| 11 | [11_1997_HTTP1.1_KEEP_ALIVE](11_1997_HTTP1.1_KEEP_ALIVE/) | Multiple requests over one TCP connection |
+| 12 | [12_1997_HTTP1.1_CHUNKED](12_1997_HTTP1.1_CHUNKED/) | Chunked response transfer |
+| 13 | [13_1999_HTTP1.1_TLS10](13_1999_HTTP1.1_TLS10/) | TLS 1.0 PRF, HMAC, and the new Finished message |
+| 14 | [14_2002_HTTP1.1_TLS_AES](14_2002_HTTP1.1_TLS_AES/) | AES-CBC support in TLS 1.0 |
+| 15 | [15_2010_HTTP1.1_TLS_RENEGOTIATION](15_2010_HTTP1.1_TLS_RENEGOTIATION/) | TLS renegotiation indication |
+| 15b | [15b_2011_HTTP1.1_REALTIME](15b_2011_HTTP1.1_REALTIME/) | SSE in an HTTP response stream and WebSocket after Upgrade |
+| 16 | [16_2015_HTTP2_FRAMES](16_2015_HTTP2_FRAMES/) | HTTP/2 connection preface, SETTINGS, and frames over TCP |
+| 17 | [17_2015_HTTP2_HPACK](17_2015_HTTP2_HPACK/) | HPACK header tables and Huffman string coding |
+| 19 | [19_2015_HTTP2_STREAMS](19_2015_HTTP2_STREAMS/) | HTTP/2 GET and HEAD responses on streams |
+| 20 | [20_2015_HTTP2_FLOW_CONTROL](20_2015_HTTP2_FLOW_CONTROL/) | HTTP/2 flow-control windows |
+| 21 | [21_2015_HTTP2_CONTINUATION](21_2015_HTTP2_CONTINUATION/) | HTTP/2 header block assembly with CONTINUATION frames |
+| 22 | [22_2018_HTTP2_TLS13_KEY_EXCHANGE](22_2018_HTTP2_TLS13_KEY_EXCHANGE/) | TLS 1.3 ClientHello, P-256 key exchange, and traffic keys |
+| 25 | [25_2018_HTTP2_TLS13_AUTH_RECORDS](25_2018_HTTP2_TLS13_AUTH_RECORDS/) | TLS 1.3 certificate, Finished, and protected records |
+| 28 | [28_2018_HTTP2_TLS13_HTTPS](28_2018_HTTP2_TLS13_HTTPS/) | HTTPS over a custom TLS 1.3 stream |
+| 29 | [29_2018_HTTP2_ALPN](29_2018_HTTP2_ALPN/) | HTTP/2 over TLS 1.3 with ALPN `h2` |
+| 30 | [30_2021_HTTP3_QUIC_PRIMITIVES](30_2021_HTTP3_QUIC_PRIMITIVES/) | QUIC v1 varints, packet format and protection, offsets, ACKs, and transport parameters |
+| 36 | [36_2021_HTTP3_QUIC_TLS](36_2021_HTTP3_QUIC_TLS/) | TLS handshake across QUIC encryption levels |
+| 37 | [37_2021_HTTP3_QUIC_UDP](37_2021_HTTP3_QUIC_UDP/) | Accepting QUIC sessions with `UdpClient` |
+| 38 | [38_2021_HTTP3_QUIC_PTO](38_2021_HTTP3_QUIC_PTO/) | QUIC ACK tracking and probe timeout |
+| 39 | [39_2022_HTTP3_QPACK](39_2022_HTTP3_QPACK/) | QPACK header compression and blocked decoding |
+| 40 | [40_2022_HTTP3_QUIC_STREAMS](40_2022_HTTP3_QUIC_STREAMS/) | QUIC streams and flow control for HTTP/3 |
+| 41 | [41_2022_HTTP3_RESPONSE](41_2022_HTTP3_RESPONSE/) | HTTP/3 GET and HEAD over QUIC, with HEADERS, DATA, and FIN |
+| 42 | [42_2022_HTTP3_QUIC_RECOVERY](42_2022_HTTP3_QUIC_RECOVERY/) | QUIC retransmission with new packet numbers |
 
-SSL2 згаданий як попередник SSL3; його реалізації немає. TLS1.1/1.2 також
-пропущені: це вибрані навчальні кроки, а не повна реалізація всіх версій.
+The examples cover selected milestones. They discuss SSL 2.0 as background and omit implementations of SSL 2.0 and TLS 1.1 and 1.2.
 
-## Повна версія
+## Run the final step
 
-Усі команди нижче запускаються з кореня репозиторію та використовують
-останній етап. Для раннього етапу заміни шлях після `--project`.
-Команди сервера і клієнта виконуються в різних терміналах.
+Run these commands from the repository root. The examples use the final step. For an earlier step, replace the path after `--project`. Run server and client commands in separate terminals.
 
 ## HTTP/1.x
 
@@ -186,126 +118,97 @@ curl --http1.0 -I http://127.0.0.1:8080/
 curl --http1.1 --raw -i http://127.0.0.1:8080/chunks
 ```
 
-Команди сервера і клієнта запускаються в різних терміналах.
-GET/HEAD, `/`, `/chunks`, 404 для інших шляхів. HTTP/1.1 вимагає єдиного
-непорожнього Host, повторно використовує TCP; `Connection: close` завершує сеанс.
-На `/chunks` видно дві частини і кінцевий нуль. Ненульове тіло запиту
-відхиляється з 400. Один TCP-клієнт за раз, таймаут 5 секунд.
+The server handles GET and HEAD for `/` and `/chunks` and returns 404 for other paths. HTTP/1.1 requires one non-empty Host header and reuses the TCP connection until `Connection: close`. `/chunks` sends two chunks and a terminating zero-length chunk. A request with a nonempty body gets 400. The server handles one TCP client at a time with a five-second timeout.
 
-### SSE та WebSocket
+### SSE and WebSocket
 
-Запусти один із двох режимів, а потім відкрий `http://127.0.0.1:8082/` у браузері.
+Start one mode, then open `http://127.0.0.1:8082/` in a browser.
 
 ```sh
 dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --sse
-# В іншому терміналі можна побачити події у форматі text/event-stream:
+# In another terminal, watch the text/event-stream response:
 curl -N http://127.0.0.1:8082/events
 ```
 
-Зупини сервер через Ctrl+C, запусти WebSocket і перезавантаж сторінку. Браузер надішле «Привіт!» і покаже відповідь сервера.
+Press Ctrl+C to stop the server, start it in WebSocket mode, and reload the page. The browser sends “Hello!” and shows the server's reply.
 
 ```sh
 dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --ws
 ```
 
-## Історичні SSL3 / TLS1.0
+## Legacy SSL 3.0 and TLS 1.0
 
 ```sh
 dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --ssl3
-# В іншому терміналі підстав надрукований SPKI pin:
+# In another terminal, substitute the printed SPKI pin:
 dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --ssl3-client PIN
 
-# Аналогічно для TLS1.0:
+# Repeat with TLS 1.0:
 dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --tls10
 dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --tls10-client PIN
 ```
 
-SSL3 слухає TCP:8442, TLS1.0 — TCP:8441. Власний `TcpClient` перевіряє pin
-сертифіката і Finished; ці старі протоколи використовуються лише як історичне демо.
-Сертифікат тимчасовий, RSA/SHA-1; приватний ключ існує лише в пам'яті.
-TLS1.0 також приймає незалежний OpenSSL-клієнт із AES128-SHA:
+SSL 3.0 listens on TCP port 8442 and TLS 1.0 on port 8441. The custom `TcpClient` checks the certificate pin and Finished. The temporary certificate uses RSA/SHA-1 and the private key stays in memory. The TLS 1.0 example also accepts an independent OpenSSL client using AES128-SHA.
 
 ```sh
 printf 'GET / HTTP/1.0\r\n\r\n' | openssl s_client -quiet -tls1 -cipher 'AES128-SHA:@SECLEVEL=0' -connect 127.0.0.1:8441
 ```
 
-В окремих папках додано AES (2002) і початкову renegotiation indication
-(2010). Повторного handshake немає. Сучасний режим використовує TLS1.3:
+Separate steps add AES (2002) and the initial renegotiation indication (2010), without a second handshake. Use `--tls` for TLS 1.3.
 
 ```sh
 dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --tls
 curl -k --http1.1 -i https://localhost:8443/
 ```
 
-TLS1.3: AES-128-GCM-SHA256, P-256, ECDSA, ALPN, HelloRetryRequest.
-`-k` допускає тимчасовий self-signed сертифікат демо; resumption/0-RTT/KeyUpdate немає.
+TLS 1.3 uses AES-128-GCM-SHA256, P-256, ECDSA, ALPN, and HelloRetryRequest. `-k` accepts the demo's temporary self-signed certificate. This example omits resumption, 0-RTT, and KeyUpdate.
 
 ## HTTP/2
 
 ```sh
 dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --h2
 curl --http2-prior-knowledge -i http://127.0.0.1:8081/
-# Або HTTP/2 через TLS1.3, ALPN h2:
+# Or use HTTP/2 over TLS 1.3 with ALPN h2:
 dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --h2 --tls
 curl -k --http2 -I https://localhost:8444/
 ```
 
-Потрібен curl із підтримкою HTTP/2. Preface, SETTINGS/ACK, PING, GET/HEAD,
-непарні stream ID, HPACK із динамічною таблицею і Huffman, CONTINUATION,
-WINDOW_UPDATE та RST_STREAM. Тіло запиту не підтримується.
+Use a curl build with HTTP/2 support. The demo handles the preface, SETTINGS and its ACK, PING, GET and HEAD, odd stream IDs, HPACK with a dynamic table and Huffman coding, CONTINUATION, WINDOW_UPDATE, and RST_STREAM. Requests are supported without bodies.
 
 ## HTTP/3
 
 ```sh
 dotnet run --project 42_2022_HTTP3_QUIC_RECOVERY -- --h3
-# В іншому терміналі підстав надрукований SPKI pin:
+# In another terminal, substitute the printed SPKI pin:
 google-chrome --user-data-dir="$(mktemp -d)" --origin-to-force-quic-on=127.0.0.1:8445 --ignore-certificate-errors-spki-list=PIN https://127.0.0.1:8445/
 ```
 
-UDP:8445; QUIC v1, TLS1.3/ALPN h3, CRYPTO/STREAM, control SETTINGS,
-QPACK і Huffman, GET/HEAD, HEADERS/DATA/FIN. Для вхідних заголовків сервер дозволяє
-до 4 КіБ динамічної таблиці й один заблокований потік. У відповідях кодує поля літералами.
-Етап 39 показує блокування й розблокування в консолі:
+The server uses UDP port 8445, QUIC v1, TLS 1.3 with ALPN `h3`, CRYPTO and STREAM frames, and control-stream SETTINGS. It supports QPACK, Huffman coding, and GET and HEAD responses with HEADERS, DATA, and FIN. For incoming headers, it permits a dynamic table of up to 4 KiB and one blocked stream. Response fields are encoded as literals. Step 39 shows QPACK blocking and unblocking in the console.
 
 ```sh
 dotnet run --project 39_2022_HTTP3_QPACK
 ```
 
-Є ACK-діапазони, захист від amplification, flow control,
-повторна передача з новим packet number, PTO/backoff і видалення старих ключів.
+The demo implements ACK ranges, amplification protection, flow control, retransmission with new packet numbers, PTO with backoff, and retirement of old keys. It allows up to 16 bidirectional and 16 unidirectional streams, 64 KiB per receive stream, 1 MiB per connection, and a send window of up to 12,000 bytes. It omits full RFC 9002 adaptive RTT and congestion control, migration, and 0-RTT.
 
-Це локальна модель: до 16 bidi та 16 uni потоків, 64 KiB на receive-потік,
-1 MiB на з'єднання. Вікно надсилання — до 12 000 байтів; повного adaptive RTT
-і congestion control з RFC9002, migration та 0-RTT немає.
+## Verification
 
-## Перевірено
+Build all steps with `dotnet build HttpEvolution.slnx -c Release`.
 
-Усі проєкти збираються в Release без попереджень.
-Зібрати всі етапи: `dotnet build HttpEvolution.slnx -c Release`.
-HTTP/1.x та HTTP/2 — curl і сирі кадри, включно з вікнами й скасуванням потоків.
-TLS1.0 та TLS1.3 — незалежний OpenSSL, перевірка сертифіката/hostname і close_notify;
-SSL3 — власний pinned peer та незалежні контрольні значення криптографії.
-TLS/QUIC/HPACK/QPACK побайтово звірені з прикладами RFC.
-Chrome відобразив сторінку через HTTP/3, зокрема після втрати Initial,
-Handshake і 1-RTT пакетів та дублювання Initial. Це демо підмножини протоколів,
-не сервер для production.
+- HTTP/1.x and HTTP/2 were checked with curl and raw frames, including flow-control windows and stream cancellation.
+- TLS 1.0 and TLS 1.3 were checked with OpenSSL, including certificate and hostname validation and `close_notify`. SSL 3.0 was checked with a pinned client and independent cryptographic test values.
+- TLS, QUIC, HPACK, and QPACK bytes were checked against RFC examples.
+- Chrome rendered the page over HTTP/3 after loss of Initial, Handshake, and 1-RTT packets and a duplicated Initial.
 
-Першоджерела: [HTTP/0.9](https://www.w3.org/Protocols/HTTP/AsImplemented),
-[HTTP/1.0](https://www.rfc-editor.org/rfc/rfc1945),
-[HTTP/1.1](https://www.rfc-editor.org/rfc/rfc2068),
-[SSL3](https://www.rfc-editor.org/rfc/rfc6101),
-[TLS1.0](https://www.rfc-editor.org/rfc/rfc2246),
-[AES у TLS](https://www.rfc-editor.org/rfc/rfc3268),
-[renegotiation indication](https://www.rfc-editor.org/rfc/rfc5746),
-[HTTP/2 + HPACK](https://www.rfc-editor.org/rfc/rfc7540),
-[TLS1.3](https://www.rfc-editor.org/rfc/rfc8446),
-[TLS приклади](https://www.rfc-editor.org/rfc/rfc8448),
-[QUIC](https://www.rfc-editor.org/rfc/rfc9000),
-[QUIC crypto-приклади](https://www.rfc-editor.org/rfc/rfc9001),
-[HTTP/3](https://www.rfc-editor.org/rfc/rfc9114),
-[QPACK](https://www.rfc-editor.org/rfc/rfc9204).
+These implementations cover selected features for local demonstrations.
 
-## Ліцензія
+## References
 
-Код і документація проєкту поширюються за [ліцензією MIT](LICENSE).
-Авторство фотографій і умови поширення вбудованих шрифтів наведено в [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+- [HTTP/0.9](https://www.w3.org/Protocols/HTTP/AsImplemented), [HTTP/1.0](https://www.rfc-editor.org/rfc/rfc1945), and [HTTP/1.1](https://www.rfc-editor.org/rfc/rfc2068)
+- [SSL 3.0](https://www.rfc-editor.org/rfc/rfc6101), [TLS 1.0](https://www.rfc-editor.org/rfc/rfc2246), [AES in TLS](https://www.rfc-editor.org/rfc/rfc3268), and [renegotiation indication](https://www.rfc-editor.org/rfc/rfc5746)
+- [HTTP/2](https://www.rfc-editor.org/rfc/rfc7540), [HPACK](https://www.rfc-editor.org/rfc/rfc7541), [TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446), and [TLS 1.3 examples](https://www.rfc-editor.org/rfc/rfc8448)
+- [QUIC](https://www.rfc-editor.org/rfc/rfc9000), [QUIC cryptographic examples](https://www.rfc-editor.org/rfc/rfc9001), [HTTP/3](https://www.rfc-editor.org/rfc/rfc9114), and [QPACK](https://www.rfc-editor.org/rfc/rfc9204)
+
+## License
+
+The project code and documentation are available under the [MIT License](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md) for photo credits and embedded font licenses.

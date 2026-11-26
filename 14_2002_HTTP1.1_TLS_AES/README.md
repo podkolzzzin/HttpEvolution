@@ -1,35 +1,35 @@
 # 14 · 2002 · HTTP/1.1 · TLS_AES
 
-TLS1.0: AES-CBC замість 3DES.
+AES-CBC support in TLS 1.0.
 
-Власне демо: [Program.cs](Program.cs). Із цієї папки:
+Run [Program.cs](Program.cs) from this directory.
 
 ```sh
 dotnet run
 ```
 
-Демо запускає локальний сервер; зупинка — Ctrl+C.
+The demo starts a local server. Press Ctrl+C to stop it.
 
-Клієнт в іншому терміналі (PIN із виводу сервера):
+Run the client in a second terminal with the pin printed by the server.
 
 ```sh
 dotnet run -- --tls10-client PIN
 ```
 
-AES-клієнт в іншому терміналі. Цей етап ще не має renegotiation indication (додано на етапі 15), тому OpenSSL потребує `-legacy_server_connect`:
+Run the AES client in a second terminal. OpenSSL requires `-legacy_server_connect` because renegotiation indication arrives in step 15.
 
 ```sh
 printf 'GET / HTTP/1.0\r\n\r\n' | openssl s_client -quiet -tls1 -legacy_server_connect -cipher 'AES128-SHA:@SECLEVEL=0' -connect 127.0.0.1:8441
 ```
 
-Код, доданий або змінений на цьому етапі:
+## Files added or changed in this step
 
 - [LegacyCipher.cs](LegacyCipher.cs).
 - [LegacyRecords.cs](LegacyRecords.cs).
 - [LegacySsl.cs](LegacySsl.cs).
 - [Program.cs](Program.cs).
 
-Порівняти з попереднім етапом (код завершення 1 означає відмінності):
+Compare with the previous step. Exit status 1 means that `diff` found differences.
 
 ```sh
 diff -u ../13_1999_HTTP1.1_TLS10/LegacyCipher.cs LegacyCipher.cs
@@ -38,6 +38,6 @@ diff -u ../13_1999_HTTP1.1_TLS10/LegacySsl.cs LegacySsl.cs
 diff -u ../13_1999_HTTP1.1_TLS10/Program.cs Program.cs
 ```
 
-`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+This demo has its own `Program.cs`. [HttpEvolution.csproj](HttpEvolution.csproj) links to shared files in [`common/`](../common/) and to the stages that introduced each version of a helper class.
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

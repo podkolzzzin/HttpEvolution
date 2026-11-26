@@ -1,62 +1,62 @@
-# Резидентна пам’ять нашого сервера, nginx і Kestrel
+# Resident memory in the demo server, nginx, and Kestrel
 
-[Слайд](https://slides.podkolzin.consulting/http-evolution/#server-memory) · [Один клієнт, три сервери (CSV)](../../presentation/public/single-server-memory.csv) · [Навантаження до 512 з’єднань (CSV)](../../presentation/public/server-memory.csv) · [Проби HTTP/0.9 і HTTP/1.0](../../presentation/public/server-memory-legacy.csv)
+[Slide](https://slides.podkolzin.consulting/http-evolution/#server-memory) · [One client across three servers (CSV)](../../presentation/public/single-server-memory.csv) · [Load up to 512 connections (CSV)](../../presentation/public/server-memory.csv) · [HTTP/0.9 and HTTP/1.0 probes (CSV)](../../presentation/public/server-memory-legacy.csv)
 
-## Спільний вимір з одним клієнтом
+## One client across all three servers
 
-23 листопада 2026 року кожен із трьох серверів пройшов п’ять запусків для кожного з п’яти режимів HTTP. Навчальні TCP-сервери обробляють по одному клієнту, тому спільне навантаження — одне активне з’єднання. Клієнт, відповідь на 22 байти, фази, затримки та зчитування PSS однакові. Демо використовує власні TLS і QUIC та свій сертифікат. nginx і Kestrel використовують один тимчасовий сертифікат. Сервери запускали по черзі на тому самому Linux-хості з маскою CPU `0,2`, клієнта — з маскою `4,6`. Порядок серверів чергувався між повторами.
+On November 23, 2026, each of the three servers ran five times in each of five HTTP modes. The demo TCP servers handle one client at a time, so the common workload uses one active connection. All runs use the same client, 22-byte response, phases, delays, and PSS sampling. The demo uses its own TLS and QUIC implementations and certificate. nginx and Kestrel use the same temporary certificate. The servers ran one at a time on the same Linux host with CPU affinity `0,2`. The client used `4,6`. The order of the servers alternated between repetitions.
 
-1. Новий процес прогрівають двома послідовними з’єднаннями з двома GET на кожному. Після закриття обох вимірюють базовий PSS.
-2. Один клієнт отримує відповідь на GET /. Через 700 мс починають вимір PSS. Після останнього знімка клієнт повторює GET на тому самому з’єднанні та перевіряє статус 200 і точний вміст відповіді.
-3. Клієнт закриває з’єднання. Через 2 с починають останній вимір. На кожній фазі знімають PSS тричі з інтервалом 100 мс. Для nginx враховано master і обидва воркери.
-4. Для кожного запуску беруть медіану трьох знімків фази. Значення PSS на слайді — медіана п’яти запусків у МіБ. Δ — медіана п’яти парних різниць від прогрітої бази, теж у МіБ. PSS включає спільні сторінки, JIT і пули, тому малі зміни можуть мати будь-який знак.
+1. Warm up a fresh process with two sequential connections and two GET requests on each. Close both connections, then measure baseline PSS.
+2. One client receives the response to `GET /`. Begin measuring PSS after 700 ms. After the last snapshot, the client repeats the GET on the same connection and checks status 200 and the exact response body.
+3. The client closes the connection. Begin the last measurement two seconds later. Take three PSS snapshots 100 ms apart in each phase. For nginx, count the master and both workers.
+4. Use the median of the three snapshots for each phase of each run. The slide shows the median PSS across five runs in MiB. Δ is the median of the five paired differences from the warmed baseline, also in MiB. PSS includes shared pages, JIT-compiled code, and pools, so small differences can go in either direction.
 
-## Навантаження від 64 до 512 з’єднань · nginx і Kestrel
+## Load from 64 to 512 connections in nginx and Kestrel
 
-### Умови
+### Test environment
 
-- Linux Mint 22.3 на Ryzen 5 PRO 4650U, Linux 6.17.0-29-generic, 21 листопада 2026 року. Сервери по черзі запускалися з початковою CPU-маскою `0,2` на різних фізичних ядрах. У QUIC-режимі Kestrel частина потоків мала ширшу маску `0-11`; вона входить у виміряну конфігурацію. Клієнт запускався з маскою `4,6` через IPv4 loopback.
-- **Kestrel ASP.NET Core 10.0.1** під `WebApplication.CreateBuilder()`, зібраний у Release через .NET SDK 10.0.101. Для HTTP/3 використано Microsoft libmsquic 2.4.20. Типові Server GC, JIT і пули буферів, журналювання вимкнено.
-- **nginx 1.30.7** з офіційного пакета Ubuntu Noble amd64, OpenSSL 3.0.13, два воркери, HTTP/2 і HTTP/3 увімкнені за потребою. Для HTTP/3 використано `reuseport`. До знімка входять master і два воркери. Журнал доступу вимкнено.
-- П’ять основних конфігурацій — HTTP/1.1, HTTP/1.1 з TLS 1.3, HTTP/2 без TLS (h2c з prior knowledge), HTTP/2 з TLS 1.3 та HTTP/3. Кожен сервер віддає те саме 22-байтне тіло на `GET /`, без бекенду, компресії й проксі. Сервери користуються одним тимчасовим ECDSA P-256 сертифікатом. Клієнт перевіряє статус і тіло кожної відповіді.
+- Linux Mint 22.3 on a Ryzen 5 PRO 4650U, Linux 6.17.0-29-generic, November 21, 2026. The servers ran one at a time with initial CPU affinity `0,2` on separate physical cores. Some Kestrel threads used the wider `0-11` mask in QUIC mode, which is part of the measured configuration. The client used `4,6` over IPv4 loopback.
+- **Kestrel ASP.NET Core 10.0.1**, initialized with `WebApplication.CreateBuilder()` and built in Release with .NET SDK 10.0.101. HTTP/3 used Microsoft libmsquic 2.4.20. The run used the default Server GC, JIT, and buffer pools with logging disabled.
+- **nginx 1.30.7** from the official Ubuntu Noble amd64 package, with OpenSSL 3.0.13 and two workers. HTTP/2 and HTTP/3 were enabled as needed, with `reuseport` for HTTP/3. Snapshots include the master and both workers. Access logging was disabled.
+- The five main configurations were HTTP/1.1, HTTP/1.1 with TLS 1.3, cleartext HTTP/2 (h2c with prior knowledge), HTTP/2 with TLS 1.3, and HTTP/3. Each server returned the same 22-byte body for `GET /` without a backend, compression, or proxy. Both servers used the same temporary ECDSA P-256 certificate. The client checked every status and response body.
 
-## Знімки й підрахунок
+## Sampling and aggregation
 
-1. Для кожного з п’яти повторів запускається новий процес. Перший знімок `ready` знімається після старту. Два прогрівальні батчі по 64 клієнти виконують сценарій, після чого з’єднання закриваються і знімається `warm`.
-2. У вимірюваній серії поступово додаються клієнти. На рівнях 64, 256 і 512 відкритих з’єднань кожен доданий клієнт уже отримав відповідь, після чого сервер чекає 700 мс. На кожному рівні фіксуються три знімки з інтервалом 100 мс. Клієнт перевіряє, чи транспорт залишився відкритим. Після повної відповіді клієнт закриває TCP-транспорт напряму, включно з режимами TLS, або надсилає QUIC CONNECTION_CLOSE. Через 2 с після закриття клієнтів знімається `closed`. Примусового GC у цьому вимірі немає.
-3. Основна метрика — PSS з `/proc/PID/smaps_rollup`. Вона охоплює резидентні сторінки керованого й нативного коду, а спільні сторінки ділить між процесами. CSV зберігає також суму RSS процесів та USS (`Private_Clean + Private_Dirty`). При додаванні RSS воркерів спільні сторінки можуть враховуватися кілька разів. Мережеві буфери ядра, пам’ять клієнта, піки всередині handshake та пропускну здатність цей сценарій не вимірює. [Документація Linux про smaps_rollup](https://www.kernel.org/doc/html/latest/filesystems/proc.html)
-4. Для кожної фази в кожному повторі береться медіана трьох знімків. Слайд показує медіану абсолютних PSS у п’яти запусках. Для таблиці нижче обчислено медіану п’яти різниць `PSS idle − PSS warm` або `PSS closed − PSS warm`. CSV зберігає абсолютні значення. Закриття TCP або QUIC не зобов’язує алокатор процесу негайно повернути сторінки ОС. PSS через 2 с описує цей момент, а знімки після тривалішого простою можуть відрізнятися.
-5. Контроль HPACK передає однаковий `x-bench` із 4 000 ASCII-символів, спочатку без індексації, окремим прогоном з індексацією. Контроль HTTP/3 порівнює вісім послідовно завершених потоків з одним. Для контролів підраховано різницю абсолютного PSS при 512 відкритих з’єднаннях між відповідними сценаріями того самого номера повтору. Це знімок цілого процесу. Залежність від конкретного об’єкта, реальна кількість пам’яті в динамічній таблиці чи причинність різниці потребують окремого профілювання.
+1. Start a fresh process for each of five repetitions. Take the first `ready` snapshot after startup. Run two warm-up batches of 64 clients. Close the connections and take the `warm` snapshot.
+2. Add clients progressively in the measured run. At 64, 256, and 512 open connections, each newly added client has already received a response and the server waits 700 ms. Take three snapshots 100 ms apart at each level. The client verifies that the transport stays open. After the full response, the client closes TCP directly, including in TLS modes, or sends QUIC CONNECTION_CLOSE. Take the `closed` snapshot two seconds after the clients close. The benchmark does not force a GC.
+3. The main metric is PSS from `/proc/PID/smaps_rollup`. It includes resident pages for managed and native code and divides shared pages proportionally between processes. The CSV also stores summed process RSS and USS (`Private_Clean + Private_Dirty`). Summing worker RSS can count shared pages more than once. Kernel network buffers, client memory, peaks during a handshake, and throughput fall outside this test. [Linux smaps_rollup documentation](https://www.kernel.org/doc/html/latest/filesystems/proc.html)
+4. Use the median of three snapshots for each phase of each repetition. The slide shows the median absolute PSS across five runs. The table below shows the median of five paired differences, `PSS idle − PSS warm` or `PSS closed − PSS warm`. The CSV stores absolute values. Process allocators can retain pages after TCP or QUIC closes, so the two-second snapshot may differ from measurements after a longer idle period.
+5. The HPACK control sends the same `x-bench` value of 4,000 ASCII characters without indexing and, in a separate run, with indexing. The HTTP/3 control compares eight sequential completed streams with one. For these controls, compare absolute PSS at 512 open connections between matching run numbers. This measures the process as a whole. Identifying individual objects, the actual memory used by the dynamic table, or the cause of a difference requires separate profiling.
 
-## Результати
+## Results
 
-80 незалежних запусків, 1 440 сирих знімків процесів і чотири проби старих протоколів. У таблиці наведено медіани зміни PSS відносно прогрітого сервера, у МіБ.
+The data contains 80 independent runs, 1,440 raw process snapshots, and four legacy-protocol probes. The table shows median changes in PSS from the warmed server, in MiB.
 
-| Протокол | Kestrel, 512 відкритих | nginx, 512 відкритих | Kestrel, через 2 с після закриття | nginx, через 2 с після закриття |
+| Protocol | Kestrel, 512 open | nginx, 512 open | Kestrel, 2 s after close | nginx, 2 s after close |
 | --- | ---: | ---: | ---: | ---: |
-| HTTP/1.1 | +6,98 | +0,22 | +7,43 | +0,20 |
-| HTTP/1.1 з TLS 1.3 | +26,88 | +6,44 | +26,82 | +6,42 |
-| HTTP/2 без TLS | +22,73 | +3,11 | +23,36 | +3,09 |
-| HTTP/2 з TLS 1.3 | +42,92 | +7,78 | +43,33 | +7,78 |
-| HTTP/3 | +55,56 | +45,36 | +102,00 | +44,66 |
+| HTTP/1.1 | +6.98 | +0.22 | +7.43 | +0.20 |
+| HTTP/1.1 with TLS 1.3 | +26.88 | +6.44 | +26.82 | +6.42 |
+| Cleartext HTTP/2 | +22.73 | +3.11 | +23.36 | +3.09 |
+| HTTP/2 with TLS 1.3 | +42.92 | +7.78 | +43.33 | +7.78 |
+| HTTP/3 | +55.56 | +45.36 | +102.00 | +44.66 |
 
-В обох серверів TLS збільшив PSS для HTTP/1.1 і HTTP/2. HTTP/3 мав найбільший приріст серед основних конфігурацій. Його прогріта база становила 85,57 МіБ у Kestrel і 15,59 МіБ у nginx. Через 2 с після закриття HTTP/3-клієнтів Kestrel мав вищий PSS, ніж у паузі з відкритими клієнтами. Довгострокове утримання або витік пам’яті вимагали б довшого спостереження і профілювання.
+TLS increased PSS for HTTP/1.1 and HTTP/2 on both servers. HTTP/3 had the largest increase among the main configurations. Its warmed baseline was 85.57 MiB in Kestrel and 15.59 MiB in nginx. Kestrel's PSS was higher two seconds after the HTTP/3 clients closed than with the clients still open. Testing for long-term retention or a leak would require longer observation and profiling.
 
-Індексація довгого заголовка змінила PSS на +2,83 МіБ у Kestrel (діапазон +0,11…+4,28) і +0,12 МіБ у nginx (+0,02…+0,19). Для восьми послідовних HTTP/3-потоків замість одного різниця абсолютного PSS становила +8,43 МіБ у Kestrel (+4,97…+15,18) і −1,42 МіБ у nginx (−2,14…−0,72). Це різниці між процесами з різною історією роботи. Вартість одного потоку з них окремо не вимірюється.
+Indexing the long header changed PSS by +2.83 MiB in Kestrel (+0.11 to +4.28) and +0.12 MiB in nginx (+0.02 to +0.19). Eight sequential HTTP/3 streams instead of one changed absolute PSS by +8.43 MiB in Kestrel (+4.97 to +15.18) and −1.42 MiB in nginx (−2.14 to −0.72). Those differences are between processes with different workload histories, so they cannot isolate the cost of a single stream.
 
-## Що можна перевірити за кодом і специфікацією
+## What the implementation and specifications explain
 
-- У HTTP/1.1 і HTTP/2 з TLS додаються шифрування й TLS-стан. HTTP/3 включає TLS 1.3 і стан QUIC, зокрема ACK і контроль потоків. У Kestrel частина QUIC працює в нативній MsQuic, тож метрика керованої купи цю частину пропустила б. [Kestrel HTTP/3](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/http3?view=aspnetcore-10.0)
-- Розміри вікон і буферів у конфігурації задають ліміти, а PSS відображає фактично резидентні сторінки. Зокрема, nginx документує типовий 64-КіБ буфер HTTP/3 для читання та запису потоків. Це саме по собі не дає 64 КіБ резидентної пам’яті на кожен завершений потік. [Модуль HTTP/3 nginx](https://nginx.org/en/docs/http/ngx_http_v3_module.html#http3_stream_buffer_size)
-- nginx під час старту воркера резервує масиви з’єднань і подій. Тому малий приріст PSS на HTTP/1.1 враховує кошти після прогріву, коли частина структур уже є в базовій пам’яті. [Ініціалізація воркера nginx](https://github.com/nginx/nginx/blob/release-1.30.7/src/event/ngx_event.c#L696-L740)
-- У двох сценаріях HPACK клієнт індексує `:authority`. nginx уже виділяє 4 КіБ під динамічну таблицю на першому записі, тому довге друге поле може вміститися в раніше виділеному сховищі. У RFC запис `x-bench` займає 4 039 байтів облікового обсягу, включно з 32 байтами накладних витрат. [Реалізація nginx](https://github.com/nginx/nginx/blob/release-1.30.7/src/http/v2/ngx_http_v2_table.c#L175-L204) · [RFC 7541 §4.1](https://www.rfc-editor.org/rfc/rfc7541.html#section-4.1)
-- Kestrel повторно використовує сторінки в пулах і планує їх звільнення окремо від закриття з’єднань. Зокрема, у пулі закріплених буферів інтервал між перевірками вивільнення становить 10 секунд. За одним знімком PSS не можна приписати залишкову пам’ять конкретному пулу або діагностувати витік. [Реалізація пулу Kestrel 10.0.1](https://github.com/dotnet/aspnetcore/blob/v10.0.1/src/Shared/Buffers.MemoryPool/PinnedBlockMemoryPool.cs)
-- Окремі короткі проби старих протоколів перевіряють поведінку на дроті. Kestrel повертає 400 на запит HTTP/0.9, nginx повертає тіло без заголовків. Після звичайного HTTP/1.0 без keep-alive обидва віддали тіло й закрили TCP. У CSV проб збережено точні байти відповіді у hex та факт EOF.
-- У навчальних демо [перший бенчмарк](README.md) міряє живі керовані об’єкти після повного GC. Цей бенчмарк міряє PSS усього сервера на Linux. Знімки керованої купи доступні в [окремому CSV](../../presentation/public/connection-memory.csv).
+- TLS adds encryption and connection state to HTTP/1.1 and HTTP/2. HTTP/3 includes TLS 1.3 and QUIC state such as ACKs and flow control. Kestrel handles some QUIC work in native MsQuic, which a managed-heap metric would miss. [Kestrel HTTP/3](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/http3?view=aspnetcore-10.0)
+- Flow-control window and buffer settings define limits. PSS measures resident pages. For example, nginx documents a default 64 KiB HTTP/3 read and write buffer. The setting alone does not establish 64 KiB of resident memory per completed stream. [nginx HTTP/3 module](https://nginx.org/en/docs/http/ngx_http_v3_module.html#http3_stream_buffer_size)
+- nginx reserves arrays for connections and events when a worker starts. The small HTTP/1.1 increase is measured against a warmed baseline that already includes some of those structures. [nginx worker initialization](https://github.com/nginx/nginx/blob/release-1.30.7/src/event/ngx_event.c#L696-L740)
+- In both HPACK scenarios, the client indexes `:authority`. nginx already allocates 4 KiB for the dynamic table on the first entry, so the second, larger header may fit in that existing storage. HPACK accounts for `x-bench` as 4,039 bytes, including 32 bytes of overhead. [nginx HPACK implementation](https://github.com/nginx/nginx/blob/release-1.30.7/src/http/v2/ngx_http_v2_table.c#L175-L204) · [RFC 7541 §4.1](https://www.rfc-editor.org/rfc/rfc7541.html#section-4.1)
+- Kestrel reuses pooled pages and schedules their release separately from connection shutdown. For example, the pinned memory pool checks every 10 seconds by default. A single PSS snapshot cannot attribute retention to a specific pool or diagnose a leak. [Kestrel 10.0.1 memory pool implementation](https://github.com/dotnet/aspnetcore/blob/v10.0.1/src/Shared/Buffers.MemoryPool/PinnedBlockMemoryPool.cs)
+- Short legacy probes check wire behavior independently. Kestrel returns 400 to an HTTP/0.9 request. nginx returns the body without headers. After a regular HTTP/1.0 request without keep-alive, both returned the body and closed TCP. The probe CSV records the exact response bytes in hex and whether EOF occurred.
+- The [managed memory benchmark](README.md) measures live managed objects after a full GC in the demo. This benchmark measures whole-server PSS on Linux. The managed heap snapshots are in a [separate CSV](../../presentation/public/connection-memory.csv).
 
-## Відтворення
+## Reproduce the benchmark
 
-Потрібні Linux, Python 3.12, .NET 10 SDK, OpenSSL, робоча збірка nginx з `--with-http_v2_module` і `--with-http_v3_module` та libmsquic. Застосунок слухає TCP/UDP 18080 на loopback. Бінарні залежності взято з [пакетів nginx](https://nginx.org/packages/ubuntu/pool/nginx/n/nginx/) та [репозиторію Microsoft](https://packages.microsoft.com/ubuntu/24.04/prod/pool/main/libm/libmsquic/). Для розпакованої локально бібліотеки передай її каталог через `LD_LIBRARY_PATH`. Клієнт і сервер нижче рознесені на пари CPU цього хоста.
+You need Linux, Python 3.12, the .NET 10 SDK, OpenSSL, an nginx build with `--with-http_v2_module` and `--with-http_v3_module`, and libmsquic. The application listens on loopback port 18080 over TCP and UDP. The native dependencies came from the [nginx package repository](https://nginx.org/packages/ubuntu/pool/nginx/n/nginx/) and the [Microsoft package repository](https://packages.microsoft.com/ubuntu/24.04/prod/pool/main/libm/libmsquic/). If you unpack libmsquic locally, put its directory on `LD_LIBRARY_PATH`. The commands below put the client and server on different CPU pairs on the test host.
 
 ```sh
 dotnet build benchmarks/connection-memory/Kestrel/Kestrel.csproj -c Release
@@ -71,7 +71,7 @@ taskset -c 4,6 /tmp/http-memory-bench-venv/bin/python \
 python3 benchmarks/connection-memory/summarize_servers.py /tmp/server-memory.csv > /tmp/serverMemory.json
 ```
 
-Для повторення спільного виміру з одним клієнтом використовуй те саме оточення та вільні порти демо (TCP 8080, 8081, 8443, 8444 і UDP 8445). Команда `summarize` перевіряє повноту серії й створює JSON, який читає слайд.
+Use the same environment and free demo ports (TCP 8080, 8081, 8443, and 8444 and UDP 8445) for the single-client comparison. `summarize` validates the completeness of the run and writes the JSON used by the slide.
 
 ```sh
 dotnet build HttpEvolution.slnx -c Release

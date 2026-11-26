@@ -1,35 +1,35 @@
 # 21 · 2015 · HTTP/2 · CONTINUATION
 
-HTTP/2: збирання блоків CONTINUATION.
+Assembly of HTTP/2 header blocks with CONTINUATION frames.
 
-Будує на етапі 20. Збирає HEADERS і CONTINUATION одного потоку в один блок до декодування HPACK.
+This step builds on step 20 by assembling HEADERS and CONTINUATION frames from the same stream before HPACK decoding.
 
-Власне демо: [Program.cs](Program.cs). Із цієї папки:
+Run [Program.cs](Program.cs) from this directory.
 
 ```sh
 dotnet run
 ```
 
-Демо запускає локальний сервер; зупинка — Ctrl+C.
+The demo starts a local server. Press Ctrl+C to stop it.
 
-Клієнт в іншому терміналі:
+Run the client in a second terminal.
 
 ```sh
 curl --http2-prior-knowledge -i http://127.0.0.1:8081/
 ```
 
-Код, доданий або змінений на цьому етапі:
+## Files added or changed in this step
 
 - [Http2ContinuationConnection.cs](Http2ContinuationConnection.cs).
 - [Program.cs](Program.cs).
 
-Порівняти з попереднім етапом (код завершення 1 означає відмінності):
+Compare with the previous step. Exit status 1 means that `diff` found differences.
 
 ```sh
 diff -u /dev/null Http2ContinuationConnection.cs
 diff -u ../20_2015_HTTP2_FLOW_CONTROL/Program.cs Program.cs
 ```
 
-`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+This demo has its own `Program.cs`. [HttpEvolution.csproj](HttpEvolution.csproj) links to shared files in [`common/`](../common/) and to the stages that introduced each version of a helper class.
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

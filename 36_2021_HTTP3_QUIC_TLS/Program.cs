@@ -1,4 +1,4 @@
-// 36_2021_HTTP3_QUIC_TLS: QUIC: TLS handshake на рівнях шифрування.
+// 36_2021_HTTP3_QUIC_TLS: TLS handshake across QUIC encryption levels.
 using System.Net;
 
 byte[] destination = QuicConstants.DemoDestinationConnectionId;

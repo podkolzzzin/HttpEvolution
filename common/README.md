@@ -1,33 +1,25 @@
-# common
+# Shared code
 
-Кожен проєкт підключає потрібні йому спільні файли через `Compile Include` і `Link`.
+Each demo links to the shared source files it uses with `Compile Include` and `Link`.
 
 ```xml
 <Compile Include="../common/Wire/Wire.cs" Link="common/Wire/Wire.cs" />
 ```
 
-`Include` задає шлях до вихідного файлу. `Link` показує його в тій самій підпапці
-`common` в IDE. Файли компілюються всередині проєкту етапу.
+`Include` points to the source file. `Link` places it in the `common` subtree in the IDE. The files compile as part of each demo project.
 
-| Папка | Вміст |
+| Directory | Contents |
 | --- | --- |
-| [Demo](Demo/) | Аргументи командного рядка через System.CommandLine і ClientHello для консольних прикладів |
-| [HeaderCompression](HeaderCompression/) | HPACK, QPACK, Huffman і спільні формати заголовків |
-| [Http1](Http1/) | Цикл приймання TCP-з’єднань для HTTP/0.9 та HTTP/1.x |
-| [Http2](Http2/) | Типи кадрів, їх читання й запис |
-| [Quic](Quic/) | Пакети, ключі, ACK, транспортні параметри, потоки й відновлення |
-| [Tls](Tls/) | Записи, шифрування, ідентифікація й потоки SSL/TLS |
-| [Wire](Wire/) | Робота з цілими числами й векторами байтів для SSL/TLS та QUIC |
+| [Demo](Demo/) | Command-line arguments with System.CommandLine and a ClientHello helper for console demos |
+| [HeaderCompression](HeaderCompression/) | HPACK, QPACK, Huffman coding, and shared header formats |
+| [Http1](Http1/) | TCP accept loop for HTTP/0.9 and HTTP/1.x |
+| [Http2](Http2/) | Frame types, reading, and writing |
+| [Quic](Quic/) | Packets, keys, ACKs, transport parameters, streams, and recovery |
+| [Tls](Tls/) | SSL and TLS records, encryption, identity, and streams |
+| [Wire](Wire/) | Integer and byte-vector handling for SSL, TLS, and QUIC |
 
-У кожного етапу власний `Program.cs`. Класи, що вводять нову поведінку,
-зберігаються у відповідних етапах. Наприклад, HTTP/2 починається з
-[кадрів і встановлення з’єднання](../16_2015_HTTP2_FRAMES/Http2Connection.cs),
-далі додає [відповіді в потоках](../19_2015_HTTP2_STREAMS/Http2StreamConnection.cs),
-[вікна](../20_2015_HTTP2_FLOW_CONTROL/Http2FlowControlConnection.cs),
-[CONTINUATION](../21_2015_HTTP2_CONTINUATION/Http2ContinuationConnection.cs)
-і [TLS з ALPN](../29_2018_HTTP2_ALPN/Http2Alpn.cs).
-TLS 1.3 handshake та SPKI pin підключаються як окремі частини класів
-з [етапу 28](../28_2018_HTTP2_TLS13_HTTPS/TlsStream.Tls13.cs) та
-[етапу 37](../37_2021_HTTP3_QUIC_UDP/TlsCertificate.Pin.cs).
+Each step has its own `Program.cs`. Classes that introduce new behavior live in the corresponding step. For example, HTTP/2 starts with [frames and connection setup](../16_2015_HTTP2_FRAMES/Http2Connection.cs), then adds [responses on streams](../19_2015_HTTP2_STREAMS/Http2StreamConnection.cs), [flow-control windows](../20_2015_HTTP2_FLOW_CONTROL/Http2FlowControlConnection.cs), [CONTINUATION](../21_2015_HTTP2_CONTINUATION/Http2ContinuationConnection.cs), and [TLS with ALPN](../29_2018_HTTP2_ALPN/Http2Alpn.cs).
 
-[Усі етапи й команди запуску](../README.md).
+The [TLS 1.3 handshake in step 28](../28_2018_HTTP2_TLS13_HTTPS/TlsStream.Tls13.cs) and [SPKI pinning in step 37](../37_2021_HTTP3_QUIC_UDP/TlsCertificate.Pin.cs) extend the shared types through partial classes.
+
+[All steps and run commands](../README.md).

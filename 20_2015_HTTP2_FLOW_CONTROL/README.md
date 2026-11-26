@@ -1,35 +1,35 @@
 # 20 · 2015 · HTTP/2 · FLOW_CONTROL
 
-HTTP/2: вікна flow control.
+HTTP/2 flow-control windows.
 
-Будує на етапі 19. Додає вікна з’єднання й потоків, чергу тіл відповідей і обробку WINDOW_UPDATE.
+This step adds connection and stream windows, a queue of response bodies, and WINDOW_UPDATE handling to step 19.
 
-Власне демо: [Program.cs](Program.cs). Із цієї папки:
+Run [Program.cs](Program.cs) from this directory.
 
 ```sh
 dotnet run
 ```
 
-Демо запускає локальний сервер; зупинка — Ctrl+C.
+The demo starts a local server. Press Ctrl+C to stop it.
 
-Клієнт в іншому терміналі:
+Run the client in a second terminal.
 
 ```sh
 curl --http2-prior-knowledge -i http://127.0.0.1:8081/
 ```
 
-Код, доданий або змінений на цьому етапі:
+## Files added or changed in this step
 
 - [Http2FlowControlConnection.cs](Http2FlowControlConnection.cs).
 - [Program.cs](Program.cs).
 
-Порівняти з попереднім етапом (код завершення 1 означає відмінності):
+Compare with the previous step. Exit status 1 means that `diff` found differences.
 
 ```sh
 diff -u /dev/null Http2FlowControlConnection.cs
 diff -u ../19_2015_HTTP2_STREAMS/Program.cs Program.cs
 ```
 
-`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+This demo has its own `Program.cs`. [HttpEvolution.csproj](HttpEvolution.csproj) links to shared files in [`common/`](../common/) and to the stages that introduced each version of a helper class.
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

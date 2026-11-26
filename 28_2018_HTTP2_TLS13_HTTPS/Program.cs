@@ -1,4 +1,4 @@
-// 28_2018_HTTP2_TLS13_HTTPS: HTTPS через власний потік TLS1.3.
+// 28_2018_HTTP2_TLS13_HTTPS: HTTPS over a custom TLS 1.3 stream.
 using static DemoMode;
 using static Http1Server;
 

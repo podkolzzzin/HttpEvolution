@@ -1,4 +1,4 @@
-// 08_1996_HTTP1.0_SSL3_HTTPS: HTTPS через власний SSL3 handshake.
+// 08_1996_HTTP1.0_SSL3_HTTPS: HTTPS with a custom SSL 3.0 handshake.
 using static DemoMode;
 using static Http1Server;
 

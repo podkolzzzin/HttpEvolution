@@ -7,7 +7,7 @@ internal static class ContentCodingConnection
     private const int BodyLimit = 64 * 1024;
     private static readonly byte[] Page = Encoding.UTF8.GetBytes(
         "<!doctype html><meta charset=utf-8><title>Dev Jungles</title><ul>\n" +
-        string.Concat(Enumerable.Range(1, 64).Select(n => $"<li>HTTP · приклад {n}</li>\n")) +
+        string.Concat(Enumerable.Range(1, 64).Select(n => $"<li>HTTP · example {n}</li>\n")) +
         "</ul>\n");
 
     public static void Serve(Stream stream)

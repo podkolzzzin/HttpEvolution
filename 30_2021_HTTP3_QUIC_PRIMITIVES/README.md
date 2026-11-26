@@ -1,24 +1,24 @@
-# 30 · 2021 · HTTP/3 · Примітиви QUIC v1
+# 30 · 2021 · HTTP/3 · QUIC v1 primitives
 
-Запусти з цієї папки. [Program.cs](Program.cs) покаже весь обмін у пам’яті й завершиться.
+Run [Program.cs](Program.cs) from this directory to see the full exchange in memory.
 
 ```sh
 dotnet run
 ```
 
-| Частина демо | Що видно в консолі | Реалізація |
+| Feature | Console output | Implementation |
 | --- | --- | --- |
-| Varint | Чотири числа в кодуванні на 1, 2, 4 і 8 байтів та результат декодування | [QuicData](../common/Quic/QuicData.cs) |
-| Пакет Initial | Датаграма на 1200 байтів із версією та двома ідентифікаторами з’єднання | [QuicPacket](../common/Quic/QuicPacket.cs) |
-| Захист пакета | З клієнтськими Initial-ключами знімаємо маску заголовка й розшифровуємо вміст. Відкритий пакет має номер 7 і містить кадр PING | [QuicKeys](../common/Quic/QuicKeys.cs) |
-| Зміщення у потоці | Хвіст із FIN надходить першим. Після отримання початку можна прочитати `HelloQUIC!` | [QuicBuffer](../common/Quic/QuicBuffer.cs) |
-| Діапазони ACK | Один кадр підтверджує отримані номери пакетів трьома діапазонами | [QuicAcks](../common/Quic/QuicAcks.cs) |
-| Транспортні параметри | Перевіряємо SCID клієнта й читаємо оголошені сервером обмеження на дані, кількість потоків і розмір датаграми | [QuicParameters](../common/Quic/QuicParameters.cs) |
+| Varint | Four integers encoded in 1, 2, 4, and 8 bytes and the decoded values | [QuicData](../common/Quic/QuicData.cs) |
+| Initial packet | A 1,200-byte datagram with the version and both connection IDs | [QuicPacket](../common/Quic/QuicPacket.cs) |
+| Packet protection | The client Initial keys remove the header mask and decrypt packet 7, which contains a PING frame | [QuicKeys](../common/Quic/QuicKeys.cs) |
+| Stream offsets | The fragment with FIN arrives first. Once the start arrives, the stream can return `HelloQUIC!` | [QuicBuffer](../common/Quic/QuicBuffer.cs) |
+| ACK ranges | One frame acknowledges packet numbers in three ranges | [QuicAcks](../common/Quic/QuicAcks.cs) |
+| Transport parameters | The demo verifies the client SCID and reads the server’s limits on data, streams, and datagram size | [QuicParameters](../common/Quic/QuicParameters.cs) |
 
-Порівняння з попереднім етапом:
+Compare with the previous step.
 
 ```sh
 diff -u ../29_2018_HTTP2_ALPN/Program.cs Program.cs
 ```
 
-[Далі — TLS handshake у QUIC](../36_2021_HTTP3_QUIC_TLS/). [Усі етапи](../README.md).
+[Next: the TLS handshake in QUIC](../36_2021_HTTP3_QUIC_TLS/). [All steps](../README.md).

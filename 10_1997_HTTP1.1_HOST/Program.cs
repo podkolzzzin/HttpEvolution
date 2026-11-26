@@ -1,4 +1,4 @@
-// 10_1997_HTTP1.1_HOST: Обов’язковий Host для HTTP/1.1.
+// 10_1997_HTTP1.1_HOST: The required Host header in HTTP/1.1.
 using static DemoMode;
 using static Http1Server;
 

@@ -1,4 +1,4 @@
-// 12_1997_HTTP1.1_CHUNKED: Передавання відповіді частинами: chunked.
+// 12_1997_HTTP1.1_CHUNKED: Chunked response transfer.
 using static DemoMode;
 using static Http1Server;
 

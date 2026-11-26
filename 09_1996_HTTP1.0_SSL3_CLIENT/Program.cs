@@ -1,4 +1,4 @@
-// 09_1996_HTTP1.0_SSL3_CLIENT: SSL3: TcpClient із перевіркою SPKI pin.
+// 09_1996_HTTP1.0_SSL3_CLIENT: SSL 3.0 with SPKI pin verification in TcpClient.
 using static DemoMode;
 using static Http1Server;
 

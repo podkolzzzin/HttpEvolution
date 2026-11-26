@@ -1,4 +1,4 @@
-// 13_1999_HTTP1.1_TLS10: TLS1.0: PRF, HMAC і новий Finished.
+// 13_1999_HTTP1.1_TLS10: TLS 1.0 PRF, HMAC, and the new Finished message.
 using static DemoMode;
 using static Http1Server;
 

@@ -1,25 +1,25 @@
 # 41 · 2022 · HTTP/3 · RESPONSE
 
-HTTP/3: GET/HEAD через QUIC, HEADERS/DATA/FIN.
+HTTP/3 GET and HEAD over QUIC, with HEADERS, DATA, and FIN.
 
-Власне демо: [Program.cs](Program.cs). Із цієї папки:
+Run [Program.cs](Program.cs) from this directory.
 
 ```sh
 dotnet run
 ```
 
-Демо запускає локальний сервер; зупинка — Ctrl+C.
+The demo starts a local server. Press Ctrl+C to stop it.
 
-Клієнт HTTP/3 та SPKI pin описані в [головному README](../README.md#http3).
+See the [main README](../README.md#http3) for the HTTP/3 client and SPKI pin.
 
-Код, доданий або змінений на цьому етапі:
+## Files added or changed in this step
 
 - [Http3Connection.cs](Http3Connection.cs).
 - [Program.cs](Program.cs).
 - [QuicServer.cs](QuicServer.cs).
 - [QuicSession.cs](QuicSession.cs).
 
-Порівняти з попереднім етапом (код завершення 1 означає відмінності):
+Compare with the previous step. Exit status 1 means that `diff` found differences.
 
 ```sh
 diff -u /dev/null Http3Connection.cs
@@ -28,6 +28,6 @@ diff -u ../37_2021_HTTP3_QUIC_UDP/QuicServer.cs QuicServer.cs
 diff -u ../40_2022_HTTP3_QUIC_STREAMS/QuicSession.cs QuicSession.cs
 ```
 
-`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+This demo has its own `Program.cs`. [HttpEvolution.csproj](HttpEvolution.csproj) links to shared files in [`common/`](../common/) and to the stages that introduced each version of a helper class.
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

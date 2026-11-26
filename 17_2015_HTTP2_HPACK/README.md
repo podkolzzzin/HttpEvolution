@@ -1,22 +1,22 @@
-# 17 · 2015 · HTTP/2 · HPACK і кодування Гаффмана
+# 17 · 2015 · HTTP/2 · HPACK and Huffman coding
 
-[Program.cs](Program.cs) декодує два запити в межах одного з’єднання. Запуск із цієї папки:
+[Program.cs](Program.cs) decodes two requests on the same connection. Run it from this directory.
 
 ```sh
 dotnet run
 ```
 
-В обох запитах виводяться той самий метод GET, схема http, шлях / і домен www.example.com. Зверни увагу на розмір блоку заголовків:
+Both requests print the same method (`GET`), scheme (`http`), path (`/`), and host (`www.example.com`). Compare the sizes of the header blocks.
 
-- У першому запиті (17 байтів) метод, схему й шлях задають індекси статичної таблиці. Домен займає 12 байтів завдяки кодуванню Гаффмана. Декодер додає пару `:authority = www.example.com` до динамічної таблиці.
-- У повторному запиті (4 байти) останній байт `BE` вказує на запис 62. Той самий декодер уже пам’ятає домен.
+- The first request uses 17 bytes. Static table indices encode the method, scheme, and path. Huffman coding reduces the host to 12 bytes. The decoder adds `:authority = www.example.com` to the dynamic table.
+- The repeated request uses four bytes. Its final byte, `BE`, points to entry 62 in the same decoder’s dynamic table.
 
-За індекси відповідає [Hpack.cs](../common/HeaderCompression/Hpack.cs), за ознаку кодування та довжину рядка — [HeaderCompression.cs](../common/HeaderCompression/HeaderCompression.cs), а біти домену декодує [Huffman.cs](../common/HeaderCompression/Huffman.cs).
+[Hpack.cs](../common/HeaderCompression/Hpack.cs) handles indices. [HeaderCompression.cs](../common/HeaderCompression/HeaderCompression.cs) handles the encoding flag and string length. [Huffman.cs](../common/HeaderCompression/Huffman.cs) decodes the host bits.
 
-Порівняти з попереднім етапом:
+Compare with the previous step.
 
 ```sh
 diff -u ../16_2015_HTTP2_FRAMES/Program.cs Program.cs
 ```
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

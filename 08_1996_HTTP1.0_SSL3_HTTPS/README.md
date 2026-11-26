@@ -1,27 +1,27 @@
 # 08 · 1996 · HTTP/1.0 · SSL3_HTTPS
 
-HTTPS через власний SSL3 handshake.
+HTTPS with a custom SSL 3.0 handshake.
 
-Власне демо: [Program.cs](Program.cs). Із цієї папки:
+Run [Program.cs](Program.cs) from this directory.
 
 ```sh
 dotnet run
 ```
 
-Демо запускає локальний сервер; зупинка — Ctrl+C.
+The demo starts a local server. Press Ctrl+C to stop it.
 
-Код, доданий або змінений на цьому етапі:
+## Files added or changed in this step
 
 - [LegacySsl.cs](LegacySsl.cs).
 - [Program.cs](Program.cs).
 
-Порівняти з попереднім етапом (код завершення 1 означає відмінності):
+Compare with the previous step. Exit status 1 means that `diff` found differences.
 
 ```sh
 diff -u /dev/null LegacySsl.cs
 diff -u ../04_1996_HTTP1.0_SSL3_PRIMITIVES/Program.cs Program.cs
 ```
 
-`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+This demo has its own `Program.cs`. [HttpEvolution.csproj](HttpEvolution.csproj) links to shared files in [`common/`](../common/) and to the stages that introduced each version of a helper class.
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

@@ -1,31 +1,31 @@
 # 42 · 2022 · HTTP/3 · QUIC_RECOVERY
 
-QUIC для HTTP/3: повтори з новими packet number.
+QUIC loss recovery for HTTP/3 with new packet numbers on retransmission.
 
-Власне демо: [Program.cs](Program.cs). Із цієї папки:
+Run [Program.cs](Program.cs) from this directory.
 
 ```sh
 dotnet run
 ```
 
-Демо запускає локальний сервер; зупинка — Ctrl+C.
+The demo starts a local server. Press Ctrl+C to stop it.
 
-Клієнт HTTP/3 та SPKI pin описані в [головному README](../README.md#http3).
+See the [main README](../README.md#http3) for the HTTP/3 client and SPKI pin.
 
-За замовчуванням — HTTP/3 із recovery. Інші готові режими: `--http`, [`--sse` та `--ws`](../15b_2011_HTTP1.1_REALTIME/), `--ssl3`, `--tls10`, `--tls`, `--h2`, `--h2 --tls` та pinned клієнти.
+The default is HTTP/3 with loss recovery. Other modes include `--http`, [`--sse` and `--ws`](../15b_2011_HTTP1.1_REALTIME/), `--ssl3`, `--tls10`, `--tls`, `--h2`, `--h2 --tls`, and clients with certificate pinning.
 
-Код, доданий або змінений на цьому етапі:
+## Files added or changed in this step
 
 - [Program.cs](Program.cs).
 - [QuicSession.cs](QuicSession.cs).
 
-Порівняти з попереднім етапом (код завершення 1 означає відмінності):
+Compare with the previous step. Exit status 1 means that `diff` found differences.
 
 ```sh
 diff -u ../41_2022_HTTP3_RESPONSE/Program.cs Program.cs
 diff -u ../41_2022_HTTP3_RESPONSE/QuicSession.cs QuicSession.cs
 ```
 
-`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+This demo has its own `Program.cs`. [HttpEvolution.csproj](HttpEvolution.csproj) links to shared files in [`common/`](../common/) and to the stages that introduced each version of a helper class.
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

@@ -1,22 +1,19 @@
-# Сторонні матеріали
+# Third-party notices
 
-Власний код і документація HttpEvolution поширюються за [ліцензією MIT](LICENSE).
-Для наведених нижче матеріалів діють умови їхніх авторів і джерел.
+The [MIT License](LICENSE) covers HttpEvolution's own code and documentation. The following materials are subject to the terms of their respective sources.
 
-## Фотографії
+## Photographs
 
-| Файл | Авторство і джерело |
+| File | Credit and source |
 | --- | --- |
 | `presentation/src/assets/gallery/as17-148-22727.jpg` | NASA. [The Blue Marble: The View From Apollo 17](https://www.nasa.gov/image-article/blue-marble-view-from-apollo-17/) |
 | `presentation/src/assets/gallery/PIA00405.jpg` | NASA/JPL/USGS. [Earth’s Moon](https://science.nasa.gov/photojournal/earths-moon/) |
 | `presentation/src/assets/gallery/PIA11141.jpg` | NASA/JPL/Space Science Institute. [Saturn … Four Years On](https://science.nasa.gov/photojournal/saturn-four-years-on/) |
 
-[Умови використання матеріалів NASA](https://www.nasa.gov/nasa-brand-center/images-and-media/) · [Умови використання зображень JPL](https://www.jpl.nasa.gov/jpl-image-use-policy/)
+[NASA media usage guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/) · [JPL image use policy](https://www.jpl.nasa.gov/jpl-image-use-policy/)
 
-## Шрифти
+## Fonts
 
-Фінальна демонстрація містить Roboto Condensed (Google) та IBM Plex Mono (IBM).
-Обидва шрифти поширюються за SIL Open Font License 1.1. Повні ліцензійні тексти
-й повідомлення про авторські права наведено у [файлі програвача](presentation/src/demos/finale/player.mjs).
+The finale embeds Roboto Condensed (Google) and IBM Plex Mono (IBM). Both fonts use the SIL Open Font License 1.1. The [player source](presentation/src/demos/finale/player.mjs) contains the full license texts and copyright notices.
 
-Залежності npm і NuGet поширюються за ліцензіями, зазначеними в їхніх пакетах.
+The npm and NuGet dependencies are covered by the licenses in their respective packages.

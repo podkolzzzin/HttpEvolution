@@ -1,25 +1,25 @@
-# 04 · 1996 · HTTP/1.0 · Примітиви SSL3
+# 04 · 1996 · HTTP/1.0 · SSL 3.0 primitives
 
-Як захистити HTTP-запит і прочитати HTTP-відповідь з потоку записів SSL3?
-Запусти [консольний приклад](Program.cs) із цієї папки.
+How does SSL 3.0 protect an HTTP request and carry the response in a record stream?
+Run the [console example](Program.cs) from this directory.
 
 ```sh
 dotnet run
 ```
 
-За один запуск програма показує чотири складові SSL3 в пам’яті.
+Each run demonstrates four parts of SSL 3.0 in memory.
 
-1. [LegacyCipher](LegacyCipher.cs) додає MAC до запиту, шифрує його за допомогою 3DES-CBC та відновлює рядок `GET / HTTP/1.0`.
-2. [LegacyRecords](LegacyRecords.cs) упаковує повідомлення `ServerHelloDone` в запис handshake. У консолі видно байти запису та вкладеного повідомлення.
-3. [LegacyIdentity](../common/Tls/LegacyIdentity.cs) надає сертифікат сервера. Програма друкує його власника, алгоритм підпису й відбиток відкритого ключа (SPKI pin).
-4. Сервер і клієнт отримують однаковий фіксований блок ключів. Після `ChangeCipherSpec` сервер надсилає зашифровану відповідь. Клієнт читає `HTTP/1.0 200 OK` через [TlsStream](../common/Tls/TlsStream.cs) і завершує читання після `close_notify`.
+1. [LegacyCipher](LegacyCipher.cs) adds a MAC to the request, encrypts it with 3DES-CBC, and recovers the line `GET / HTTP/1.0`.
+2. [LegacyRecords](LegacyRecords.cs) wraps `ServerHelloDone` in a handshake record. The console shows the bytes of both the record and its message.
+3. [LegacyIdentity](../common/Tls/LegacyIdentity.cs) provides the server certificate. The demo prints its subject, signature algorithm, and public-key fingerprint (the SPKI pin).
+4. The server and client receive the same fixed key block. After `ChangeCipherSpec`, the server sends an encrypted response. The client reads `HTTP/1.0 200 OK` through [TlsStream](../common/Tls/TlsStream.cs) and stops reading after `close_notify`.
 
-Порівняй із попереднім [сервером HTTP/1.0](../03_1996_HTTP1.0_HEAD/).
+Compare with the previous [HTTP/1.0 server](../03_1996_HTTP1.0_HEAD/).
 
 ```sh
 diff -u ../03_1996_HTTP1.0_HEAD/Program.cs Program.cs
 ```
 
-На [етапі 08](../08_1996_HTTP1.0_SSL3_HTTPS/) ці складові працюють разом у TCP-сервері HTTPS із навчальним рукостисканням SSL3.
+In [step 08](../08_1996_HTTP1.0_SSL3_HTTPS/), these pieces work together in an HTTPS server over TCP with a teaching implementation of the SSL 3.0 handshake.
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

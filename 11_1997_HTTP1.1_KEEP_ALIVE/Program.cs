@@ -1,4 +1,4 @@
-// 11_1997_HTTP1.1_KEEP_ALIVE: Кілька запитів через одне TCP-з’єднання.
+// 11_1997_HTTP1.1_KEEP_ALIVE: Multiple requests over one TCP connection.
 using static DemoMode;
 using static Http1Server;
 

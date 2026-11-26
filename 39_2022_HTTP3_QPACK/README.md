@@ -1,32 +1,32 @@
 # 39 · 2022 · HTTP/3 · QPACK
 
-QPACK стискає заголовки HTTP/3. Формати цілих чисел і рядків спільні з HPACK.
+QPACK compresses HTTP/3 headers and shares its integer and string formats with HPACK.
 
-Власне демо: [Program.cs](Program.cs). Із цієї папки:
+Run [Program.cs](Program.cs) from this directory.
 
 ```sh
 dotnet run
 ```
 
-Після прикладу з літералами консоль покаже три події:
+After the literal example, the console shows three events.
 
-1. Потік `0` отримує `HEADERS`, що посилається на першу вставку, і чекає.
-2. Потік `4` декодується за статичною таблицею, поки потік `0` чекає.
-3. Encoder stream доставляє `x-demo: ready`. Тепер потік `0` декодує своє посилання.
+1. Stream `0` receives `HEADERS` referencing the first insertion and waits.
+2. The decoder uses the static table to decode stream `4` while stream `0` waits.
+3. The encoder stream delivers `x-demo: ready`. The decoder can now resolve the reference on stream `0`.
 
-Код, доданий або змінений на цьому етапі:
+## Files added or changed in this step
 
 - [Program.cs](Program.cs).
 - [Qpack.cs](../common/HeaderCompression/Qpack.cs).
 - [QpackDynamicTable.cs](../common/HeaderCompression/QpackDynamicTable.cs).
 
-Порівняти з попереднім етапом (код завершення 1 означає відмінності):
+Compare with the previous step. Exit status 1 means that `diff` found differences.
 
 ```sh
 diff -u ../38_2021_HTTP3_QUIC_PTO/Program.cs Program.cs
 diff -u /dev/null ../common/HeaderCompression/Qpack.cs
 ```
 
-`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+This demo has its own `Program.cs`. [HttpEvolution.csproj](HttpEvolution.csproj) links to shared files in [`common/`](../common/) and to the stages that introduced each version of a helper class.
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

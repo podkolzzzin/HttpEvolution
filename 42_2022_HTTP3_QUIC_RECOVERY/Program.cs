@@ -1,4 +1,4 @@
-// 42_2022_HTTP3_QUIC_RECOVERY: QUIC для HTTP/3: повтори з новими packet number.
+// 42_2022_HTTP3_QUIC_RECOVERY: QUIC loss recovery for HTTP/3 with new packet numbers on retransmission.
 using static DemoMode;
 using static Http1Server;
 

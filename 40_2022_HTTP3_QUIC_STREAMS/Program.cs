@@ -1,4 +1,4 @@
-// 40_2022_HTTP3_QUIC_STREAMS: QUIC для HTTP/3: потоки й flow control.
+// 40_2022_HTTP3_QUIC_STREAMS: QUIC streams and flow control for HTTP/3.
 using System.Text;
 
 byte[] limits = [.. QuicData.Pair(4, QuicData.Int(4)), .. QuicData.Pair(5, QuicData.Int(4))];

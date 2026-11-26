@@ -1,35 +1,35 @@
 # 29 · 2018 · HTTP/2 · ALPN
 
-HTTP/2 через TLS1.3 з ALPN h2.
+HTTP/2 over TLS 1.3 with ALPN `h2`.
 
-Повторно використовує з’єднання етапу 21. TLS 1.3 узгоджує протокол `h2` через ALPN перед обробкою кадрів.
+This step uses the connection from step 21. TLS 1.3 negotiates `h2` through ALPN before the server handles frames.
 
-Власне демо: [Program.cs](Program.cs). Із цієї папки:
+Run [Program.cs](Program.cs) from this directory.
 
 ```sh
 dotnet run
 ```
 
-Демо запускає локальний сервер; зупинка — Ctrl+C.
+The demo starts a local server. Press Ctrl+C to stop it.
 
-Клієнт в іншому терміналі:
+Run the client in a second terminal.
 
 ```sh
 curl -k --http2 -i https://localhost:8444/
 ```
 
-Код, доданий або змінений на цьому етапі:
+## Files added or changed in this step
 
 - [Http2Alpn.cs](Http2Alpn.cs).
 - [Program.cs](Program.cs).
 
-Порівняти з попереднім етапом (код завершення 1 означає відмінності):
+Compare with the previous step. Exit status 1 means that `diff` found differences.
 
 ```sh
 diff -u /dev/null Http2Alpn.cs
 diff -u ../28_2018_HTTP2_TLS13_HTTPS/Program.cs Program.cs
 ```
 
-`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+This demo has its own `Program.cs`. [HttpEvolution.csproj](HttpEvolution.csproj) links to shared files in [`common/`](../common/) and to the stages that introduced each version of a helper class.
 
-[Усі етапи](../README.md).
+[All steps](../README.md).

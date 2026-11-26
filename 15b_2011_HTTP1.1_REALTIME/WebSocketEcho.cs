@@ -8,18 +8,18 @@ internal static class WebSocketEcho
     private const int MaxMessageBytes = 4096;
 
     public const string Page = """
-        <!doctype html><html lang="uk"><meta charset="utf-8"><title>WebSocket echo</title>
+        <!doctype html><html lang="en"><meta charset="utf-8"><title>WebSocket echo</title>
         <h1>WebSocket echo</h1><pre id="log"></pre>
         <script>
         const socket = new WebSocket("ws://" + location.host + "/chat");
         const log = document.querySelector("#log");
         socket.onopen = () => {
-          const text = "Привіт!";
-          log.textContent = "Клієнт → " + text + "\n";
+          const text = "Hello!";
+          log.textContent = "Client → " + text + "\n";
           socket.send(text);
         };
         socket.onmessage = e => {
-          log.textContent += "Сервер → " + e.data + "\n";
+          log.textContent += "Server → " + e.data + "\n";
           socket.close(1000);
         };
         </script></html>

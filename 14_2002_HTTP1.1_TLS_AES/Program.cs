@@ -1,4 +1,4 @@
-// 14_2002_HTTP1.1_TLS_AES: TLS1.0: AES-CBC замість 3DES.
+// 14_2002_HTTP1.1_TLS_AES: AES-CBC support in TLS 1.0.
 using static DemoMode;
 using static Http1Server;
 

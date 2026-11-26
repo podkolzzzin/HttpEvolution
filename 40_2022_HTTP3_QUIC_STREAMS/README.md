@@ -1,22 +1,22 @@
 # 40 · 2022 · HTTP/3 · QUIC_STREAMS
 
-QUIC для HTTP/3: потоки й flow control.
+QUIC streams and flow control for HTTP/3.
 
-Власне демо: [Program.cs](Program.cs). Із цієї папки:
+Run [Program.cs](Program.cs) from this directory.
 
 ```sh
 dotnet run
 ```
 
-Консольне демо виконує приклад цього етапу, друкує результат і завершується.
+The console demo runs this step, prints the result, and exits.
 
-Код, доданий або змінений на цьому етапі:
+## Files added or changed in this step
 
 - [Program.cs](Program.cs).
 - [QuicSession.cs](QuicSession.cs).
 - [QuicStreams.cs](../common/Quic/QuicStreams.cs).
 
-Порівняти з попереднім етапом (код завершення 1 означає відмінності):
+Compare with the previous step. Exit status 1 means that `diff` found differences.
 
 ```sh
 diff -u ../39_2022_HTTP3_QPACK/Program.cs Program.cs
@@ -24,6 +24,6 @@ diff -u ../36_2021_HTTP3_QUIC_TLS/QuicSession.cs QuicSession.cs
 diff -u /dev/null ../common/Quic/QuicStreams.cs
 ```
 
-`Program.cs` завжди локальний і належить цьому демо. Допоміжні класи підключені з [`common/`](../common/) або з етапів, де з’явилася потрібна версія; склад видно в [HttpEvolution.csproj](HttpEvolution.csproj).
+This demo has its own `Program.cs`. [HttpEvolution.csproj](HttpEvolution.csproj) links to shared files in [`common/`](../common/) and to the stages that introduced each version of a helper class.
 
-[Усі етапи](../README.md).
+[All steps](../README.md).
